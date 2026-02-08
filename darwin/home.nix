@@ -73,19 +73,22 @@
 
     starship = {
       enable = true;
-      enableBashIntegration = true;
-      enableFishIntegration = true;
+      enableZshIntegration = true;
     };
 
     gpg = {
       enable = true;
     };
 
+    zsh = {
+
+    };
+
   };
 
   services.gpg-agent = {
     enable = true;
-    enableFishIntegration = true;
+    enableZshIntegration = true;
   };
 
   xdg.enable = true;

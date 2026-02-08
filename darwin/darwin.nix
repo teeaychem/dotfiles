@@ -6,13 +6,11 @@
   environment = {
     shells = with pkgs; [
       bash
-      fish
       zsh
     ];
 
     systemPackages = with pkgs; [
       bat
-      blesh
       bitwise
       clang-tools
       coreutils
@@ -99,13 +97,13 @@
     caskArgs.no_quarantine = true;
   };
 
-  programs.bash.enable = true;
+  programs.zsh.enable = true;
 
   users = {
     knownUsers = [ config.system.primaryUser ];
     users.${config.system.primaryUser} = {
       uid = 501;
-      shell = pkgs.bash;
+      shell = pkgs.zsh;
     };
   };
 }
