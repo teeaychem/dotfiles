@@ -96,7 +96,6 @@
   imports = [
     ../dot-config/nix/direnv.nix
     ../dot-config/nix/git.nix
-    ../dot-config/nix/tmux.nix
   ];
 
 }
