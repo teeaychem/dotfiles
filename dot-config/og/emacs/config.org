@@ -1684,6 +1684,7 @@ https://github.com/renzmann/treesit-auto
 
 #+begin_src emacs-lisp
 (use-package dape
+  :disabled
   :straight t
   :preface
   ;; By default dape shares the same keybinding prefix as `gud'
