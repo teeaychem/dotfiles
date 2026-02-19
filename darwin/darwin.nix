@@ -19,7 +19,6 @@
       fzf
       hunspell
       imagemagick
-      navidrome
       neovim
       nixfmt-rfc-style
       pass
@@ -85,6 +84,7 @@
     brews = [
       # "emacs-plus@30"
       "llvm"
+      "navidrome"
     ];
     casks = [
       "hammerspoon"
