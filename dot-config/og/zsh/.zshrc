@@ -179,7 +179,7 @@ eval "$(starship init zsh)"
 
 eval "$(direnv hook zsh)"
 
-if eval "$(fzf --zsh)"; then
+if ( FZF_ALT_C_COMMAND= source <(fzf --zsh) ); then
     # preview
     fzfp() {
         fzf --layout='default' \
