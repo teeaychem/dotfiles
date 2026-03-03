@@ -8,10 +8,9 @@ fi
 source ${ZDOTDIR:-$HOME}/.antidote/antidote.zsh
 antidote load
 
-
 # fns
 
-path_add() {
+function path_add {
     element=${1%/}
     if [ -d "$1" ] && ! echo $PATH | grep -E -q "(^|:)$element($|:)"; then
         case "$2" in
@@ -29,6 +28,10 @@ path_add() {
                 ;;
         esac
     fi
+}
+
+function rmdsstore {
+  find "${@:-.}" -type f -name .DS_Store -delete
 }
 
 
@@ -71,11 +74,6 @@ bindkey "^[[1;5D" backward-word # | ctl + <-
 bindkey "\e\e[C" forward-word   # | option + ->
 bindkey "^[[1;5C" forward-word  # | ctl + ->
 
-# # # macos
-function rmdsstore() {
-  find "${@:-.}" -type f -name .DS_Store -delete
-}
-
 # # # completions
 
 zstyle ":completion:*:commands" rehash 1 # no caching
@@ -88,8 +86,6 @@ setopt complete_in_word     # Complete from both ends of a word.
 setopt path_dirs            # Perform path search even on command names with slashes.
 setopt NO_flow_control      # Disable start/stop characters in shell editor.
 setopt NO_menu_complete     # Do not autoselect the first completion entry.
-
-
 
 # OS earlyish
 case "$OSTYPE" in
@@ -137,7 +133,7 @@ export MPLCONFIGDIR="${XDG_CACHE_HOME}/matplotlib"
 alias pyfind='find . -name "*.py"'
 alias pygrep='grep -nr --include="*.py"'
 
-function pyclean() {
+function pyclean {
   find "${@:-.}" -type f -name "*.py[co]" -delete
   find "${@:-.}" -type d -name "__pycache__" -delete
   find "${@:-.}" -depth -type d -name ".mypy_cache" -exec rm -r "{}" +
@@ -171,17 +167,16 @@ export LESSHISTFILE="${XDG_STATE_HOME}/less/history"
 # # man
 export MANPAGER="nvim +Man!"
 
-
-
 # Extensions
 
 eval "$(starship init zsh)"
 
 eval "$(direnv hook zsh)"
 
-if ( FZF_ALT_C_COMMAND= source <(fzf --zsh) ); then
+FZF_CTRL_T_COMMAND=
+if source <(fzf --zsh); then
     # preview
-    fzfp() {
+    function fzfp {
         fzf --layout='default' \
             --ansi \
             --preview-window=top,75%,sharp,wrap \
