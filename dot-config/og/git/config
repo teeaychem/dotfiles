@@ -1,0 +1,35 @@
+[alias]
+	l = "log --graph --decorate --pretty=format:'%C(auto)%h %Cblue%ad %Cred%aN %C(auto)%d %n    %s' --date=human"
+
+[core]
+	pager = "delta"
+
+[delta]
+	dark = true
+	navigate = true
+
+[fetch]
+	prune = true
+
+[filter "lfs"]
+	clean = "git-lfs clean -- %f"
+	process = "git-lfs filter-process"
+	required = true
+	smudge = "git-lfs smudge -- %f"
+
+[init]
+	defaultBranch = "main"
+
+[interactive]
+	diffFilter = "delta --color-only"
+
+[rerere]
+	enabled = false
+
+[status]
+	branch = true
+	short = false
+
+[user]
+	email = "ben@sparkes.uk.net"
+	name = "teeaychem"

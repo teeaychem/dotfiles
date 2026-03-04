@@ -63,11 +63,19 @@
 
       # toml
       pkgs.taplo
+
+      # git
+      pkgs.git
+      pkgs.delta
+      pkgs.git-filter-repo
+      pkgs.git-lfs
     ];
   };
 
   programs = {
     bash.enable = true;
+
+    git.enable = true;
 
     home-manager.enable = true;
 
@@ -80,9 +88,7 @@
       enable = true;
     };
 
-    zsh = {
-
-    };
+    zsh = { };
 
   };
 
@@ -95,7 +101,6 @@
 
   imports = [
     ../dot-config/nix/direnv.nix
-    ../dot-config/nix/git.nix
   ];
 
 }
