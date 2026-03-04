@@ -33,7 +33,6 @@
       # llvmPackages_21.clang-tools
       pkgs.comrak # GF(Markdown)
 
-
       pkgs.prettier
 
       pkgs.universal-ctags

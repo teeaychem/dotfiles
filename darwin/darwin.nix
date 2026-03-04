@@ -3,6 +3,8 @@
   # $ nix-env -qaP
   nix.enable = false;
 
+  nix.settings.auto-optimise-store = true;
+
   environment = {
     shells = with pkgs; [
       bash
@@ -28,7 +30,6 @@
       tmux
       typos
       yazi
-      zellij
       zoxide
 
       tree-sitter
@@ -83,7 +84,7 @@
     ];
     brews = [
       # "emacs-plus@30"
-      "llvm"
+      # "llvm"
       "navidrome"
     ];
     casks = [

@@ -8,6 +8,13 @@ home-manager switch --flake /etc/nix-darwin/
 ```
 
 ``` shell
+ nix-collect-garbage --delete-old
+
+sudo nix-collect-garbage -d
+nix-collect-garbage -d
+```
+
+``` shell
 sudo nix run nix-darwin -- switch --flake .
 sudo nix run nix-darwin -- switch --flake /etc/nix-darwin
 ```
@@ -29,11 +36,8 @@ nix flake update --flake <flake_directory>
 ## getting started
 
 ``` shell
-nix run github:nix-community/home-manager -- switch --flake .
-```
-
-``` shell
 sudo nix run nix-darwin/nix-darwin-25.05#darwin-rebuild -- switch
+nix run github:nix-community/home-manager -- switch --flake .
 ```
 
 https://dev.to/synecdokey/nix-on-macos-2oj3
