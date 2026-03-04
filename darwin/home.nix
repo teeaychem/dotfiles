@@ -75,6 +75,11 @@
   programs = {
     bash.enable = true;
 
+    direnv = {
+      enable = true;
+      nix-direnv.enable = true;
+    };
+
     git.enable = true;
 
     home-manager.enable = true;
@@ -100,7 +105,7 @@
   xdg.enable = true;
 
   imports = [
-    ../dot-config/nix/direnv.nix
+    # ../dot-config/nix/file.nix
   ];
 
 }
