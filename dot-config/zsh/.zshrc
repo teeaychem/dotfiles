@@ -91,7 +91,11 @@ setopt NO_menu_complete     # Do not autoselect the first completion entry.
 case "$OSTYPE" in
     darwin*)
         eval "$(/opt/homebrew/bin/brew shellenv)"
-        path_add "/opt/homebrew/opt/llvm/bin/" "prepend"
+        # llvm
+        # path_add "/opt/homebrew/opt/llvm/bin/" "prepend"
+        # export LDFLAGS="-L/opt/homebrew/opt/llvm/lib -L/opt/homebrew/opt/llvm/lib/c++ -L/opt/homebrew/opt/llvm/lib/unwind -lunwind"
+        # export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
+        # export CMAKE_PREFIX_PATH="/opt/homebrew/opt/llvm"
         ;;
     linux*)
         ;;

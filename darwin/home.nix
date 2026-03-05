@@ -14,7 +14,7 @@
     homeDirectory = "/Users/sparkes";
 
     file.".config" = {
-      source = ../dot-config/og;
+      source = ../dot-config;
       recursive = true;
     };
 
@@ -68,6 +68,8 @@
       pkgs.delta
       pkgs.git-filter-repo
       pkgs.git-lfs
+
+      pkgs.lldb
     ];
   };
 

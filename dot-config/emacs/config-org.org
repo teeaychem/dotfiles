@@ -6,31 +6,42 @@
 
 #+begin_src emacs-lisp
 (use-package org
-  :defer t
-  :pin manual
+  :straight nil
   :mode ("\\.org" . org-mode)
 
   :custom
-  (org-directory "~/Documents/Org")
-  (org-agenda-files (file-expand-wildcards "~/Documents/Org/*.org")) ;; Include all org files from a directory into the agenda.
-  (org-default-notes-file (concat org-directory "/OrgCapture.org"))
-  (org-src-fontify-natively t) ;; use syntax-highlighting for src blocks
-  (org-src-preserve-indentation t) ;; preserve indentation in src blocks, don't re-indent
-  (org-src-tab-acts-natively t) ;; respect the src block syntax for tabs
-  (org-startup-truncated nil) ;; wrap lines on startup
+  (org-directory "~/org")
+
+  (org-agenda-files (file-expand-wildcards "~/org/*.org")) ;; Include all org files from a directory into the agenda.
+
+  (org-adapt-indentation nil) ;; prevent demoting heading also shifting text inside sections
   (org-catch-invisible-edits 'show-and-error) ;; if editing in an invisible region, complain.
   (org-confirm-babel-evaluate t) ;; ask when evaluating every src block
-  (org-hide-emphasis-markers nil) ;; don't hide emphasis markers, because there are soo many
-  (org-pretty-entities t) ;; try to draw utf8 characters, don't just show their code
-  (org-fontify-quote-and-verse-blocks t) ;; add a background to begin_quote and begin_verse blocks.
-  (org-cycle-separator-lines -1) ;; don't collapse blank lines when collapsing a tree
-  (org-tag-column 0) ;; don't align tags
-  (org-adapt-indentation nil) ;; prevent demoting heading also shifting text inside sections
-  (org-support-shift-select t)   ;; leave shift keys alone!
+
+  (org-cycle-separator-lines 1)
+
+  (org-default-notes-file (concat org-directory "/org_capture.org"))
+
+  (org-hide-emphasis-markers nil)
+
+  (org-pretty-entities t) ;; try to draw utf8 characters
+  (org-pretty-entities-include-sub-superscripts nil)
+
   (org-replace-disputed-keys t)
+  (org-support-shift-select t)   ;; leave shift keys alone!
+
+  (org-src-fontify-natively t)
+  (org-src-preserve-indentation t)
+  (org-src-tab-acts-natively t)
+
+  (org-startup-truncated nil) ;; wrap lines on startup
+
+  (org-tag-column 0) ;; don't align tags
 
   (org-fontify-done-headline t)
   (org-fontify-whole-heading-line t)
+  (org-fontify-quote-and-verse-blocks t) ;; add a background to begin_quote and begin_verse blocks.
+
   (org-list-allow-alphabetical t)
 
   (org-log-done 'time) ;; Auto add time and closing note to done
@@ -38,7 +49,8 @@
 
   :config
   (org-babel-do-load-languages 'org-babel-load-languages
-                               '((emacs-lisp . t)
+                               '((C . t)
+                                 (emacs-lisp . t)
                                  (org . t)
                                  (scheme . t))))
 #+end_src
@@ -54,10 +66,12 @@
 (use-package consult-org-roam
    :straight t
    :after org-roam
+
    :init
    (require 'consult-org-roam)
    ;; Activate the minor mode
    (consult-org-roam-mode 1)
+
    :custom
    ;; Use `ripgrep' for searching with `consult-org-roam-search'
    (consult-org-roam-grep-func #'consult-ripgrep)
@@ -66,11 +80,13 @@
    ;; Display org-roam buffers right after non-org-roam buffers
    ;; in consult-buffer (and not down at the bottom)
    (consult-org-roam-buffer-after-buffers t)
+
    :config
    ;; Eventually suppress previewing for certain functions
    (consult-customize
     consult-org-roam-forward-links
     :preview-key "M-.")
+
    :bind
    ;; Define some convenient keybindings as an addition
    ("C-c n e" . consult-org-roam-file-find)
@@ -79,3 +95,4 @@
    ("C-c n l" . consult-org-roam-forward-links)
    ("C-c n r" . consult-org-roam-search))
 #+end_src
+
