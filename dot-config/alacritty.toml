@@ -1,0 +1,10 @@
+[cursor]
+style = { shape = "Block", blinking = "On" }
+
+[font]
+normal = { family = "Source Code Pro", style = "Regular" }
+
+size = 14
+
+[mouse]
+hide_when_typing = true
