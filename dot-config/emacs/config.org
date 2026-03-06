@@ -4,13 +4,14 @@
 
 * to investigate
 
-https://www.reddit.com/r/emacs/comments/1ai00g5/more_totally_evident_but_super_useful_emacs/
 https://github.com/editorconfig/editorconfig-emacs?tab=readme-ov-file https://editorconfig.org
+
 
 * temp
 
 #+begin_src emacs-lisp
 #+end_src
+
 
 * startup
 
@@ -18,7 +19,9 @@ https://github.com/editorconfig/editorconfig-emacs?tab=readme-ov-file https://ed
 (setq debug-on-error nil)
 #+end_src
 
+
 * general
+
 ** emacs
 
 #+begin_src emacs-lisp
@@ -82,6 +85,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (vc-make-backup-files nil) ; backup version controlled files
   )
 #+end_src
+
 *** locale
 
 #+begin_src emacs-lisp
@@ -96,7 +100,18 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (setq locale-coding-system 'utf-8)
 #+end_src
 
+
 * binds
+
+#+begin_src emacs-lisp
+(use-package emacs
+  :config
+  (unbind-key "C-<wheel-up>")
+  (unbind-key "C-<wheel-down>")
+  (unbind-key "<mouse-2>")
+  (unbind-key "C-z")
+)
+#+end_src
 
 #+begin_src emacs-lisp
 (use-package emacs
@@ -113,14 +128,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (defun backward-delete-word (arg) (interactive "p")
          (delete-region (point) (progn (backward-word arg) (point))))
 
-
   :bind
-  (("C-<wheel-up>" . ignore)
-   ("C-<wheel-down>" . ignore)
-   ("<mouse-2>" . ignore) ;; figure out what to do with middle button…
-   ("C-z" . ignore)
-
-   ("<mouse-3>" . context-menu-open)
+  (("<mouse-3>" . context-menu-open)
    ("C-<tab>" . completion-at-point)
    ("C-<backspace>" . backward-delete-word)
    ("C-k" . forward-delete-line)
@@ -157,6 +166,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 ** bookmarks
+
 #+begin_src emacs-lisp
 (use-package emacs
   :bind (:prefix-map bookmark-prefix-map
@@ -170,7 +180,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
         ("S" . bookmark-set)))
   #+end_src
 
+
 * visual
+
 ** display
 
 #+begin_src emacs-lisp
@@ -215,6 +227,15 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   (warning-minimum-level :error))
 #+end_src
+
+#+begin_src emacs-lisp
+ (defun visible-bell-invert ()
+   (invert-face 'mode-line)
+   (run-with-timer 0.2 nil 'invert-face 'mode-line))
+
+(setq visible-bell t)
+(setq ring-bell-function #'visible-bell-invert)
+#+end_src
 ** font
 
 #+begin_src emacs-lisp
@@ -229,13 +250,16 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (treesit-font-lock-level 4))
 #+end_src
 
+
 * internal
 
 #+begin_src emacs-lisp
 (add-hook 'prog-mode-hook #'context-menu-mode)
 (add-hook 'prog-mode-hook #'electric-pair-mode)
 #+end_src
+
 ** dired
+
 #+begin_src emacs-lisp
 (use-package emacs
   :init
@@ -252,9 +276,18 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (insert-directory-program "ls")
   )
 #+end_src
-** eldoc
-#+begin_src emacs-lisp
+** editorconfig
 
+#+begin_src emacs-lisp
+(use-package editorconfig
+  :ensure t
+
+  :config
+  (editorconfig-mode 1))
+#+end_src
+** eldoc
+
+#+begin_src emacs-lisp
 (use-package eglot-signature-eldoc-talkative
   :straight t)
 
@@ -377,6 +410,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   )
 #+end_src
 ** isearch
+
 #+begin_src emacs-lisp
 (use-package emacs
   :config
@@ -386,16 +420,15 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (setq search-whitespace-regexp ".*?"))
 #+end_src
 ** tramp
+
 #+begin_src emacs-lisp
 (use-package tramp
   :config
   (connection-local-set-profile-variables
-   'remote-direct-async-process
-   '((tramp-direct-async-process . t)))
+   'remote-direct-async-process '((tramp-direct-async-process . t)))
 
   (connection-local-set-profiles
-   '(:application tramp :protocol "scp")
-   'remote-direct-async-process)
+   '(:application tramp :protocol "scp") 'remote-direct-async-process)
 
   (setq magit-tramp-pipe-stty-settings 'pty)
 
@@ -407,6 +440,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 )
 #+end_src
 ** which-key
+
 #+begin_src emacs-lisp
 (use-package which-key
   :demand t
@@ -420,48 +454,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (set-face-attribute 'which-key-local-map-description-face nil :weight 'bold))
 #+end_src
 
-* other configs
-
-#+begin_src emacs-lisp
-(defun load-config (name)
-  (message (concat "Request to load config: " name))
-  (let* ((file-el (expand-file-name (concat name ".el") user-emacs-directory))
-         (file-org (expand-file-name (concat name ".org") user-emacs-directory)))
-    (if (file-exists-p file-el) (delete-file file-el) (message (concat "Did not find " file-el)))
-    (if (file-exists-p file-org) (org-babel-load-file file-org) (message (concat "Did not find " file-org)))))
-#+end_src
-
-#+begin_src emacs-lisp
-(if (memq system-type '(darwin)) (load-config "config-darwin"))
-(if (memq system-type '(gnu/linux)) (load-config "config-gnu"))
-(if (memq system-type '(windows-nt)) (load-config "config-nt"))
-(load-config "config-org")
-#+end_src
-
-* themes
-
-#+begin_src emacs-lisp
- (defun visible-bell-invert ()
-   (invert-face 'mode-line)
-   (run-with-timer 0.2 nil 'invert-face 'mode-line))
-
-(setq visible-bell t)
-(setq ring-bell-function #'visible-bell-invert)
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package catppuccin-theme
-  :straight t
-  :config
-  (load-theme 'catppuccin t)
-  (catppuccin-set-color 'text "#ffffff")
-  :custom
-  (catppuccin-flavor 'mocha)
-  (catppuccin-highlight-matches t)
-  (catppuccin-italic-variables t))
-#+end_src
 
 * internal straight
+
 ** flymake
 #+begin_src emacs-lisp :result silent
 (use-package flymake
@@ -507,7 +502,43 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   )
 #+end_src
 
+
+
+* other configs
+
+#+begin_src emacs-lisp
+(defun load-config (name)
+  (message (concat "Request to load config: " name))
+  (let* ((file-el (expand-file-name (concat name ".el") user-emacs-directory))
+         (file-org (expand-file-name (concat name ".org") user-emacs-directory)))
+    (if (file-exists-p file-el) (delete-file file-el) (message (concat "Did not find " file-el)))
+    (if (file-exists-p file-org) (org-babel-load-file file-org) (message (concat "Did not find " file-org)))))
+#+end_src
+
+#+begin_src emacs-lisp
+(if (memq system-type '(darwin)) (load-config "config-darwin"))
+(if (memq system-type '(gnu/linux)) (load-config "config-gnu"))
+(if (memq system-type '(windows-nt)) (load-config "config-nt"))
+(load-config "config-org")
+#+end_src
+
+
+* theme
+
+#+begin_src emacs-lisp
+(use-package catppuccin-theme
+  :straight t
+  :config
+  (load-theme 'catppuccin t)
+  (catppuccin-set-color 'text "#ffffff")
+  :custom
+  (catppuccin-flavor 'mocha)
+  (catppuccin-highlight-matches t)
+  (catppuccin-italic-variables t))
+#+end_src
+
 * external, etc.
+
 ** COMMENT compile-angel
 #+begin_src emacs-lisp
 (use-package compile-angel
@@ -824,7 +855,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 ;;   (add-hook 'before-save-hook 'whitespace-cleanup))
 #+end_src
 
+
 * vc
+
 ** diff-hl
 #+begin_src emacs-lisp
 (use-package diff-hl
@@ -901,7 +934,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :config (magit-todos-mode t))
 #+end_src
 
+
 * languages
+
 ** COMMENT ASP
 
 #+begin_src emacs-lisp
@@ -912,20 +947,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 ;;   :load-path (lambda() (concat user-emacs-directory "../../projects/emacs/clingo-asp-mode/")))
 #+end_src
 ** C/pp
-** COMMENT COBOL
-
-#+begin_src emacs-lisp
-(use-package cobol-superbol-mode
-  :defer t
-  :mode (("\\.cob\\'" . cobol-superbol-mode)
-         ("\\.cbl\\'" . cobol-superbol-mode)
-         ("\\.cpy\\'" . cobol-superbol-mode))
-  :vc (cobol-superbol-mode :url "https://github.com/OCamlPro/superbol-studio-oss/"
-                           :lisp-dir "emacs/"
-                           :rev :newest)
-  :custom
-  (cobol-tab-width 3))
-#+end_src
 ** fish
 
 #+begin_src emacs-lisp
@@ -993,6 +1014,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
                                    TeX-run-latexmk nil (plain-TeX-mode LaTeX-mode) :help "Run LatexMk")))
 #+end_src
 ** lua
+
 #+begin_src emacs-lisp
 (use-package lua-mode
   :straight t
@@ -1002,6 +1024,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (lua-indent-level 4))
 #+end_src
 ** nix
+
 #+begin_src emacs-lisp
 (use-package nix-ts-mode
   :straight t
@@ -1009,6 +1032,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :defer t)
 #+end_src
 ** COMMENT OCaml
+
 #+begin_src emacs-lisp
 (use-package tuareg
   :straight t
@@ -1038,6 +1062,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (ocaml-eglot . eglot-ensure))
 #+end_src
 ** python
+
 #+begin_src emacs-lisp
 (use-package python
   :straight t
@@ -1120,14 +1145,17 @@ https://github.com/radian-software/apheleia/issues/278
                                                     (cdr (assq 'packages metadata))))))))))))
 #+end_src
 
+
 * markup
 ** json
+
 #+begin_src emacs-lisp
 (use-package json-mode
   :straight t
   :mode ("\\.json\\'" . json-ts-mode))
 #+end_src
 ** markdown
+
 #+begin_src emacs-lisp
 (use-package markdown-mode
   :defer t
@@ -1140,6 +1168,7 @@ https://github.com/radian-software/apheleia/issues/278
   (setq-default markdown-enable-math t))
 #+end_src
 ** toml
+
 #+begin_src emacs-lisp
 (use-package toml-mode
   :straight t
@@ -1147,12 +1176,15 @@ https://github.com/radian-software/apheleia/issues/278
   :mode "\\.toml\\'")
 #+end_src
 
+
 * search
 ** rg
+
 #+begin_src emacs-lisp
 (use-package rg
   :straight t)
 #+end_src
+
 
 * completion
 
@@ -1162,6 +1194,7 @@ https://github.com/radian-software/apheleia/issues/278
   (push ".DS_store" completion-ignored-extensions))
 #+end_src
 ** cape
+
 #+begin_src emacs-lisp
 (use-package cape
   :straight t
@@ -1202,6 +1235,7 @@ https://github.com/radian-software/apheleia/issues/278
 ;; (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
 #+end_src
 ** consult
+
 #+begin_src emacs-lisp :noweb yes
 (use-package consult
   :straight t
@@ -1387,6 +1421,7 @@ https://github.com/Qkessler/consult-project-extra
   :bind (("C-x p o" . consult-project-extra-find)))
 #+end_src
 ** corfu
+
 #+begin_src emacs-lisp
 (use-package corfu
   :straight t
@@ -1410,6 +1445,7 @@ https://github.com/Qkessler/consult-project-extra
               ("M-_" . corfu-info-documentation)))
 #+end_src
 ** marginalia
+
 #+begin_src emacs-lisp :result silent
 (use-package marginalia
   :straight t
@@ -1424,6 +1460,7 @@ https://github.com/Qkessler/consult-project-extra
   (marginalia-align 'right))
 #+end_src
 ** orderless
+
 #+begin_src emacs-lisp
 (use-package orderless
   :straight t
@@ -1436,6 +1473,7 @@ https://github.com/Qkessler/consult-project-extra
   )
 #+end_src
 ** vertico
+
 #+begin_src emacs-lisp
 (use-package vertico
   :straight t
@@ -1450,6 +1488,7 @@ https://github.com/Qkessler/consult-project-extra
   (setq vertico-multiform-commands '((find-file (vertico-sort-function . vertico-sort-alpha)))))
 #+end_src
 ** embark
+
 #+begin_src emacs-lisp
 (use-package embark
   :straight t
@@ -1478,8 +1517,10 @@ https://github.com/Qkessler/consult-project-extra
   (embark-collect-mode . consult-preview-at-point-mode))
 #+end_src
 
+
 * language interaction
 ** citre
+
 #+begin_src emacs-lisp
 (use-package citre
   :straight t
@@ -1676,17 +1717,16 @@ https://github.com/renzmann/treesit-auto
 #+begin_src emacs-lisp
 (use-package treesit-auto
   :straight t
-  :demand t
-  :custom
-  (global-treesit-auto-mode nil)
-  (treesit-auto-install 'prompt))
 
-(add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
-(add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
-(add-to-list 'major-mode-remap-alist '(c-or-c++-mode . c-or-c++-ts-mode))
-(add-to-list 'major-mode-remap-alist '(rust-mode . rust-ts-mode))
-(add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
+  :custom
+  (treesit-auto-install 'prompt)
+
+  :config
+  (treesit-auto-add-to-auto-mode-alist 'all)
+  ;; (global-treesit-auto-mode)
+)
 #+end_src
+
 
 * tempel
 
@@ -1719,6 +1759,7 @@ https://github.com/renzmann/treesit-auto
                       (tempel-key "C-c c ." dereference c-ts-mode-map)
                       (tempel-key "C-c c >" reference   c-ts-mode-map))))
 #+end_src
+
 
 * dap
 
