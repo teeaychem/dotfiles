@@ -80,12 +80,11 @@
    ;; Display org-roam buffers right after non-org-roam buffers
    ;; in consult-buffer (and not down at the bottom)
    (consult-org-roam-buffer-after-buffers t)
+   (org-roam-capture-templates '(("d" "default" plain "%?" :target (file+head "${slug}.org" "#+title: ${title}\n") :unnarrowed t)))
 
    :config
    ;; Eventually suppress previewing for certain functions
-   (consult-customize
-    consult-org-roam-forward-links
-    :preview-key "M-.")
+   (consult-customize consult-org-roam-forward-links :preview-key "M-.")
 
    :bind
    ;; Define some convenient keybindings as an addition
