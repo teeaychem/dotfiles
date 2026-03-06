@@ -845,14 +845,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (ws-butler-keep-whitespace-before-point nil)
 
   :hook
-  ((prog-mode . ws-butler-mode)))
-
-;; (use-package whitespace
-;;   :config
-;;   ;; (setq-default show-trailing-whitespace t)
-;;   (setq whitespace-style '(face tabs trailing))
-;;   (add-hook 'prog-mode-hook 'whitespace-mode)
-;;   (add-hook 'before-save-hook 'whitespace-cleanup))
+  (((org-mode prog-mode text-mode) . ws-butler-mode)))
 #+end_src
 
 
