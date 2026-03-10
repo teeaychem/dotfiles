@@ -42,7 +42,6 @@
   :if (memq system-type '(darwin))
   :demand
   :init
-  (setq exec-path-from-shell-arguments '("-l"))
   (exec-path-from-shell-initialize)
   (exec-path-from-shell-copy-env "DICPATH"))
 #+end_src

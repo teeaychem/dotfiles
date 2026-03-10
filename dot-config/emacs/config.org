@@ -1160,6 +1160,12 @@ https://github.com/radian-software/apheleia/issues/278
         markdown-header-scaling t)
   (setq-default markdown-enable-math t))
 #+end_src
+** math-preview
+#+begin_src emacs-lisp
+(use-package math-preview
+  :straight (math-preview :type git :host gitlab :repo "matsievskiysv/math-preview" :branch "master")
+  :custom (math-preview-command "~/.npm-packages/bin/math-preview"))
+#+end_src
 ** toml
 
 #+begin_src emacs-lisp
