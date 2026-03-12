@@ -81,6 +81,7 @@
     onActivation.autoUpdate = true;
     taps = [
       # "d12frosted/emacs-plus"
+      "kgarner7/feishin"
     ];
     brews = [
       # "emacs-plus@30"
@@ -88,6 +89,7 @@
       "navidrome"
     ];
     casks = [
+      "feishin"
       "hammerspoon"
       "iina"
       "raycast"

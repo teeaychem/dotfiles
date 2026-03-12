@@ -37,7 +37,6 @@
 
       pkgs.universal-ctags
 
-      pkgs.feishin
       pkgs.keka
       pkgs.keepassxc
       pkgs.xld

@@ -10,6 +10,11 @@ antidote load
 
 # fns
 
+# de-quarantine $1
+function dq {
+    eval "xattr -r -d com.apple.quarantine $1"
+}
+
 function path_add {
     element=${1%/}
     if [ -d "$1" ] && ! echo $PATH | grep -E -q "(^|:)$element($|:)"; then
