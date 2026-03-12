@@ -54,7 +54,7 @@
       # python
       pkgs.ruff
       pkgs-unstable.ty
-      pkgs-unstable.uv
+      pkgs.uv
 
       # rust
       # pkgs.rust-analyzer
