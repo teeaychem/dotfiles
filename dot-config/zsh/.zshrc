@@ -101,6 +101,7 @@ case "$OSTYPE" in
         # export LDFLAGS="-L/opt/homebrew/opt/llvm/lib -L/opt/homebrew/opt/llvm/lib/c++ -L/opt/homebrew/opt/llvm/lib/unwind -lunwind"
         # export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
         # export CMAKE_PREFIX_PATH="/opt/homebrew/opt/llvm"
+        path_add "/usr/local/texlive/2026basic/bin/universal-darwin/" "prepend"
         ;;
     linux*)
         ;;

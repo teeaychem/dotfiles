@@ -960,61 +960,52 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 ** LaTeX
 
 #+begin_src emacs-lisp
+
+
 (use-package tex
   :mode ("\\.tex\\'" . LaTeX-mode)
   :defer t
-
-  :hook
-  (LaTeX-mode . LaTeX-math-mode)
-  (LaTeX-mode . turn-on-reftex)
-  (LaTeX-mode . TeX-source-correlate-mode)
-  (LaTeX-mode . flyspell-mode)
-  (LaTeX-mode . (lambda () (set (make-variable-buffer-local 'TeX-electric-math) (cons "\\(" "\\)"))))
+  :straight (auctex :host nil
+                    :repo "git://git.git.savannah.gnu.org/auctex.git"
+                    :branch "main"
+                    :files (:defaults (:exclude "*.xpm")))
+  :ensure auctex
 
   :custom
-  (TeX-master nil) ; All master files called "master".
-  (TeX-auto-save t)
-  (TeX-save-query nil)
-  (TeX-parse-self t)
-  (reftex-plug-into-AUCTeX t)
+  (TeX-electric-math (cons "\\(" "\\)"))
   (TeX-electric-sub-and-superscript t)
-  (LaTeX-electric-left-right-brace t)
-  (TeX-view-program-selection '((output-pdf "PDF Viewer")))
-  (TeX-view-program-list '(("PDF Viewer" "/Applications/Skim.app/Contents/SharedSupport/displayline -r -b -g %n %o %b")))
+  (TeX-master 'dwin)
+  (TeX-parse-self t)
+  (TeX-save-query nil)
   (TeX-source-correlate-method-active 'synctex)
-  (font-latex-fontify-sectioning 'color)
-  (font-latex-fontify-script nil)
+  (TeX-view-program-list '(("PDF Viewer" "/Applications/Skim.app/Contents/SharedSupport/displayline -r -b -g %n %o %b")))
+  (TeX-view-program-selection '((output-pdf "PDF Viewer")))
+
+  (LaTeX-electric-left-right-brace t)
   (LaTeX-math-abbrev-prefix "C-c 1")
+
+  (font-latex-fontify-script nil)
+  (font-latex-fontify-sectioning 'color)
+
+  (reftex-plug-into-AUCTeX t)
 
   :custom-face
   ;; (font-latex-math-face ((t (:foreground "pale violet red"))))
   (font-latex-subscript-face ((t nil)))
-  (font-latex-superscript-face ((t nil))))
+  (font-latex-superscript-face ((t nil)))
+
+  :hook
+  (LaTeX-mode . LaTeX-math-mode)
+  (LaTeX-mode . reftex-mode)
+  (LaTeX-mode . TeX-source-correlate-mode)
+  (LaTeX-mode . flyspell-mode)
+)
 #+end_src
 
 - use Skim as default pdf viewer
   - Skim's displayline is used for forward search (from .tex to .pdf)
   - option -r relaods the file; option -b highlights the current line; option -g opens Skim in the background
   - For this to work, it seems one needs no spaces in the file name
-
-#+begin_src emacs-lisp
-(use-package auctex-latexmk
-  :straight t
-  :defer t
-
-  :init
-  (auctex-latexmk-setup)
-  (add-to-list 'TeX-command-list '("Other" "" TeX-run-command t t :help "Run an arbitrary command"))
-  (add-to-list 'TeX-command-list '("Clean" "TeX-clean" TeX-run-function nil t :help "Delete intermediate files"))
-  (add-to-list 'TeX-command-list '("View" "%V" TeX-run-discard-or-function t t :help "Run Viewer"))
-  (add-to-list 'TeX-command-list '("Biber" "biber %(output-dir) %s"
-                                   TeX-run-Biber nil (plain-TeX-mode LaTeX-mode) :help "Run Biber"))
-  (add-to-list 'TeX-command-list '("BibTeX" "bibtex %(O?aux)"
-                                   TeX-run-BibTeX nil (plain-TeX-mode LaTeX-mode ConTeXt-mode) :help "Run BibTeX"))
-  (add-to-list 'TeX-command-list '("LaTeX" "%`%l%(mode)%' %T" TeX-run-TeX nil (LaTeX-mode) :help "Run LaTeX"))
-  (add-to-list 'TeX-command-list '("LatexMk" "latexmk %(-PDF)%S%(mode) %(file-line-error) %(extraopts) %t"
-                                   TeX-run-latexmk nil (plain-TeX-mode LaTeX-mode) :help "Run LatexMk")))
-#+end_src
 ** lua
 
 #+begin_src emacs-lisp
@@ -1636,7 +1627,6 @@ maybe: https://github.com/casouri/eldoc-box
 #+begin_src emacs-lisp
 (with-eval-after-load 'eglot
 
-  ;; (add-to-list 'eglot-server-programs '(LaTeX-mode . ("TexLab")))
   (add-to-list 'eglot-server-programs '((rust-ts-mode rust-mode) .
                                         ("rust-analyzer"
                                          :initializationOptions (:check (:command "clippy")))))
@@ -1663,6 +1653,7 @@ maybe: https://github.com/casouri/eldoc-box
   (add-to-list 'eglot-server-programs '(python-mode . ("ty" "server")))
   (add-to-list 'eglot-server-programs '(nix-mode . ("nil")))
   (add-to-list 'eglot-server-programs '(csharp-mode . ("omnisharp" "*.sln" "-lsp")))
+  (add-to-list 'eglot-server-programs '(latex-mode . ("texlab")))
   (add-to-list 'eglot-server-programs '((sh-mode bash-ts-mode) . ("bash-language-server" "start")))
   )
 #+end_src
