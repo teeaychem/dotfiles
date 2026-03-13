@@ -1,3 +1,9 @@
+[c]
+disabled = true
+
+[cpp]
+disabled = true
+
 [nix_shell]
 disabled = true
 
