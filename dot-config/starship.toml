@@ -1,0 +1,5 @@
+[nix_shell]
+disabled = true
+
+[package]
+disabled = true
