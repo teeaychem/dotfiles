@@ -91,13 +91,14 @@
       darwinConfigurations."mbp" = nix-darwin.lib.darwinSystem {
         inherit system;
         pkgs = darwin-pkgs;
+        specialArgs = { inherit darwin-pkgs pkgs-unstable; };
         modules = [ ./darwin/darwin.nix ];
       };
 
       homeConfigurations = {
         sparkes = inputs.home-manager.lib.homeManagerConfiguration {
           pkgs = darwin-pkgs;
-          extraSpecialArgs = { inherit inputs outputs pkgs-unstable; };
+          extraSpecialArgs = { inherit inputs outputs; };
           modules = [ ./darwin/home.nix ];
         };
       };
