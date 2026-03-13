@@ -15,6 +15,8 @@
 
 (setq inhibit-compacting-font-caches t)
 
+(setq use-package-always-defer t)
+
 
 ;; https://github.com/d12frosted/homebrew-emacs-plus/issues/323
 ;; (defun homebrew-gcc-paths ()

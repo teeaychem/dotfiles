@@ -59,7 +59,8 @@
 
 #+begin_src emacs-lisp
 (use-package org-roam
-  :straight t)
+  :straight t
+  :demand t)
 #+end_src
 
 #+begin_src emacs-lisp

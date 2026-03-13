@@ -7,12 +7,6 @@
 https://github.com/editorconfig/editorconfig-emacs?tab=readme-ov-file https://editorconfig.org
 
 
-* temp
-
-#+begin_src emacs-lisp
-#+end_src
-
-
 * startup
 
 #+begin_src emacs-lisp
@@ -93,10 +87,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (set-default-coding-systems 'utf-8)
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
-(setq default-buffer-file-coding-system 'utf-8)
-(setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
-
-(when (fboundp 'set-charset-priority) (set-charset-priority 'unicode))
+(set-charset-priority 'unicode)
 (setq locale-coding-system 'utf-8)
 #+end_src
 
@@ -128,10 +119,27 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (defun backward-delete-word (arg) (interactive "p")
          (delete-region (point) (progn (backward-word arg) (point))))
 
+  ;; https://protesilaos.com/codelog/2024-11-28-basic-emacs-configuration/
+  (defun prot/keyboard-quit-dwim ()
+    "Do-What-I-Mean behaviour for a general `keyboard-quit'."
+    (interactive)
+    (cond
+     ;; When the region is active, disable it.
+     ((region-active-p) (keyboard-quit))
+     ;; When the Completions buffer is selected, close it.
+     ((derived-mode-p 'completion-list-mode) (delete-completion-window))
+     ;; When a minibuffer is open, but not focused, close the minibuffer.
+     ((> (minibuffer-depth) 0) (abort-recursive-edit))
+     ;;In every other case use the regular `keyboard-quit'.
+     (t (keyboard-quit))))
+
+  (define-key global-map (kbd "C-g") #'prot/keyboard-quit-dwim)
+
   :bind
   (("<mouse-3>" . context-menu-open)
    ("C-<tab>" . completion-at-point)
    ("C-<backspace>" . backward-delete-word)
+   ("C-g" . #'prot/keyboard-quit-dwim)
    ("C-k" . forward-delete-line)
    ("C-x k" . kill-current-buffer)
    ("C-x K" . kill-buffer)
@@ -261,27 +269,29 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 ** dired
 
 #+begin_src emacs-lisp
-(use-package emacs
-  :init
-  (setq dired-omit-files (concat "\\`[.]\\'"
-                                 "\\|\\.\\(?:elc|a\\|o\\|pyc\\|pyo\\|swp\\|class\\)\\'"
-                                 "\\|^\\.DS_Store\\'"
-                                 "\\|^\\.\\(?:svn\\|git\\)\\'"
-                                 "\\|^__pycache__\\'"
-                                 "\\|^flycheck_.*"
-                                 "\\|^flymake_.*"))
-  (add-hook 'dired-mode-hook #'dired-omit-mode)
+(use-package dired
+  :ensure nil
+
   :custom
   (dired-kill-when-opening-new-dired-buffer t)
   (insert-directory-program "ls")
-  )
+  (dired-recursive-copies 'always)
+  (dired-recursive-deletes 'always)
+  (dired-omit-files (concat "\\`[.]\\'"
+                            "\\|\\.\\(?:elc|a\\|o\\|pyc\\|pyo\\|swp\\|class\\)\\'"
+                            "\\|^\\.DS_Store\\'"
+                            "\\|^\\.\\(?:svn\\|git\\)\\'"
+                            "\\|^__pycache__\\'"
+                            "\\|^flycheck_.*"
+                            "\\|^flymake_.*"))
+
+  :hook
+  (dired-mode . #'dired-omit-mode))
 #+end_src
 ** editorconfig
 
 #+begin_src emacs-lisp
 (use-package editorconfig
-  :ensure t
-
   :config
   (editorconfig-mode 1))
 #+end_src
@@ -289,10 +299,12 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package eglot-signature-eldoc-talkative
-  :straight t)
+  :straight t
+  :demand t)
 
 (use-package eldoc
   :straight t
+
   :init
   (global-eldoc-mode)
 
@@ -528,9 +540,12 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package catppuccin-theme
   :straight t
+  :demand t
+
   :config
   (load-theme 'catppuccin t)
   (catppuccin-set-color 'text "#ffffff")
+
   :custom
   (catppuccin-flavor 'mocha)
   (catppuccin-highlight-matches t)
@@ -625,7 +640,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package devdocs
   ;; :straight t
-  :defer t
   :bind (("C-h D" . 'devdocs-lookup)))
 #+end_src
 ** diminish
@@ -727,6 +741,22 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
         ;; If nil, the fzf buffer will appear at the top of the window
         fzf/position-bottom t
         fzf/window-height 15))
+#+end_src
+** gumshoe
+
+#+begin_src emacs-lisp
+(use-package gumshoe
+  :straight t
+  :init
+  ;; Enabing global-gumshoe-mode will initiate tracking
+  (global-gumshoe-mode +1)
+  ;; customize peruse slot display if you like
+  (setf gumshoe-slot-schema '(time buffer position line))
+  ;; personally, I use perspectives
+  ;; (setf gumshoe-slot-schema '(perspective time buffer position line))
+  ;; disable auto-cancel of backtracking
+  (setf gumshoe-auto-cancel-backtracking-p nil)
+  )
 #+end_src
 ** helpful
 #+begin_src emacs-lisp
@@ -944,7 +974,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package cmake-mode
   :mode ("\\CMakeLists.txt\\'" . cmake-ts-mode)
-  :defer t
   :straight (:host github
              :repo "emacsmirror/cmake-mode"
              :branch "master"))
@@ -954,8 +983,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package fish-mode
   :straight t
-  :mode "\\.fish\\'"
-  :defer t)
+  :mode "\\.fish\\'")
 #+end_src
 ** LaTeX
 
@@ -964,7 +992,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 (use-package tex
   :mode ("\\.tex\\'" . LaTeX-mode)
-  :defer t
   :straight (auctex :host nil
                     :repo "git://git.git.savannah.gnu.org/auctex.git"
                     :branch "main"
@@ -1011,7 +1038,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package lua-mode
   :straight t
-  :defer t
 
   :custom
   (lua-indent-level 4))
@@ -1021,24 +1047,19 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package nix-ts-mode
   :straight t
-  :mode "\\.nix\\'"
-  :defer t)
+  :mode "\\.nix\\'")
 #+end_src
 ** COMMENT OCaml
 
 #+begin_src emacs-lisp
 (use-package tuareg
   :straight t
-  :defer t
   :mode (("\\.ocamlinit\\'" . tuareg-mode)))
 
-(use-package dune
-  :straight t
-  :defer t)
+(use-package dune :straight t)
 
 (use-package utop
   :straight t
-  :defer t
 
   :config
   (add-hook 'tuareg-mode-hook #'utop-minor-mode)
@@ -1059,7 +1080,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package python
   :straight t
-  :defer t
 
   :config
   (setq-default python-indent-offset 4)
@@ -1151,19 +1171,20 @@ https://github.com/radian-software/apheleia/issues/278
 
 #+begin_src emacs-lisp
 (use-package markdown-mode
-  :defer t
+  :straight t
   :mode (("/README\\(?:\\.md\\)?\\'" . gfm-mode)
          ("\\.m[k]d\\'" . gfm-mode))
 
   :config
-  (setq markdown-fontify-code-blocks-natively t
-        markdown-header-scaling t)
+  (setq markdown-fontify-code-blocks-natively t)
+  (setq markdown-header-scaling t)
   (setq-default markdown-enable-math t))
 #+end_src
 ** math-preview
 #+begin_src emacs-lisp
 (use-package math-preview
   :straight (math-preview :type git :host gitlab :repo "matsievskiysv/math-preview" :branch "master")
+
   :custom (math-preview-command "~/.npm-packages/bin/math-preview"))
 #+end_src
 ** toml
@@ -1171,8 +1192,14 @@ https://github.com/radian-software/apheleia/issues/278
 #+begin_src emacs-lisp
 (use-package toml-mode
   :straight t
-  :defer t
   :mode "\\.toml\\'")
+#+end_src
+** yaml
+
+#+begin_src emacs-lisp
+(use-package yaml-mode
+  :straight t
+  :mode "\\.yml\\'")
 #+end_src
 
 
@@ -1238,6 +1265,7 @@ https://github.com/radian-software/apheleia/issues/278
 #+begin_src emacs-lisp :noweb yes
 (use-package consult
   :straight t
+
   :bind ((:prefix-map consult-search-prefix-map :prefix "C-c s")
          (:map consult-search-prefix-map
                ("d" . consult-find)                  ;; Alternative: consult-fd
@@ -1289,6 +1317,7 @@ https://github.com/radian-software/apheleia/issues/278
          :map minibuffer-local-map
          ("M-s" . consult-history)                 ;; orig. next-matching-history-element
          ("M-r" . consult-history))                 ;; orig. previous-matching-history-element
+
   ;; Enable automatic preview at point in the *Completions* buffer. This is relevant when you use the default completion UI.
   :hook
   (completion-list-mode . consult-preview-at-point-mode)
@@ -1425,8 +1454,11 @@ https://github.com/Qkessler/consult-project-extra
 (use-package corfu
   :straight t
 
-  :init
-  (global-corfu-mode)
+  :bind (:map corfu-map
+              ;; ("C-SPC" . corfu-insert-separator)
+              ("RET" . nil) ;; Free the RET key for less intrusive behavior.
+              ("C-<return>" . corfu-insert)
+              ("M-_" . corfu-info-documentation))
 
   :custom
   (corfu-cycle nil)
@@ -1437,11 +1469,8 @@ https://github.com/Qkessler/consult-project-extra
   (corfu-preselect 'directory) ;; Select the first candidate, except for directories
   ;; (corfu-on-exact-match nil)
 
-  :bind (:map corfu-map
-              ;; ("C-SPC" . corfu-insert-separator)
-              ("RET" . nil) ;; Free the RET key for less intrusive behavior.
-              ("C-<return>" . corfu-insert)
-              ("M-_" . corfu-info-documentation)))
+  :init
+  (global-corfu-mode))
 #+end_src
 ** marginalia
 
@@ -1449,14 +1478,16 @@ https://github.com/Qkessler/consult-project-extra
 (use-package marginalia
   :straight t
 
-  :init
-  (marginalia-mode)
-  :bind (:map minibuffer-local-map
-              ("M-A" . marginalia-cycle))
-
   :custom
   (marginalia-max-relative-age 0)
-  (marginalia-align 'right))
+  (marginalia-align 'right)
+
+  :init
+  (marginalia-mode)
+
+  :bind (:map minibuffer-local-map
+              ("M-A" . marginalia-cycle)))
+
 #+end_src
 ** orderless
 
@@ -1477,14 +1508,16 @@ https://github.com/Qkessler/consult-project-extra
 (use-package vertico
   :straight t
 
+  :custom
+  (vertico-scroll-margin 0) ;; Different scroll margin
+  (vertico-count 16) ;; Show more candidates
+  (vertico-resize t) ;; Grow and shrink the Vertico minibuffer
+  (vertico-cycle nil)
+  (vertico-multiform-commands '((find-file (vertico-sort-function . vertico-sort-alpha))))
+
   :init
   (vertico-mode)
-  (vertico-multiform-mode)
-  (setq vertico-scroll-margin 0) ;; Different scroll margin
-  (setq vertico-count 16) ;; Show more candidates
-  (setq vertico-resize t) ;; Grow and shrink the Vertico minibuffer
-  (setq vertico-cycle nil)
-  (setq vertico-multiform-commands '((find-file (vertico-sort-function . vertico-sort-alpha)))))
+  (vertico-multiform-mode))
 #+end_src
 ** embark
 
@@ -1523,7 +1556,6 @@ https://github.com/Qkessler/consult-project-extra
 #+begin_src emacs-lisp
 (use-package citre
   :straight t
-  :defer t
 
   :init
   ;; (require 'citre-config) ;; needed in `:init' block for lazy load to work.
