@@ -1626,10 +1626,6 @@ maybe: https://github.com/casouri/eldoc-box
 
 #+begin_src emacs-lisp
 (with-eval-after-load 'eglot
-
-  (add-to-list 'eglot-server-programs '((rust-ts-mode rust-mode) .
-                                        ("rust-analyzer"
-                                         :initializationOptions (:check (:command "clippy")))))
   (let* ((query-driver (if (eq system-type 'windows-nt)
                            "--query-driver=*:\\**\\*"
                          "--query-driver=/**/*")))
@@ -1642,18 +1638,14 @@ maybe: https://github.com/casouri/eldoc-box
                                           ;; "--header-insertion-decorators"
                                           "--fallback-style=None"
                                           "-j=4")))
-  (add-to-list 'eglot-server-programs `((c-mode c++-mode) "clangd"
-                                          "--background-index"
-                                          "--clang-tidy"
-                                          "--completion-style=detailed"
-                                          "--header-insertion=never"
-                                          ;; "--header-insertion-decorators"
-                                          "--fallback-style=None"
-                                          "-j=4"))
-  (add-to-list 'eglot-server-programs '(python-mode . ("ty" "server")))
-  (add-to-list 'eglot-server-programs '(nix-mode . ("nil")))
   (add-to-list 'eglot-server-programs '(csharp-mode . ("omnisharp" "*.sln" "-lsp")))
   (add-to-list 'eglot-server-programs '(latex-mode . ("texlab")))
+  (add-to-list 'eglot-server-programs '(nix-mode . ("nil")))
+  (add-to-list 'eglot-server-programs '(python-mode . ("ty" "server")))
+  (add-to-list 'eglot-server-programs '((rust-ts-mode rust-mode) .
+                                        ("rust-analyzer"
+                                         :initializationOptions (:check (:command "clippy")))))
+  (add-to-list 'eglot-server-programs '(toml-mode . ("taplo" "lsp" "stdio")))
   (add-to-list 'eglot-server-programs '((sh-mode bash-ts-mode) . ("bash-language-server" "start")))
   )
 #+end_src

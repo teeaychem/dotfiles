@@ -12,7 +12,7 @@
   :custom
   (org-directory "~/org")
 
-  (org-agenda-files (file-expand-wildcards "~/org/*.org")) ;; Include all org files from a directory into the agenda.
+  (org-agenda-files (file-expand-wildcards "~/org/*.org")) ;; Include all org files into the agenda.
 
   (org-adapt-indentation nil) ;; prevent demoting heading also shifting text inside sections
   (org-catch-invisible-edits 'show-and-error) ;; if editing in an invisible region, complain.

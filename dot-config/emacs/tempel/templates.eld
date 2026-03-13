@@ -1,6 +1,6 @@
 fundamental-mode ;; Available everywhere
 
-(today (format-time-string "%Y-%m-%d"))
+(today (format-time-string "%Y%m%d"))
 
 ;; abbreviations
 
@@ -169,7 +169,6 @@ using namespace std;
 int main(int argc, char *argv[]) {"
 p
 "
-return 0;
 }")
 
 
