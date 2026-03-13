@@ -940,6 +940,15 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 ;;   :load-path (lambda() (concat user-emacs-directory "../../projects/emacs/clingo-asp-mode/")))
 #+end_src
 ** C/pp
+
+#+begin_src emacs-lisp
+(use-package cmake-mode
+  :mode ("\\CMakeLists.txt\\'" . cmake-ts-mode)
+  :defer t
+  :straight (:host github
+             :repo "emacsmirror/cmake-mode"
+             :branch "master"))
+#+end_src
 ** fish
 
 #+begin_src emacs-lisp
