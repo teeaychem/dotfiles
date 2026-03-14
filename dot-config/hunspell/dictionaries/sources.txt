@@ -1,0 +1,5 @@
+http://wordlist.aspell.net/dicts/
+
+https://github.com/en-wl/wordlist
+
+en_GB, large

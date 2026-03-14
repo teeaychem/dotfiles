@@ -1,3 +1,0 @@
-http://wordlist.aspell.net/dicts/
-
-en_GB | https://sourceforge.net/projects/wordlist/files/speller/2020.12.07/ (large)

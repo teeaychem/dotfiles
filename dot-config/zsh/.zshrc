@@ -178,6 +178,7 @@ export GPG_TTY=$(tty)
 alias grep='grep --color=auto'
 
 # # hunspell
+export DICTIONARY="en_GB"
 export DICPATH="${XDG_CONFIG_HOME}/hunspell/dictionaries"
 
 # # less

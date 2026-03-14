@@ -407,7 +407,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package ispell
+  :demand t
   :after exec-path-from-shell
+
   :if (executable-find "hunspell")
   :custom
   (add-to-list
