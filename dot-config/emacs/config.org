@@ -837,6 +837,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package undo-fu
   :straight t
+  :demand t
 
   :init
   (setq undo-limit (* 8 1024 1024))
@@ -851,6 +852,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package undo-fu-session
   :straight t
+  :demand t
 
   :config
   (setq undo-fu-session-incompatible-files '("/COMMIT_EDITMSG\\'" "/git-rebase-todo\\'"))
@@ -863,6 +865,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package vundo
   :straight t
+  :demand t
 
   :config
   (setq vundo-compact-display t)
