@@ -10,6 +10,11 @@ antidote load
 
 # fns
 
+# Change working directory to the top finder window location
+function cdf() {
+    cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
+}
+
 # de-quarantine $1
 function dq {
     eval "xattr -r -d com.apple.quarantine $1"
@@ -139,7 +144,6 @@ export PYTHON_HISTORY="${XDG_CACHE_HOME}/python/history"
 export IPYTHONDIR="${XDG_CACHE_HOME}/ipython"
 export MPLCONFIGDIR="${XDG_CACHE_HOME}/matplotlib"
 
-
 alias pyfind='find . -name "*.py"'
 alias pygrep='grep -nr --include="*.py"'
 
@@ -164,6 +168,11 @@ fi
 
 # # docker
 export DOCKER_CONFIG="${XDG_CONFIG_HOME}/docker"
+
+# # gpg
+
+# https://www.gnupg.org/(it)/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html
+export GPG_TTY=$(tty)
 
 # # grep
 alias grep='grep --color=auto'
