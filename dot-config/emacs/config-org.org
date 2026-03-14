@@ -55,44 +55,27 @@
                                  (scheme . t))))
 #+end_src
 
-* roam
+* node
 
 #+begin_src emacs-lisp
-(use-package org-roam
+(use-package org-mem
   :straight t
-  :demand t)
+
+  :config
+  (setq org-mem-watch-dirs (list "~/org-notes/"))
+  (org-mem-updater-mode))
 #+end_src
 
 #+begin_src emacs-lisp
-(use-package consult-org-roam
-   :straight t
-   :after org-roam
+(use-package org-node
+  :straight t
 
-   :init
-   (require 'consult-org-roam)
-   ;; Activate the minor mode
-   (consult-org-roam-mode 1)
-
-   :custom
-   ;; Use `ripgrep' for searching with `consult-org-roam-search'
-   (consult-org-roam-grep-func #'consult-ripgrep)
-   ;; Configure a custom narrow key for `consult-buffer'
-   (consult-org-roam-buffer-narrow-key ?r)
-   ;; Display org-roam buffers right after non-org-roam buffers
-   ;; in consult-buffer (and not down at the bottom)
-   (consult-org-roam-buffer-after-buffers t)
-   (org-roam-capture-templates '(("d" "default" plain "%?" :target (file+head "${slug}.org" "#+title: ${title}\n") :unnarrowed t)))
-
-   :config
-   ;; Eventually suppress previewing for certain functions
-   (consult-customize consult-org-roam-forward-links :preview-key "M-.")
-
-   :bind
-   ;; Define some convenient keybindings as an addition
-   ("C-c n e" . consult-org-roam-file-find)
-   ("C-c n b" . consult-org-roam-backlinks)
-   ("C-c n B" . consult-org-roam-backlinks-recursive)
-   ("C-c n l" . consult-org-roam-forward-links)
-   ("C-c n r" . consult-org-roam-search))
+  :init
+  ;; Optional key bindings
+  ;; Tip: Try changing these to just "M-o"!
+  (keymap-global-set "M-o n" org-node-global-prefix-map)
+  (with-eval-after-load 'org
+    (keymap-set org-mode-map "M-o n" org-node-org-prefix-map))
+  :config
+  (org-node-cache-mode))
 #+end_src
-
