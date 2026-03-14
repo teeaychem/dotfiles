@@ -31,5 +31,8 @@
 	short = false
 
 [user]
-	email = "ben@sparkes.uk.net"
+	email = "bsparkes@alumni.stanford.edu"
 	name = "teeaychem"
+
+[apply]
+	whitespace = fix
