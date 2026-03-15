@@ -585,6 +585,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package apheleia
   :straight t
+  :demand t
+
   :init
   (setq-default apheleia-inhibit t)
   (setq-default apheleia-global-mode nil)
@@ -610,6 +612,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   (push '(gersemi . ("gersemi" "-")) apheleia-formatters)
   (setf (alist-get 'cmake-ts-mode apheleia-mode-alist) '(gersemi))
+
+  (setf (alist-get 'stylua apheleia-formatters) '("stylua" "-s" "-"))
 
   (push '(taplo . ("taplo" "format")) apheleia-formatters)
   (setf (alist-get 'toml-mode apheleia-mode-alist) '(taplo))
@@ -715,6 +719,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package editorconfig
   :straight t
+  :demand t
+  :delight
+
   :config
   (editorconfig-mode 1))
 #+end_src
@@ -1677,14 +1684,16 @@ maybe: https://github.com/casouri/eldoc-box
                                           "-j=4")))
   (add-to-list 'eglot-server-programs '(csharp-mode . ("omnisharp" "*.sln" "-lsp")))
   (add-to-list 'eglot-server-programs '(latex-mode . ("texlab")))
+  (let* ((config-path (concat (getenv "XDG_CONFIG_HOME") "/.luarc.json"))
+         (config-arg (if (file-exists-p config-path) (concat "--configpath=" config-path) "")))
+    (add-to-list 'eglot-server-programs `(lua-mode . ("lua-language-server" ,config-arg))))
   (add-to-list 'eglot-server-programs '(nix-mode . ("nil")))
   (add-to-list 'eglot-server-programs '(python-mode . ("ty" "server")))
   (add-to-list 'eglot-server-programs '((rust-ts-mode rust-mode) .
                                         ("rust-analyzer"
                                          :initializationOptions (:check (:command "clippy")))))
   (add-to-list 'eglot-server-programs '(toml-mode . ("taplo" "lsp" "stdio")))
-  (add-to-list 'eglot-server-programs '((sh-mode bash-ts-mode) . ("bash-language-server" "start")))
-  )
+  (add-to-list 'eglot-server-programs '((sh-mode bash-ts-mode) . ("bash-language-server" "start"))))
 #+end_src
 *** eglot-x
 https://github.com/nemethf/eglot-x#rust-analyzer-extensions

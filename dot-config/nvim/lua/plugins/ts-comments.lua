@@ -1,7 +1,7 @@
 local M = {
-	"folke/ts-comments.nvim",
-	opts = {},
-	event = "VeryLazy",
+    "folke/ts-comments.nvim",
+    opts = {},
+    event = "VeryLazy",
 }
 
 return { M }

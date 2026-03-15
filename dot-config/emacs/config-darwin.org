@@ -43,7 +43,8 @@
   :demand
   :init
   (exec-path-from-shell-initialize)
-  (exec-path-from-shell-copy-env "DICPATH"))
+  (exec-path-from-shell-copy-env "DICPATH")
+  (exec-path-from-shell-copy-env "XDG_CONFIG_HOME"))
 #+end_src
 
 #+begin_src emacs-lisp
