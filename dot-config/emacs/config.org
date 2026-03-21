@@ -259,6 +259,37 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (treesit-font-lock-level 4))
 #+end_src
 
+#+begin_src emacs-lisp
+(use-package emacs
+  :if (memq system-type '(darwin))
+  :init
+  (set-face-attribute 'default nil
+                      :family "M PLUS 1 Code"; "Maple Mono NF" "JuliaMono"
+                      :height 150)
+
+  :custom
+  )
+#+end_src
+
+** macos
+#+begin_src emacs-lisp
+(use-package emacs
+  :if (memq system-type '(darwin))
+  :custom
+  (mac-command-modifier 'meta)
+  (mac-option-modifier 'option)
+  (mac-right-option-modifier 'left)
+  (mac-control-modifier 'control)
+  (mac-pass-command-to-system t)
+
+  (menu-bar-mode t)
+
+  (ns-use-thin-smoothing t)
+  (mac-allow-anti-aliasing t)
+
+  (setq-default trash-directory "~/.Trash/emacs"))
+#+end_src
+
 
 * internal
 
@@ -531,10 +562,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 #+begin_src emacs-lisp
-(if (memq system-type '(darwin)) (load-config "config-darwin"))
+;; (if (memq system-type '(darwin)) (load-config "config-darwin"))
 (if (memq system-type '(gnu/linux)) (load-config "config-gnu"))
 (if (memq system-type '(windows-nt)) (load-config "config-nt"))
-(load-config "config-org")
 #+end_src
 
 
@@ -733,6 +763,25 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :custom
   (envrc-show-summary-in-minibuffer nil)
   :hook (after-init . envrc-global-mode))
+#+end_src
+** exec-path-from-shell
+
+#+begin_src emacs-lisp
+(use-package exec-path-from-shell
+  :straight t
+  :if (memq system-type '(darwin gnu/linux))
+
+  :custom
+  (exec-path-from-shell-arguments '("-l"))
+
+  :init
+  (exec-path-from-shell-initialize)
+  (exec-path-from-shell-copy-env "DICPATH")
+  (exec-path-from-shell-copy-env "XDG_CONFIG_HOME"))
+#+end_src
+
+#+begin_src emacs-lisp
+;; (getenv "PATH")
 #+end_src
 ** fzf
 #+begin_src emacs-lisp
@@ -1001,8 +1050,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 ** LaTeX
 
 #+begin_src emacs-lisp
-
-
 (use-package tex
   :mode ("\\.tex\\'" . LaTeX-mode)
   :straight (auctex :host nil
@@ -1217,6 +1264,84 @@ https://github.com/radian-software/apheleia/issues/278
 (use-package yaml-mode
   :straight t
   :mode "\\.yml\\'")
+#+end_src
+
+
+* org
+
+#+begin_src emacs-lisp
+(use-package org
+  :straight nil
+  :mode ("\\.org" . org-mode)
+
+  :custom
+  (org-directory "~/org")
+
+  (org-agenda-files (file-expand-wildcards "~/org/*.org")) ;; Include all org files into the agenda.
+
+  (org-adapt-indentation nil) ;; prevent demoting heading also shifting text inside sections
+  (org-catch-invisible-edits 'show-and-error) ;; if editing in an invisible region, complain.
+  (org-confirm-babel-evaluate t) ;; ask when evaluating every src block
+
+  (org-cycle-separator-lines 1)
+
+  (org-default-notes-file (concat org-directory "/org_capture.org"))
+
+  (org-hide-emphasis-markers nil)
+
+  (org-pretty-entities t) ;; try to draw utf8 characters
+  (org-pretty-entities-include-sub-superscripts nil)
+
+  (org-replace-disputed-keys t)
+  (org-support-shift-select t)   ;; leave shift keys alone!
+
+  (org-src-fontify-natively t)
+  (org-src-preserve-indentation t)
+  (org-src-tab-acts-natively t)
+
+  (org-startup-truncated nil) ;; wrap lines on startup
+
+  (org-tag-column 0) ;; don't align tags
+
+  (org-fontify-done-headline t)
+  (org-fontify-whole-heading-line t)
+  (org-fontify-quote-and-verse-blocks t) ;; add a background to begin_quote and begin_verse blocks.
+
+  (org-list-allow-alphabetical t)
+
+  (org-log-done 'time) ;; Auto add time and closing note to done
+  (org-log-done 'note)
+
+  :config
+  (org-babel-do-load-languages 'org-babel-load-languages
+                               '((C . t)
+                                 (emacs-lisp . t)
+                                 (org . t)
+                                 (scheme . t))))
+#+end_src
+** org-node
+
+#+begin_src emacs-lisp
+(use-package org-mem
+  :straight t
+
+  :config
+  (setq org-mem-watch-dirs (list "~/org-notes/"))
+  (org-mem-updater-mode))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package org-node
+  :straight t
+
+  :init
+  ;; Optional key bindings
+  ;; Tip: Try changing these to just "M-o"!
+  (keymap-global-set "M-o n" org-node-global-prefix-map)
+  (with-eval-after-load 'org
+    (keymap-set org-mode-map "M-o n" org-node-org-prefix-map))
+  :config
+  (org-node-cache-mode))
 #+end_src
 
 
@@ -1822,6 +1947,7 @@ https://github.com/renzmann/treesit-auto
   (after-init . dape-breakpoint-load)
 
   :config
+
   ;; Turn on global bindings for setting breakpoints with mouse
   (dape-breakpoint-global-mode)
 
@@ -1847,4 +1973,30 @@ https://github.com/renzmann/treesit-auto
   ;; Projectile users
   ;; (setq dape-cwd-function 'projectile-project-root)
   )
+
+;; (with-eval-after-load 'dape
+;;   (add-to-list 'dape-configs
+;;                `(gdb
+;;                  ensure (lambda (config)
+;;                           (dape-ensure-command config)
+;;                           (let* ((default-directory
+;;                                   (or (dape-config-get config 'command-cwd) default-directory))
+;;                                  (command (dape-config-get config 'command))
+;;                                  (output (shell-command-to-string (format "%s --version" command)))
+
+;;                                  (version (save-match-data
+;;                                             (when (string-match "GNU gdb \\(?:(.*) \\)?\\([0-9.]+\\)" output)
+;;                                               (string-to-number (match-string 1 output))))))
+;;                             (message command)
+;;                             (unless (>= version 14.1)
+;;                               (user-error "Requires gdb version >= 14.1"))))
+;;      modes (c-mode c-ts-mode c++-mode c++-ts-mode)
+;;      command-cwd dape-command-cwd
+;;      command "gdb"
+;;      command-args ("--interpreter=dap")
+;;      :command-cwd nil
+;;      :request "launch"
+;;      :program "a.out"
+;;      :args []
+;;      :stopAtBeginningOfMainSubprogram nil)))
 #+end_src

@@ -7,11 +7,11 @@
 (setq native-comp-async-query-on-exit t)
 (setq package-native-compile t)
 
-(setq gc-cons-threshold (* 32 1024 1024))
+(setq gc-cons-threshold (* 64 1024 1024))
 (run-with-idle-timer 2.0 t 'garbage-collect)
 (setq garbage-collection-messages nil)
 
-(setq read-process-output-max (* 2 1024 1024))
+(setq read-process-output-max (* 64 1024))
 
 (setq inhibit-compacting-font-caches t)
 
