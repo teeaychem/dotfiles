@@ -72,7 +72,7 @@ export ELAN_HOME="${XDG_DATA_HOME}/elan"
 # path_add "${HOME}/.npm-packages/bin" prepend
 
 # # OCaml
-export OPAMROOT="${XDG_DATA_HOME}/opam"
+# export OPAMROOT="${XDG_DATA_HOME}/opam"
 
 # # python
 

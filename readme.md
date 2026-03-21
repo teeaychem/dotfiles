@@ -1,3 +1,9 @@
+# setup
+
+``` shell
+ln -s $HOME/.config/zsh/.zshenv $HOME/.zshenv
+```
+
 # brew
 
 ``` shell
