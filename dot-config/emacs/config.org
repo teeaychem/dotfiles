@@ -195,6 +195,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package emacs
+
   :init
   (setq-default fill-column 1024)
   (setq-default indicate-empty-lines t)
@@ -1101,6 +1102,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package pet
   :straight t
+  :demand t
 
   :custom
   (python-shell-interpreter "python")
