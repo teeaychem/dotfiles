@@ -110,12 +110,11 @@ darwin*)
         path_add "/usr/local/texlive/2026basic/bin/universal-darwin/" "prepend"
 
         export HOMEBREW_NO_AUTO_UPDATE
+        export HOMEBREW_BUNDLE_FILE="$XDG_CONFIG_HOME/brew/Brewfile"
+
         [[ -x $(which bat) ]] && export HOMEBREW_BAT=1
         ;;
 linux*) ;;
-bsd*) ;;
-msys*) ;;
-cygwin*) ;;
 *)
         echo "No configuration for: $OSTYPE"
         ;;

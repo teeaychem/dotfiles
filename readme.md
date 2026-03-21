@@ -1,3 +1,9 @@
+# brew
+
+``` shell
+brew bundle (check|install) [--file $HOMEBREW_BUNDLE_FILE]
+```
+
 # nix
 
 ## commands
@@ -8,7 +14,7 @@ home-manager switch --flake /etc/nix-darwin/
 ```
 
 ``` shell
- nix-collect-garbage --delete-old
+nix-collect-garbage --delete-old
 
 sudo nix-collect-garbage -d
 nix-collect-garbage -d
@@ -46,4 +52,3 @@ https://dev.to/synecdokey/nix-on-macos-2oj3
 
 - https://github.com/nix-darwin/nix-darwin/issues/871
 - https://github.com/nix-community/home-manager/issues/8174
-  `rm -r ~/Applications/Home\ Manager\ Apps/` to resolve `error: permission denied when trying to update apps, aborting activation`

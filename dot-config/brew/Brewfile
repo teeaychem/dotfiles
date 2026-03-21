@@ -1,0 +1,87 @@
+# # Taps
+
+tap "d12frosted/emacs-plus"
+tap "kgarner7/feishin"
+
+# # Brews
+
+# brew "emacs-plus" # alt. cash "emacs-plus-app"
+brew "bat"
+brew "bitwise"
+brew "cmake"
+brew "coreutils"
+brew "direnv"
+brew "fq"
+brew "fzf"
+brew "grep"
+brew "gnupg"
+brew "hunspell"
+brew "imagemagick"
+brew "navidrome"
+brew "neovim"
+brew "pass"
+brew "pkg-config"
+brew "qemu"
+brew "ranger"
+brew "ripgrep"
+brew "starship"
+brew "tmux"
+brew "zoxide"
+
+# tree-sitter
+brew "tree-sitter"
+brew "tree-sitter-cli"
+
+brew "universal-ctags"
+
+# linting
+brew "gersemi" # cmake
+brew "prettier"
+brew "shfmt"
+brew "texlab" # TeX
+brew "typos-cli" # typos
+
+# git
+brew "git"
+brew "git-delta"
+brew "git-filter-repo"
+brew "git-lfs"
+brew "gitui"
+
+# lua
+brew "luarocks"
+
+# markdown
+brew "comrak" # GFM(arkdown)
+
+#python
+brew "python"
+brew "ruff"
+brew "ty"
+brew "uv"
+
+# sh
+brew "bash-language-server" # mostly works for zsh
+
+# toml
+brew "taplo"
+
+# tools
+brew "z3"
+
+# # Casks
+cask  "appcleaner"
+cask  "emacs-plus-app"
+# cask  "feishin"
+cask  "hammerspoon"
+cask  "iina"
+cask  "keepassxc"
+cask  "keka"
+cask  "raycast"
+cask  "rectangle"
+cask  "skim"
+cask  "vlc"
+
+# # Fonts
+cask "font-m+-nerd-font"
+cask "font-source-code-pro"
