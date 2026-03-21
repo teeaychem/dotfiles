@@ -1,7 +1,7 @@
 # setup
 
 ``` shell
-ln -s $HOME/.config/zsh/.zshenv $HOME/.zshenv
+ln -s $HOME/.config/zsh/.misplaced/.zshenv $HOME/.zshenv
 ```
 
 # brew
