@@ -28,7 +28,7 @@ nix-collect-garbage -d
 
 ``` shell
 sudo nix run nix-darwin -- switch --flake .
-sudo nix run nix-darwin -- switch --flake /etc/nix-darwin
+sudo nix run nix-darwin -- switch --flake /etc/nix-darwin/
 ```
 
 ``` shell
