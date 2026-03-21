@@ -41,7 +41,7 @@ case "$OSTYPE" in
 darwin*)
         eval "$(/opt/homebrew/bin/brew shellenv)"
         # llvm
-        # path_add "/opt/homebrew/opt/llvm/bin/" "prepend"
+        path_add "/opt/homebrew/opt/llvm/bin/" "append"
         # export LDFLAGS="-L/opt/homebrew/opt/llvm/lib -L/opt/homebrew/opt/llvm/lib/c++ -L/opt/homebrew/opt/llvm/lib/unwind -lunwind"
         # export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
         # export CMAKE_PREFIX_PATH="/opt/homebrew/opt/llvm"
