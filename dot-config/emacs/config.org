@@ -1114,8 +1114,11 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
     (message "Performing local python setup")
     (setq-local python-shell-interpreter (pet-executable-find "python3"))
     (setq-local python-shell-virtualenv-root (pet-virtualenv-root))
-    (pet-eglot-setup))
-  (add-hook 'python-base-mode-hook 'python-local-setup))
+    (pet-eglot-setup)
+    (pet-dape-setup))
+
+  :hook
+  (python-base-mode . 'python-local-setup))
 #+end_src
 ** rust
 
@@ -1804,7 +1807,7 @@ https://github.com/renzmann/treesit-auto
 
 #+begin_src emacs-lisp
 (use-package dape
-  :disabled
+  :after (eglot pet)
   :straight t
 
   :preface
@@ -1812,11 +1815,11 @@ https://github.com/renzmann/treesit-auto
   ;; If you do not want to use any prefix, set it to nil.
   (setq dape-key-prefix "\C-c\C-d")
 
-  ;; :hook
+  :hook
   ;; Save breakpoints on quit
-  ;; (kill-emacs . dape-breakpoint-save)
+  (kill-emacs . dape-breakpoint-save)
   ;; Load breakpoints on startup
-  ;; (after-init . dape-breakpoint-load)
+  (after-init . dape-breakpoint-load)
 
   :config
   ;; Turn on global bindings for setting breakpoints with mouse
@@ -1833,7 +1836,7 @@ https://github.com/renzmann/treesit-auto
   ;; (add-hook 'dape-display-source-hook 'pulse-momentary-highlight-one-line)
 
   ;; Showing inlay hints
-  ;; (setq dape-inlay-hints t)
+  (setq dape-inlay-hints t)
 
   ;; Save buffers on startup, useful for interpreted languages
   ;; (add-hook 'dape-start-hook (lambda () (save-some-buffers t t)))
