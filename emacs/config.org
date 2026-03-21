@@ -265,10 +265,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :init
   (set-face-attribute 'default nil
                       :family "M PLUS 1 Code"; "Maple Mono NF" "JuliaMono"
-                      :height 150)
-
-  :custom
-  )
+                      :height 150))
 #+end_src
 
 ** macos
