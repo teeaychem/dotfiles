@@ -1938,8 +1938,13 @@ https://github.com/renzmann/treesit-auto
 
   :config
   (treesit-auto-add-to-auto-mode-alist 'all)
+
+  (add-to-list 'treesit-language-source-alist
+               '(llvm "https://github.com/benwilliamgraham/tree-sitter-llvm"))
+  (add-to-list 'treesit-language-source-alist
+               '(tablegen "https://github.com/tree-sitter-grammars/tree-sitter-tablegen"))
   ;; (global-treesit-auto-mode)
-)
+  )
 #+end_src
 
 
