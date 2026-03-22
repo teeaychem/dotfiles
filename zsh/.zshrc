@@ -2,7 +2,7 @@
 # # https://getantidote.github.io/usage
 
 if [[ ! -d ${ZDOTDIR:-$HOME}/.antidote ]]; then
-        git clone https://github.com/mattmc3/antidote ${ZDOTDIR:-$HOME}/.antidote
+    git clone https://github.com/mattmc3/antidote ${ZDOTDIR:-$HOME}/.antidote
 fi
 
 source ${ZDOTDIR:-$HOME}/.antidote/antidote.zsh
@@ -12,16 +12,16 @@ antidote load
 
 # Change working directory to the top finder window location
 function cdf() {
-        cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')"
+    cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')"
 }
 
 # de-quarantine $1
 function dq {
-        eval "xattr -r -d com.apple.quarantine $1"
+    eval "xattr -r -d com.apple.quarantine $1"
 }
 
 function rmdsstore {
-        find "${@:-.}" -type f -name .DS_Store -delete
+    find "${@:-.}" -type f -name .DS_Store -delete
 }
 
 # options
@@ -95,15 +95,11 @@ alias pyfind='find . -name "*.py"'
 alias pygrep='grep -nr --include="*.py"'
 
 function pyclean {
-        find "${@:-.}" -type f -name "*.py[co]" -delete
-        find "${@:-.}" -type d -name "__pycache__" -delete
-        find "${@:-.}" -depth -type d -name ".mypy_cache" -exec rm -r "{}" +
-        find "${@:-.}" -depth -type d -name ".pytest_cache" -exec rm -r "{}" +
+    find "${@:-.}" -type f -name "*.py[co]" -delete
+    find "${@:-.}" -type d -name "__pycache__" -delete
+    find "${@:-.}" -depth -type d -name ".mypy_cache" -exec rm -r "{}" +
+    find "${@:-.}" -depth -type d -name ".pytest_cache" -exec rm -r "{}" +
 }
-
-
-
-
 
 # Extensions
 
@@ -111,17 +107,17 @@ eval "$(direnv hook zsh)"
 
 FZF_CTRL_T_COMMAND=
 if source <(fzf --zsh); then
-        # preview
-        function fzfp {
-                fzf --layout='default' \
-                        --ansi \
-                        --preview-window=top,75%,sharp,wrap \
-                        --bind 'focus:transform-header:file --brief {}' \
-                        --bind='ctrl-d:abort' \
-                        --bind='ctrl-s:change-preview(stat {})' \
-                        --bind='ctrl-e:change-preview(bat -n --color=always {})' \
-                        --bind='ctrl-w:toggle-preview'
-        }
+    # preview
+    function fzfp {
+        fzf --layout='default' \
+            --ansi \
+            --preview-window=top,75%,sharp,wrap \
+            --bind 'focus:transform-header:file --brief {}' \
+            --bind='ctrl-d:abort' \
+            --bind='ctrl-s:change-preview(stat {})' \
+            --bind='ctrl-e:change-preview(bat -n --color=always {})' \
+            --bind='ctrl-w:toggle-preview'
+    }
 fi
 
 eval "$(zoxide init zsh)"
