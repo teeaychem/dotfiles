@@ -769,12 +769,14 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   :custom
   (exec-path-from-shell-arguments '("-l"))
+  (exec-path-from-shell-variables
+   '("PATH"
+     "DICPATH"
+     "REPOS_DIR"
+     "XDG_CONFIG_HOME"))
 
-  :init
-  (exec-path-from-shell-initialize)
-  (exec-path-from-shell-copy-env "DICPATH")
-  (exec-path-from-shell-copy-env "REPOS_DIR")
-  (exec-path-from-shell-copy-env "XDG_CONFIG_HOME"))
+  :config
+  (exec-path-from-shell-initialize))
 #+end_src
 
 #+begin_src emacs-lisp
