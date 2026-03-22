@@ -569,8 +569,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package catppuccin-theme
-  :straight t
-  :demand t
+  :straight (catppuccin-theme :local-repo "catppuccin" :type git :host github :repo "catppuccin/emacs" :branch "main")
 
   :config
   (load-theme 'catppuccin t)
