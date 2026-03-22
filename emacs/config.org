@@ -1102,6 +1102,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 ** llvm
 
+https://github.com/llvm/llvm-project.git
+
 #+begin_src emacs-lisp
 (with-eval-after-load 'exec-path-from-shell
   (eval-and-compile
@@ -1126,6 +1128,21 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
     (use-package tablegen-mode
       :load-path (lambda () (list (repos-load-path "/llvm/llvm/utils/emacs")))
       :mode "\\.td\\'"
+
+      :config
+      (defun tblgen-lsp ()
+        ;; Write a tablegen lsp call to the kill ring, to then be invoked with `C-u M-x eglot`
+        ;; Heuristic is to search for compile commands from the root of the current project
+        ;; ties are resolved by taking the shortest path
+        (let* ((pr (project-current t))
+               (root (project-root pr))
+               (candidates (sort (directory-files-recursively root "tablegen_compile_commands.yml" t nil nil)))
+               (candidate (file-truename (car candidates)))
+               (compilation-db (if candidates
+                                   (concat " --tablegen-compilation-database=" candidate)
+                                 "")))
+          (kill-new (concat "tblgen-lsp-server" compilation-db))))
+
       :commands tablegen-mode)
     )
 #+end_src
