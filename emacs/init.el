@@ -42,6 +42,7 @@
   (load bootstrap-file nil 'nomessage))
 
 (straight-use-package 'use-package)
+(setq straight-vc-git-default-clone-depth 1)
 
 
 ;; save custom things to separate file, and also load before doing anything else with packages as it contains a useful list

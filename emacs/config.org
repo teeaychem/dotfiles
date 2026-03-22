@@ -1052,6 +1052,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :straight (auctex :host nil
                     :repo "git://git.git.savannah.gnu.org/auctex.git"
                     :branch "main"
+                    :depth 1
                     :files (:defaults (:exclude "*.xpm")))
   :ensure auctex
 
