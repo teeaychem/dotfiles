@@ -55,6 +55,7 @@ linux*) ;;
     ;;
 esac
 
+export REPOS_DIR="${HOME}/repos/"
 
 # Languages, etc.
 

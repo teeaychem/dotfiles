@@ -773,6 +773,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :init
   (exec-path-from-shell-initialize)
   (exec-path-from-shell-copy-env "DICPATH")
+  (exec-path-from-shell-copy-env "REPOS_DIR")
   (exec-path-from-shell-copy-env "XDG_CONFIG_HOME"))
 #+end_src
 
@@ -1098,6 +1099,36 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :custom
   (lua-indent-level 4))
 #+end_src
+** llvm
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'exec-path-from-shell
+  (eval-and-compile
+    (defun repos-load-path (load-path)
+      (concat (getenv "REPOS_DIR") load-path)))
+
+    (use-package llvm-mode
+      :load-path (lambda () (list (repos-load-path "/llvm/llvm/utils/emacs")))
+      :mode "\\.ll\\'"
+      :commands llvm-mode)
+
+    (use-package llvm-mir-mode
+      :load-path (lambda () (list (repos-load-path "/llvm/llvm/utils/emacs")))
+      :mode "\\.mir\\'"
+      :commands llvm-mir-mode)
+
+    (use-package mlir-mode
+      :load-path (lambda () (list (repos-load-path "/llvm/mlir/utils/emacs")))
+      :mode "\\.mlir\\'"
+      :commands mlir-mode)
+
+    (use-package tablegen-mode
+      :load-path (lambda () (list (repos-load-path "/llvm/llvm/utils/emacs")))
+      :mode "\\.td\\'"
+      :commands tablegen-mode)
+    )
+#+end_src
+
 ** nix
 
 #+begin_src emacs-lisp
@@ -1813,11 +1844,14 @@ maybe: https://github.com/casouri/eldoc-box
   (let* ((config-path (concat (getenv "XDG_CONFIG_HOME") "/.luarc.json"))
          (config-arg (if (file-exists-p config-path) (concat "--configpath=" config-path) "")))
     (add-to-list 'eglot-server-programs `(lua-mode . ("lua-language-server" ,config-arg))))
+  (add-to-list 'eglot-server-programs '(mlir-mode . ("mlir-lsp-server")))
+  (add-to-list 'eglot-server-programs '(mlir-pdll-mode . ("mlir-pdll-lsp-server")))
   (add-to-list 'eglot-server-programs '(nix-mode . ("nil")))
   (add-to-list 'eglot-server-programs '(python-mode . ("ty" "server")))
   (add-to-list 'eglot-server-programs '((rust-ts-mode rust-mode) .
                                         ("rust-analyzer"
                                          :initializationOptions (:check (:command "clippy")))))
+  (add-to-list 'eglot-server-programs '(tablegen-mode . ("tblgen-lsp-server")))
   (add-to-list 'eglot-server-programs '(toml-mode . ("taplo" "lsp" "stdio")))
   (add-to-list 'eglot-server-programs '((sh-mode bash-ts-mode) . ("bash-language-server" "start"))))
 #+end_src
