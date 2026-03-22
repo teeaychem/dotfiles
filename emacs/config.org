@@ -379,7 +379,14 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   :custom
   (recentf-auto-cleanup (if (daemonp) 300 'never))
-  (recentf-exclude '("COMMIT_EDITMSG\\'"))
+  (recentf-exclude '((expand-file-name package-user-dir)
+                     ".cache"
+                     "bookmarks"
+                     "cache"
+                     "recentf"
+                     "undo-tree-hist"
+                     "url"
+                     "COMMIT_EDITMSG\\'"))
 
   :config
   ;; to ensure `recentf-cleanup` runs before `recentf-save-list`
@@ -755,6 +762,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 ** envrc
 #+begin_src emacs-lisp
 (use-package envrc
+  :disabled
   :straight t
   :custom
   (envrc-show-summary-in-minibuffer nil)
