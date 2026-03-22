@@ -107,8 +107,6 @@ function pyclean {
 
 # Extensions
 
-eval "$(starship init zsh)"
-
 eval "$(direnv hook zsh)"
 
 FZF_CTRL_T_COMMAND=

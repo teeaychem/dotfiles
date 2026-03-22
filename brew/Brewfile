@@ -25,7 +25,7 @@ brew "pkg-config"
 brew "qemu"
 brew "ranger"
 brew "ripgrep"
-brew "starship"
+# brew "starship" # / pure
 brew "tmux"
 brew "zoxide"
 

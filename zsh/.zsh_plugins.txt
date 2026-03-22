@@ -5,3 +5,4 @@ belak/zsh-utils path:completion/functions kind:autoload post:compstyle_zshzoo_se
 
 zsh-users/zsh-syntax-highlighting
 zsh-users/zsh-autosuggestions
+sindresorhus/pure
