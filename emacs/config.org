@@ -480,13 +480,15 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (connection-local-set-profiles
    '(:application tramp :protocol "scp") 'remote-direct-async-process)
 
-  (setq magit-tramp-pipe-stty-settings 'pty)
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
 
   :custom
-  (remote-file-name-inhibit-locks t)
-  (tramp-use-scp-direct-remote-copying t)
+  (magit-tramp-pipe-stty-settings 'pty)
   (remote-file-name-inhibit-auto-save-visited t)
+  (remote-file-name-inhibit-locks t)
   (tramp-copy-size-limit (* 1024 1024))
+  (tramp-use-scp-direct-remote-copying t)
+  (tramp-verbose 2)
 )
 #+end_src
 ** which-key
@@ -999,7 +1001,10 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
          ("r" . magit-refresh))
 
   :custom
-  (magit-log-arguments '("--graph" "--decorate" "--color")))
+  (magit-log-arguments '("--graph" "--decorate" "--color"))
+  ;; (magit-commit-show-diff nil)
+  (magit-branch-direct-configure nil)
+  (magit-refresh-status-buffer nil))
 #+end_src
 
 #+begin_src emacs-lisp
