@@ -9,7 +9,7 @@ tap "kgarner7/feishin"
 brew "bat"
 brew "bitwise"
 brew "cmake"
-brew "coreutils"
+brew "coreutils" # GNU File, Shell, and Text utilities
 brew "direnv"
 brew "wader/tap/fq"
 brew "fzf"

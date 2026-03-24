@@ -303,7 +303,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   :custom
   (dired-kill-when-opening-new-dired-buffer t)
-  (insert-directory-program "ls")
   (dired-recursive-copies 'always)
   (dired-recursive-deletes 'always)
   (dired-omit-files (concat "\\`[.]\\'"
@@ -316,6 +315,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   :hook
   (dired-mode . #'dired-omit-mode))
+;; issues with dired and non-gnu darwin ls
+(when (and (eq system-type 'darwin) (executable-find "gls"))
+  (setq insert-directory-program (executable-find "gls")))
 #+end_src
 ** editorconfig
 
