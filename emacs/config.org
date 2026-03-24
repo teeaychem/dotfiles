@@ -315,6 +315,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   :hook
   (dired-mode . #'dired-omit-mode))
+
 ;; issues with dired and non-gnu darwin ls
 (when (and (eq system-type 'darwin) (executable-find "gls"))
   (setq insert-directory-program (executable-find "gls")))
@@ -553,6 +554,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :straight t
   :config
   (add-to-list 'project-vc-extra-root-markers "INSTALL_RECEIPT.json") ;; brewed libraries, etc.
+  (add-to-list 'project-vc-extra-root-markers ".projectile") ;; custom
   )
 #+end_src
 
@@ -893,6 +895,18 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
         kept-new-versions 6
         kept-old-versions 2
         version-control t))
+#+end_src
+** projectile
+#+begin_src emacs-lisp
+(use-package projectile
+  :straight t
+
+  :config
+  (projectile-mode +1)
+
+  :bind-keymap
+  ("C-x p" . projectile-command-map)
+  )
 #+end_src
 ** rainbow delimiters
 #+begin_src emacs-lisp
@@ -1469,6 +1483,7 @@ https://github.com/radian-software/apheleia/issues/278
 #+begin_src emacs-lisp :noweb yes
 (use-package consult
   :straight t
+  :after projectile
 
   :bind ((:prefix-map consult-search-prefix-map :prefix "C-c s")
          (:map consult-search-prefix-map
@@ -1503,7 +1518,7 @@ https://github.com/radian-software/apheleia/issues/278
          ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
          ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
          ;; ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
-         ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
+         ;; ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
          ;; Custom M-# bindings for fast register access
          ("C-c r l" . consult-register-load)
          ("C-c r s" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
@@ -1538,6 +1553,9 @@ https://github.com/radian-software/apheleia/issues/278
   ;; Use Consult to select xref locations with preview
   (setq xref-show-xrefs-function #'consult-xref)
   (setq xref-show-definitions-function #'consult-xref)
+
+  (autoload 'projectile-project-root "projectile")
+  (setq consult-project-function (lambda (_) (projectile-project-root)))
 
   :config
   (setq consult-peek-key '(:debounce 0.5 any))
@@ -1645,12 +1663,13 @@ From: https://github.com/minad/consult/wiki#hide-all-sources-except-normal-buffe
 #+end_src
 *** consult-project-extra
 
-https://github.com/Qkessler/consult-project-extra
+https://gitlab.com/OlMon/consult-projectile
+https://github.com/Qkessler/consult-project-extra, for project
 
 #+begin_src emacs-lisp
-(use-package consult-project-extra
-  ;; :straight t
-  :bind (("C-x p o" . consult-project-extra-find)))
+(use-package consult-projectile
+  :straight (consult-projectile :type git :host gitlab :repo "OlMon/consult-projectile" :branch "master")
+  :after (consult projectile))
 #+end_src
 ** corfu
 
