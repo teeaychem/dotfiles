@@ -199,6 +199,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :init
   (setq-default fill-column 1024)
   (setq-default indicate-empty-lines t)
+  (setq-default tool-bar-mode nil)
 
   (set-frame-parameter nil 'internal-border-width 2)
 
@@ -399,6 +400,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package repeat
+  :custom
+  (repeat-exit-key "ESC")
   :init (repeat-mode t))
 #+end_src
 ** savehist
@@ -487,6 +490,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   :custom
   (magit-tramp-pipe-stty-settings 'pty)
+  (remote-file-name-access-timeout 5)
   (remote-file-name-inhibit-auto-save-visited t)
   (remote-file-name-inhibit-locks t)
   (tramp-copy-size-limit (* 1024 1024))
@@ -900,6 +904,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package projectile
   :straight t
+  :demand t
 
   :config
   (projectile-mode +1)
