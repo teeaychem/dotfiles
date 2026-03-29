@@ -24,6 +24,20 @@ function rmdsstore {
     find "${@:-.}" -type f -name .DS_Store -delete
 }
 
+function venv-activate() {
+    local venv_root=".venv"
+    if [ $1 ]; then
+        venv_root=$1
+    fi
+
+    if [ -d "${venv_root}" ] && [ -f "${venv_root}/bin/activate" ]; then
+        echo "Activated venv: ${venv_root}"
+        source "${venv_root}/bin/activate"
+    else
+        echo "Unable to activate venv: ${venv_root}"
+    fi
+}
+
 # options
 
 export EDITOR=nvim
@@ -32,18 +46,33 @@ export EDITOR=nvim
 
 # # history
 
-setopt HIST_IGNORE_SPACE
-HISTORY_IGNORE="(ls|cd|pwd|which|z)*"
-
 # # # no duplication
-setopt HIST_EXPIRE_DUPS_FIRST
-setopt HIST_IGNORE_DUPS
-setopt HIST_IGNORE_ALL_DUPS
-setopt HIST_FIND_NO_DUPS
-setopt HIST_SAVE_NO_DUPS
-setopt HIST_FCNTL_LOCK
+setopt HIST_EXPIRE_DUPS_FIRST # delete duplicates first when size exceeds HISTSIZE
+setopt HIST_FCNTL_LOCK        # locking thorugh fcntl
+setopt HIST_FIND_NO_DUPS      # do not display duplicates of a line previously found
+setopt HIST_IGNORE_ALL_DUPS   # replace older commands with duplicated newer
+setopt HIST_IGNORE_DUPS       # ignore duplicated commands
+setopt HIST_IGNORE_SPACE # ignore commands that start with space
+setopt HIST_SAVE_NO_DUPS      # older commands that duplicate newer ones are omitted
+setopt HIST_VERIFY       # show expansion before running it
 
-setopt EXTENDED_HISTORY # additional info
+# setopt inc_append_history
+setopt share_history # hare command history data, append history and read on each call
+
+setopt EXTENDED_HISTORY # record timestamp of command
+
+HISTORY_IGNORE="[[:space:]]*"
+
+HISTORY_IGNORE_CONFIG="${ZDOTDIR}/history_ignore_config"
+if [ -f "${HISTORY_IGNORE_CONFIG}" ]; then
+    . "${HISTORY_IGNORE_CONFIG}"
+    HISTORY_IGNORE="(${(j:|:)IGNORE_COMMANDS})${HISTORY_IGNORE}"
+fi
+
+zshaddhistory() {
+    emulate -L zsh
+    [[ $1 != ${~HISTORY_IGNORE} ]]
+}
 
 # # # corrections
 # setopt CORRECT
@@ -104,6 +133,7 @@ function pyclean {
 # Extensions
 
 eval "$(direnv hook zsh)"
+eval "$(mise activate zsh)"
 
 FZF_CTRL_T_COMMAND=
 if source <(fzf --zsh); then
@@ -121,6 +151,9 @@ if source <(fzf --zsh); then
 fi
 
 eval "$(zoxide init zsh)"
+
+# alibi
+alias ll="ls -lh"
 
 # closing
 autoload -Uz compinit
