@@ -20,8 +20,12 @@ keybind = global:opt+space=toggle_quick_terminal
 
 mouse-hide-while-typing = true
 
-shell-integration-features = ssh-env
+shell-integration-features = cursor,no-sudo,title,ssh-env,no-ssh-terminfo,path
 
+macos-option-as-alt = true
+macos-titlebar-proxy-icon = hidden
+
+unfocused-split-opacity = 0.5
 
 # Disable ligatures
 font-feature = -dlig
