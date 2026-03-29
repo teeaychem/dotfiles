@@ -24,20 +24,6 @@ function rmdsstore {
     find "${@:-.}" -type f -name .DS_Store -delete
 }
 
-function venv-activate() {
-    local venv_root=".venv"
-    if [ $1 ]; then
-        venv_root=$1
-    fi
-
-    if [ -d "${venv_root}" ] && [ -f "${venv_root}/bin/activate" ]; then
-        echo "Activated venv: ${venv_root}"
-        source "${venv_root}/bin/activate"
-    else
-        echo "Unable to activate venv: ${venv_root}"
-    fi
-}
-
 # options
 
 export EDITOR=nvim
@@ -52,16 +38,16 @@ setopt HIST_FCNTL_LOCK        # locking thorugh fcntl
 setopt HIST_FIND_NO_DUPS      # do not display duplicates of a line previously found
 setopt HIST_IGNORE_ALL_DUPS   # replace older commands with duplicated newer
 setopt HIST_IGNORE_DUPS       # ignore duplicated commands
-setopt HIST_IGNORE_SPACE # ignore commands that start with space
+setopt HIST_IGNORE_SPACE      # ignore commands that start with space
 setopt HIST_SAVE_NO_DUPS      # older commands that duplicate newer ones are omitted
-setopt HIST_VERIFY       # show expansion before running it
+setopt HIST_VERIFY            # show expansion before running it
 
 # setopt inc_append_history
 setopt share_history # hare command history data, append history and read on each call
 
 setopt EXTENDED_HISTORY # record timestamp of command
 
-HISTORY_IGNORE="[[:space:]]*"
+HISTORY_IGNORE=""
 
 HISTORY_IGNORE_CONFIG="${ZDOTDIR}/history_ignore_config"
 if [ -f "${HISTORY_IGNORE_CONFIG}" ]; then
@@ -69,10 +55,11 @@ if [ -f "${HISTORY_IGNORE_CONFIG}" ]; then
     HISTORY_IGNORE="(${(j:|:)IGNORE_COMMANDS})${HISTORY_IGNORE}"
 fi
 
-zshaddhistory() {
-    emulate -L zsh
-    [[ $1 != ${~HISTORY_IGNORE} ]]
-}
+# to stop history being added in the first place...
+# zshaddhistory() {
+#     emulate -L zsh
+#     [[ $1 != ${~HISTORY_IGNORE} ]]
+# }
 
 # # # corrections
 # setopt CORRECT
@@ -98,14 +85,14 @@ bindkey "^[[1;5C" forward-word  # | ctl + ->
 
 zstyle ":completion:*:commands" rehash 1 # no caching
 
-setopt always_to_end    # Move cursor to the end of a completed word.
-setopt auto_list        # Automatically list choices on ambiguous completion.
-setopt auto_menu        # Show completion menu on a successive tab press.
-setopt auto_param_slash # If completed parameter is a directory, add a trailing slash.
-setopt complete_in_word # Complete from both ends of a word.
-setopt path_dirs        # Perform path search even on command names with slashes.
-setopt NO_flow_control  # Disable start/stop characters in shell editor.
-setopt NO_menu_complete # Do not autoselect the first completion entry.
+setopt ALWAYS_TO_END    # move cursor to the end of a completed word
+setopt AUTO_LIST        # automatically list choices on ambiguous completion
+setopt AUTO_MENU        # show completion menu on a successive tab press
+setopt AUTO_PARAM_SLASH # if completed parameter is a directory, add a trailing slash
+setopt COMPLETE_IN_WORD # complete from both ends of a word
+setopt PATH_DIRS        # perform path search even on command names with slashes
+setopt NO_FLOW_CONTROL  # disable start/stop characters in shell editor
+setopt NO_MENU_COMPLETE # do not autoselect the first completion entry
 
 # Tools
 
@@ -118,10 +105,24 @@ export MANPAGER="nvim +Man!"
 # # python
 
 alias py="python3"
-alias py3="python3"
 
 alias pyfind='find . -name "*.py"'
-alias pygrep='grep -nr --include="*.py"'
+# alias pygrep='grep -nr --include="*.py"'
+alias pygrep='rg -g "*.py" -g "!**/site-packages/"'
+
+function venv-activate() {
+    local venv_root=".venv"
+    if [ $1 ]; then
+        venv_root=$1
+    fi
+
+    if [ -d "${venv_root}" ] && [ -f "${venv_root}/bin/activate" ]; then
+        echo "Activated venv: ${venv_root}"
+        source "${venv_root}/bin/activate"
+    else
+        echo "Unable to activate venv: ${venv_root}"
+    fi
+}
 
 function pyclean {
     find "${@:-.}" -type f -name "*.py[co]" -delete
@@ -133,7 +134,6 @@ function pyclean {
 # Extensions
 
 eval "$(direnv hook zsh)"
-eval "$(mise activate zsh)"
 
 FZF_CTRL_T_COMMAND=
 if source <(fzf --zsh); then
