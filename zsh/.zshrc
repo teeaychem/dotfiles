@@ -69,16 +69,17 @@ fi
 
 set -o emacs
 
-WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
+WORDCHARS='*?.&!#%^'
 autoload select-word-style
 select-word-style normal
 
+bindkey '^H' backward-kill-word   # C-DEL
 bindkey '^I' complete-word        # tab          | complete
 bindkey '^[[Z' autosuggest-accept # shift + tab  | autosuggest
 
-bindkey "\e\e[D" backward-word  # | option + <-
+bindkey "^[b" backward-word     # | option + <-
 bindkey "^[[1;5D" backward-word # | ctl + <-
-bindkey "\e\e[C" forward-word   # | option + ->
+bindkey "^[f" forward-word      # | option + ->
 bindkey "^[[1;5C" forward-word  # | ctl + ->
 
 # # # completions
