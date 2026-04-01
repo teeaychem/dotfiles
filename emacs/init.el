@@ -10,7 +10,6 @@
 ;;                      "/opt/homebrew/opt/gcc/lib/gcc/current/gcc/aarch64-apple-darwin24/15")
 ;;                    ":"))
 
-
 (require 'package)
 (require 'use-package)
 
@@ -74,7 +73,6 @@
 
 (add-hook 'org-babel-post-tangle-hook #'my-ensure-lexical-binding-cookie)
 
-
 ;; load a fresh tangle of config.org
 (if (file-exists-p (expand-file-name "config.el" user-emacs-directory))
     (delete-file (expand-file-name "config.el" user-emacs-directory)))
@@ -83,6 +81,8 @@
 ;; start emacs in server mode for communcation between skim, etc.
 
 (require 'server)
+(setq server-host (system-name)
+      server-use-tcp t)
 (unless (server-running-p) (server-start))
 
 ;;; init.el ends here
