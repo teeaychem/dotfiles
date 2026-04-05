@@ -51,6 +51,7 @@ https://github.com/editorconfig/editorconfig-emacs?tab=readme-ov-file https://ed
   (enable-recursive-minibuffers t)
   (tab-always-indent t)
   (custom-buffer-indent 4)
+  (tab-width 2)
 
   (auto-save-interval 200)
 
@@ -656,8 +657,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (push '(gersemi . ("gersemi" "-")) apheleia-formatters)
   (setf (alist-get 'cmake-ts-mode apheleia-mode-alist) '(gersemi))
 
-  (setf (alist-get 'stylua apheleia-formatters) '("stylua" "-s" "-"))
-
   (push '(taplo . ("taplo" "format")) apheleia-formatters)
   (setf (alist-get 'toml-mode apheleia-mode-alist) '(taplo))
 
@@ -1135,7 +1134,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :straight t
 
   :custom
-  (lua-indent-level 4))
+  (lua-indent-level 2))
 #+end_src
 ** llvm
 
