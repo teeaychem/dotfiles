@@ -2,9 +2,24 @@
 #+startup: show2levels
 #+PROPERTY: header-args :results silent
 
+* notes
+** tcp
+
+https://www.gnu.org/software/emacs/manual/html_node/emacs/TCP-Emacs-server.html
+https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
+
+#+begin_src sh
+emacsclient -nw -f ~/.config/emacs/var/server/auth/server
+/Applications/Emacs.app/Contents/MacOS/bin/emacsclient -n -c -f ~/.config/emacs/var/server/auth/server
+#+end_src
+
+Though if `EMACS_SERVER_FILE` is set, `-f` is only relevant as an override.
+TCP is used for remote connexions.
+
 * to investigate
 
 https://github.com/editorconfig/editorconfig-emacs?tab=readme-ov-file https://editorconfig.org
+https://github.com/pierre-rouleau/pel
 
 
 * startup
@@ -36,7 +51,6 @@ https://github.com/editorconfig/editorconfig-emacs?tab=readme-ov-file https://ed
   (global-auto-revert-mode t) ; for reloading bib files, etc.
   (global-subword-mode)
 
-  (desktop-save-mode)
   (save-place-mode t)
 
   (setq native-comp-async-report-warnings-errors nil)
@@ -51,6 +65,7 @@ https://github.com/editorconfig/editorconfig-emacs?tab=readme-ov-file https://ed
   (enable-recursive-minibuffers t)
   (tab-always-indent t)
   (custom-buffer-indent 4)
+  (desktop-save-mode t)
   (tab-width 2)
 
   (auto-save-interval 200)
