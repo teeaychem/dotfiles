@@ -787,7 +787,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :if (memq system-type '(darwin gnu/linux))
 
   :custom
-  (exec-path-from-shell-arguments '("-l"))
+  (exec-path-from-shell-arguments '("-i" "-l"))
   (exec-path-from-shell-variables
    '("PATH"
      "DICPATH"

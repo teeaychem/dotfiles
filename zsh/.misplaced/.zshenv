@@ -13,48 +13,6 @@ export SAVEHIST=10000                # Maximum events in history file
 
 typeset -gU path fpath # ensure path arrays do not contain duplicates.
 
-function path_add {
-    element=${1%/}
-    if [ -d "$1" ] && ! echo $PATH | grep -E -q "(^|:)$element($|:)"; then
-        case "$2" in
-        "append")
-            PATH="${PATH:+${PATH}:}$1"
-            ;;
-        "prepend")
-            PATH="$1${PATH:+:${PATH}}"
-            ;;
-        "")
-            PATH="$1${PATH:+:${PATH}}"
-            ;;
-        *)
-            echo -N "Unexpected path_add specification: ${2}"
-            ;;
-        esac
-    fi
-}
-
-# OS earlyish
-case "$OSTYPE" in
-darwin*)
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-    # llvm
-    path_add "/opt/homebrew/opt/llvm/bin/" "append"
-    # export LDFLAGS="-L/opt/homebrew/opt/llvm/lib -L/opt/homebrew/opt/llvm/lib/c++ -L/opt/homebrew/opt/llvm/lib/unwind -lunwind"
-    # export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
-    # export CMAKE_PREFIX_PATH="/opt/homebrew/opt/llvm"
-    path_add "/usr/local/texlive/2026basic/bin/universal-darwin/" "prepend"
-
-    export HOMEBREW_NO_AUTO_UPDATE
-    export HOMEBREW_BUNDLE_FILE="$XDG_CONFIG_HOME/brew/Brewfile"
-
-    [[ -x $(which bat) ]] && export HOMEBREW_BAT=1
-    ;;
-linux*) ;;
-*)
-    echo "No configuration for: $OSTYPE"
-    ;;
-esac
-
 export REPOS_DIR="${HOME}/repos/"
 
 # Languages, etc.
@@ -79,20 +37,13 @@ export PYTHON_HISTORY="${XDG_CACHE_HOME}/python/history"
 export IPYTHONDIR="${XDG_CACHE_HOME}/ipython"
 export MPLCONFIGDIR="${XDG_CACHE_HOME}/matplotlib"
 
-# # rust
-export CARGO_HOME="${HOME}/.cargo"
-if [[ -d $CARGO_HOME ]]; then
-    if [[ -f $CARGO_HOME/env && -r $CARGO_HOME/env ]]; then
-        source "${CARGO_HOME}/env"
-    else
-        echo "CARGO_HOME set, but CARGO_HOME/env unavailable"
-    fi
-fi
-
 # Utils
 
 # # docker
 export DOCKER_CONFIG="${XDG_CONFIG_HOME}/docker"
+
+# # emacs
+export EMACS_SERVER_FILE="${XDG_CONFIG_HOME}/emacs/var/server/auth/server"
 
 # # gpg
 
