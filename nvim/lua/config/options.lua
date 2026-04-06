@@ -40,7 +40,6 @@ opt.spelllang = { "en" }
 opt.splitbelow = true                         -- Put new windows below current
 opt.splitkeep = "screen"
 opt.splitright = true                         -- Put new windows right of current
-opt.statuscolumn = [[%!v:lua.require'snacks.statuscolumn'.get()]]
 opt.swapfile = true                           -- turn on swapfile
 opt.tabstop = 4                               -- Number of spaces tabs count for
 opt.termguicolors = true                      -- True color support
@@ -51,8 +50,3 @@ opt.updatetime = 200               -- Save swap file and trigger CursorHold
 opt.virtualedit = "block"          -- Allow cursor to move where there is no text in visual block mode
 opt.wildmode = "longest:full,full" -- Command-line completion mode
 opt.wrap = true                    -- line wrap
-
-vim.cmd("nnoremap <C-c> <cmd>WhichKey<cr>")
-vim.cmd("vnoremap <C-c> <cmd>WhichKey '' v<cr>")
-vim.cmd("inoremap <C-c> <cmd>WhichKey '' i<cr>")
-vim.cmd("cnoremap <C-c> <cmd>WhichKey '' c<cr>")
