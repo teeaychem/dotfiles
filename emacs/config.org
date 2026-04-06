@@ -112,16 +112,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package emacs
-  :config
-  (unbind-key "C-<wheel-up>")
-  (unbind-key "C-<wheel-down>")
-  (unbind-key "<mouse-2>")
-  (unbind-key "C-z")
-)
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package emacs
   :init
   (defun foward-delete-word (arg) (interactive "p")
          (delete-region (point) (progn (forward-word arg) (point))))
@@ -151,14 +141,27 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   (define-key global-map (kbd "C-g") #'prot/keyboard-quit-dwim)
 
+  :config
+  (unbind-key "C-<wheel-up>")
+  (unbind-key "C-<wheel-down>")
+  (unbind-key "<mouse-2>")
+  (unbind-key "C-z")
+  (unbind-key "M-z")
+
   :bind
   (("<mouse-3>" . context-menu-open)
    ("C-<tab>" . completion-at-point)
+   ("<backtab>" . completion-at-point)
    ("C-<backspace>" . backward-delete-word)
    ("C-g" . #'prot/keyboard-quit-dwim)
    ("C-k" . forward-delete-line)
    ("C-x k" . kill-current-buffer)
    ("C-x K" . kill-buffer)
+   ("C-x C-r" . 'execute-extended-command)
+
+   ("s-." . 'xref-find-definitions)
+   ("s-<" . 'xref-go-back)
+   ("s->" . 'xref-go-forward)
 
    ("M-DEL" . backward-delete-word)
 
@@ -1413,7 +1416,8 @@ https://github.com/radian-software/apheleia/issues/278
                                '((C . t)
                                  (emacs-lisp . t)
                                  (org . t)
-                                 (scheme . t))))
+                                 (scheme . t)))
+  (keymap-unset org-mode-map "<backtab>" 'remove))
 #+end_src
 ** org-node
 
