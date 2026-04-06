@@ -318,7 +318,11 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package dired
-  :ensure nil
+  :demand
+
+  :init
+  (when (and (eq system-type 'darwin) (executable-find "gls"))
+    (setq insert-directory-program (executable-find "gls")))
 
   :custom
   (dired-kill-when-opening-new-dired-buffer t)
@@ -336,8 +340,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (dired-mode . #'dired-omit-mode))
 
 ;; issues with dired and non-gnu darwin ls
-(when (and (eq system-type 'darwin) (executable-find "gls"))
-  (setq insert-directory-program (executable-find "gls")))
 #+end_src
 ** editorconfig
 
@@ -576,7 +578,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :straight t
   :config
   (add-to-list 'project-vc-extra-root-markers "INSTALL_RECEIPT.json") ;; brewed libraries, etc.
-  (add-to-list 'project-vc-extra-root-markers ".projectile") ;; custom
+  (add-to-list 'project-vc-extra-root-markers ".project") ;; custom
   )
 #+end_src
 
@@ -1849,6 +1851,22 @@ https://github.com/Qkessler/consult-project-extra, for project
 #+end_src
 ** eglot
 *** eglot
+
+
+#+begin_src emacs-lisp
+(defun set-project-override ()
+  "Set `project-current-directory-override' for the current buffer"
+  (interactive)
+  (setq-local project-current-directory-override (project-prompt-project-dir)))
+#+end_src
+
+set-project-override is not particularly useful as it's (only) buffer local.
+Instead, a .dir.locals in the root with the following seems to work ok.
+
+#+begin_src emacs-lisp :tangle no
+((nil . ((project-current-directory-override . "<project_root>"))))
+#+end_src
+
 
 maybe: https://github.com/casouri/eldoc-box
 
