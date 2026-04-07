@@ -67,6 +67,7 @@ https://github.com/pierre-rouleau/pel
   (custom-buffer-indent 4)
   (desktop-save-mode t)
   (tab-width 2)
+  (xterm-mouse-mode t)
 
   (auto-save-interval 200)
 
@@ -160,8 +161,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
    ("C-x C-r" . 'execute-extended-command)
 
    ("s-." . 'xref-find-definitions)
-   ("s-<" . 'xref-go-back)
-   ("s->" . 'xref-go-forward)
+   ("M-." . 'xref-find-definitions)
+   ("M-s-," . 'xref-go-back)
+   ("M-s-." . 'xref-go-forward)
 
    ("M-DEL" . backward-delete-word)
 
@@ -533,7 +535,13 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (set-face-attribute 'which-key-local-map-description-face nil :weight 'bold))
 #+end_src
 
-
+** xclip
+#+begin_src emacs-lisp
+(use-package xclip
+  :straight t
+  :config
+  (xclip-mode 1))
+#+end_src
 * internal straight
 
 ** flymake
@@ -890,6 +898,16 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :hook
   (prog-mode . highlight-indent-guides-mode))
 #+end_src
+** kkp
+
+#+begin_src emacs-lisp
+(use-package kkp
+  :straight t
+  :hook (tty-setup . global-kkp-mode)
+  :config
+  ;; (setq kkp-alt-modifier 'alt) ;; use this if you want to map the Alt keyboard modifier to Alt in Emacs (and not to Meta)
+  )
+#+end_src
 ** multiple cursors
 #+begin_src emacs-lisp
 (use-package multiple-cursors
@@ -923,6 +941,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 ** projectile
 #+begin_src emacs-lisp
 (use-package projectile
+  :disabled
   :straight t
   :demand t
 
