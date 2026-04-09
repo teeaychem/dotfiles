@@ -1,6 +1,6 @@
-local ce = hs.loadSpoon('ControlEscape')
-ce.cancel_delay_seconds = 0.00125
-ce:start()
+-- local ce = hs.loadSpoon('ControlEscape')
+-- ce.cancel_delay_seconds = 0.00125
+-- ce:start()
 
 local left_square_bracket = 42
 local right_square_bracket = 30
