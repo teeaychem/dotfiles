@@ -81,8 +81,7 @@
 ;; start emacs in server mode for communcation between skim, etc.
 
 (require 'server)
-(setq server-host (system-name)
-      server-use-tcp t)
+(setq server-host (system-name))
 (unless (server-running-p) (server-start))
 
 ;;; init.el ends here

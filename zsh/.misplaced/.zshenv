@@ -42,9 +42,6 @@ export MPLCONFIGDIR="${XDG_CACHE_HOME}/matplotlib"
 # # docker
 export DOCKER_CONFIG="${XDG_CONFIG_HOME}/docker"
 
-# # emacs
-export EMACS_SERVER_FILE="${XDG_CONFIG_HOME}/emacs/var/server/auth/server"
-
 # # gpg
 
 # https://www.gnupg.org/(it)/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html

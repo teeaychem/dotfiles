@@ -68,6 +68,7 @@ https://github.com/pierre-rouleau/pel
   (desktop-save-mode t)
   (tab-width 2)
   (xterm-mouse-mode t)
+  (translate-upper-case-key-bindings nil)
 
   (auto-save-interval 200)
 
@@ -717,7 +718,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 ** COMMENT devdocs
 #+begin_src emacs-lisp
 (use-package devdocs
-  ;; :straight t
+  :straight t
+  :disabled
   :bind (("C-h D" . 'devdocs-lookup)))
 #+end_src
 ** diminish
@@ -850,6 +852,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package gumshoe
+  :disabled
   :straight t
   :init
   ;; Enabing global-gumshoe-mode will initiate tracking
@@ -903,19 +906,17 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package kkp
   :straight t
-  :hook (tty-setup . global-kkp-mode)
-  :config
-  ;; (setq kkp-alt-modifier 'alt) ;; use this if you want to map the Alt keyboard modifier to Alt in Emacs (and not to Meta)
-  )
+  :demand t
+  :hook (tty-setup . global-kkp-mode))
 #+end_src
 ** multiple cursors
 #+begin_src emacs-lisp
 (use-package multiple-cursors
   :straight t
 
-  :bind (("C->" . mc/mark-next-like-this)
-         ("C-<" . mc/mark-previous-like-this)
-         ("C-c C->" . mc/mark-all-like-this)
+  :bind (("C-S-." . mc/mark-next-like-this)
+         ("C-S-," . mc/mark-previous-like-this)
+         ("C-c C-S-." . mc/mark-all-like-this)
          ("C-c C-SPC" . mc/edit-lines)
          ("M-<M-down-mouse-1>" . mc/add-cursor-on-click)))
 #+end_src
