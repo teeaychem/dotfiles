@@ -1,14 +1,7 @@
 # This is the configuration file for Ghostty.
 #
-# The template does not set any default options, since Ghostty ships
-# with sensible defaults for all options. Users should only need to set
-# options that they want to change from the default.
-#
-# Run `ghostty +show-config --default --docs` to view a list of
-# all available config options and their default values.
-#
-# Additionally, each config option is also explained in detail
-# on Ghostty's website, at https://ghostty.org/docs/config.
+# ghostty +show-config --default --docs
+# https://ghostty.org/docs/config.
 
 auto-update = off
 
@@ -16,18 +9,19 @@ cursor-style = block
 
 font-family = Source Code Pro
 
-keybind = global:opt+space=toggle_quick_terminal
+# Disable ligatures
+font-feature = -dlig
+font-feature = -liga
+font-feature = -calt
+
+keybind = global:opt+super+space=toggle_quick_terminal
+keybind = opt+shift+super+p=toggle_command_palette
+
+macos-option-as-alt = true
+macos-titlebar-proxy-icon = hidden
 
 mouse-hide-while-typing = true
 
 shell-integration-features = no-sudo,title,ssh-env,no-ssh-terminfo,path
 
-macos-option-as-alt = true
-macos-titlebar-proxy-icon = hidden
-
 unfocused-split-opacity = 0.5
-
-# Disable ligatures
-font-feature = -dlig
-font-feature = -liga
-font-feature = -calt
