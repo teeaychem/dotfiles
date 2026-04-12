@@ -11,7 +11,7 @@
 (run-with-idle-timer 2.0 t 'garbage-collect)
 (setq garbage-collection-messages nil)
 
-(setq read-process-output-max (* 64 1024))
+(setq read-process-output-max (* 4 1024 1024))
 
 (setq inhibit-compacting-font-caches t)
 

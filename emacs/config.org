@@ -3,18 +3,35 @@
 #+PROPERTY: header-args :results silent
 
 * notes
-** tcp
+** compilation
 
-https://www.gnu.org/software/emacs/manual/html_node/emacs/TCP-Emacs-server.html
-https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
+Run autogen, if needed.
 
 #+begin_src sh
-emacsclient -nw -f ~/.config/emacs/var/server/auth/server
-/Applications/Emacs.app/Contents/MacOS/bin/emacsclient -n -c -f ~/.config/emacs/var/server/auth/server
+./autogen.sh
+./configure
+make -j$(nproc)
+sudo make install
 #+end_src
 
-Though if `EMACS_SERVER_FILE` is set, `-f` is only relevant as an override.
-TCP is used for remote connexions.
+maybe make bootstrap, if old build artifacts conflict
+
+#+begin_src sh
+CFLAGS='-march=native -O3' \
+./configure \
+    --with-ns=no \
+    --with-x \
+    --with-x-toolkit=yes \
+    --with-native-compilation \
+    --prefix="$HOME/.local/opt/emacs/" \
+    --program-transform-name='s/^ctags$/ctags.emacs/' \
+    --with-imagemagick \
+    --with-native-compilation=aot \
+    --with-tree-sitter \
+    --without-toolkit-scroll-bars \
+    --without-mailutils \
+    --without-compress-install
+#+end_src
 
 * to investigate
 
@@ -32,6 +49,15 @@ https://github.com/pierre-rouleau/pel
 * general
 
 ** emacs
+
+#+begin_src emacs-lisp
+;; Optimization from doom-start.el
+(setq auto-mode-case-fold nil)
+(setq-default bidi-display-reordering 'left-to-right
+              bidi-paragraph-direction 'left-to-right)
+(setq bidi-inhibit-bpa t)
+(setq idle-update-delay 1.0)
+#+end_src
 
 #+begin_src emacs-lisp
 (use-package emacs
@@ -69,6 +95,12 @@ https://github.com/pierre-rouleau/pel
   (tab-width 2)
   (xterm-mouse-mode t)
   (translate-upper-case-key-bindings nil)
+
+  (kill-do-not-save-duplicates t)
+  (save-interprogram-paste-before-kill t)
+
+  (window-combination-resize t)
+
 
   (auto-save-interval 200)
 
@@ -149,6 +181,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (unbind-key "<mouse-2>")
   (unbind-key "C-z")
   (unbind-key "M-z")
+  (unbind-key "s-:")
 
   :bind
   (("<mouse-3>" . context-menu-open)
@@ -171,6 +204,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
    ("M-u" . 'upcase-dwim)
    ("M-l" . 'downcase-dwim)
    ("M-c" . 'capitalize-dwim)
+
+   ("s-:" . 'eval-expression)
+   ("s-x" . 'execute-extended-command)
 
    ("RET" . newline)))
 #+end_src
@@ -425,6 +461,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (use-package repeat
   :custom
   (repeat-exit-key "C-g")
+  (set-mark-command-repeat-pop t)
   :init (repeat-mode t))
 #+end_src
 ** savehist
