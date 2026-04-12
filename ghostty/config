@@ -7,7 +7,7 @@ auto-update = off
 
 cursor-style = block
 
-font-family = Source Code Pro
+font-family = "M+1Code Nerd Font Mono"
 
 # Disable ligatures
 font-feature = -dlig
@@ -16,6 +16,15 @@ font-feature = -calt
 
 keybind = global:opt+super+space=toggle_quick_terminal
 keybind = opt+shift+super+p=toggle_command_palette
+
+keybind = super+0=unbind
+keybind = super++=unbind
+keybind = super+-=unbind
+keybind = super+==unbind
+
+# macOS owned
+keybind = ctrl+tab=unbind
+keybind = ctrl+shift+tab=unbind
 
 macos-option-as-alt = true
 macos-titlebar-proxy-icon = hidden

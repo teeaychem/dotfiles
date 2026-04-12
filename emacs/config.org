@@ -941,7 +941,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 ** projectile
 #+begin_src emacs-lisp
 (use-package projectile
-  :disabled
+  ;; :disabled
   :straight t
   :demand t
 
