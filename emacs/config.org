@@ -37,6 +37,7 @@ CFLAGS='-march=native -O3' \
 
 https://github.com/editorconfig/editorconfig-emacs?tab=readme-ov-file https://editorconfig.org
 https://github.com/pierre-rouleau/pel
+https://whhone.com/emacs-config/
 
 
 * startup
@@ -95,6 +96,8 @@ https://github.com/pierre-rouleau/pel
   (tab-width 2)
   (xterm-mouse-mode t)
   (translate-upper-case-key-bindings nil)
+  (mouse-yank-at-point t)
+  (kill-whole-line t)
 
   (kill-do-not-save-duplicates t)
   (save-interprogram-paste-before-kill t)
@@ -324,7 +327,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
                       :family "M PLUS 1 Code"; "Maple Mono NF" "JuliaMono"
                       :height 150))
 #+end_src
-
 ** macos
 #+begin_src emacs-lisp
 (use-package emacs
@@ -443,6 +445,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :custom
   (recentf-auto-cleanup (if (daemonp) 300 'never))
   (recentf-exclude '((expand-file-name package-user-dir)
+                     ":" ;; tramp
                      ".cache"
                      "bookmarks"
                      "cache"
@@ -572,6 +575,12 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (which-key-setup-minibuffer)
   (set-face-attribute 'which-key-local-map-description-face nil :weight 'bold))
 #+end_src
+** winner
+
+#+begin_src emacs-lisp
+(use-package winner
+  :init (winner-mode +1))
+#+end_src
 ** xclip
 #+begin_src emacs-lisp
 (use-package xclip
@@ -579,6 +588,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :config
   (xclip-mode 1))
 #+end_src
+
 * internal straight
 
 ** flymake
@@ -624,10 +634,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :config
   (add-to-list 'project-vc-extra-root-markers "INSTALL_RECEIPT.json") ;; brewed libraries, etc.
   (add-to-list 'project-vc-extra-root-markers ".project") ;; custom
+  (add-to-list 'project-vc-extra-root-markers ".dir-locals.el")
   )
 #+end_src
-
-
 
 * other configs
 
@@ -651,6 +660,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package catppuccin-theme
+  :disabled
   :straight (catppuccin-theme :local-repo "catppuccin" :type git :host github :repo "catppuccin/emacs" :branch "main")
 
   :config
@@ -661,6 +671,10 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (catppuccin-flavor 'mocha)
   (catppuccin-highlight-matches t)
   (catppuccin-italic-variables t))
+
+(use-package batppuccin
+  :straight (batppuccin :type git :host github :repo "bbatsov/batppuccin-emacs"))
+(load-theme 'batppuccin-mocha t)
 #+end_src
 
 * external, etc.
@@ -742,6 +756,12 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 ** browse kill ring
 #+begin_src emacs-lisp
 (use-package browse-kill-ring
+  :straight t)
+#+end_src
+** crux
+
+#+begin_src emacs-lisp
+(use-package crux
   :straight t)
 #+end_src
 ** ctrlf
@@ -1053,6 +1073,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package diff-hl
   :straight t
+  :after magit
   :if (not (memq system-type '(windows-nt)))
   :custom
   (diff-hl-draw-borders nil)
@@ -1071,6 +1092,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (diff-hl-margin-mode)
   (diff-hl-flydiff-mode nil)
   (diff-hl-show-hunk-mouse-mode nil)
+  (diff-hl-update-async t)
 
   :custom-face
   ;; (diff-hl-change ((t (:background ,(face-attribute 'default :background)))))
@@ -1086,7 +1108,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package magit
   :straight t
-
+  :demand t
   :bind (:prefix-map magit-prefix-map
          :prefix "C-c v"
          ("s" . magit-status)
@@ -1140,7 +1162,17 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :vc (:fetcher github :repo teeaychem/clingo-asp-mode))
 ;;   :load-path (lambda() (concat user-emacs-directory "../../projects/emacs/clingo-asp-mode/")))
 #+end_src
-** C/pp
+** C/++
+
+#+begin_src emacs-lisp
+(use-package cc-mode
+  :bind (:map c++-mode-map
+              ;; ("C-c C-h" . ff-find-other-file)
+              ("C-c h" . ff-find-other-file-other-window))
+  :config
+  ;; do not override the open link (c-set-offset)
+  (keymap-unset c++-mode-map "C-c C-o"))
+#+end_src
 
 #+begin_src emacs-lisp
 (use-package cmake-mode
@@ -1148,6 +1180,13 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :straight (:host github
              :repo "emacsmirror/cmake-mode"
              :branch "master"))
+#+end_src
+** elf
+
+#+begin_src emacs-lisp
+(use-package elf-mode
+  :disabled
+  :magic ("ELF" . elf-mode))
 #+end_src
 ** fish
 
@@ -1324,6 +1363,15 @@ https://github.com/llvm/llvm-project.git
   :hook
   (python-base-mode . 'python-local-setup))
 #+end_src
+*** uv
+
+#+begin_src emacs-lisp
+(use-package uv-mode
+  :straight t
+  :disabled
+  :hook (python-mode-hook . uv-mode-auto-activate-hook))
+#+end_src
+
 ** rust
 
 https://robert.kra.hn/posts/rust-emacs-setup/
@@ -1395,6 +1443,13 @@ https://github.com/radian-software/apheleia/issues/278
   :straight t
   :mode (("/README\\(?:\\.md\\)?\\'" . gfm-mode)
          ("\\.m[k]d\\'" . gfm-mode))
+
+  :bind
+  (:map markdown-mode-map
+        ("M-<left>" . markdown-promote)
+        ("M-<right>" . markdown-demote)
+        ("M-S-<left>" . markdown-promote-subtree)
+        ("M-S-<right>" . markdown-demote-subtree))
 
   :config
   (setq markdown-fontify-code-blocks-natively t)
@@ -1751,7 +1806,12 @@ https://github.com/Qkessler/consult-project-extra, for project
 #+begin_src emacs-lisp
 (use-package consult-projectile
   :straight (consult-projectile :type git :host gitlab :repo "OlMon/consult-projectile" :branch "master")
-  :after (consult projectile))
+  :after (consult projectile)
+  :bind ((:prefix-map consult-projectile-search-prefix-map :prefix "C-c s p")
+         (:map consult-projectile-search-prefix-map
+               ("b" . consult-projectile-switch-to-buffer)
+               ("d" . consult-projectile-find-dir)
+               ("f" . consult-projectile-find-file))))
 #+end_src
 ** corfu
 
@@ -1829,21 +1889,20 @@ https://github.com/Qkessler/consult-project-extra, for project
 #+begin_src emacs-lisp
 (use-package embark
   :straight t
-
-  :bind (("C-c a" . embark-act)         ;; pick some comfortable binding
+  :bind (("C-c a" . embark-act)       ;; pick some comfortable binding
          ("C-;" . embark-dwim)        ;; good alternative: M-.
          ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
-
-  :init
-  ;; Optionally replace the key help with a completing-read interface
-  (setq prefix-help-command #'embark-prefix-help-command)
 
   :config
   ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                  nil
-                 (window-parameters (mode-line-format . none)))))
+                 (window-parameters (mode-line-format . none))))
+
+  :init
+  ;; Optionally replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -1856,6 +1915,14 @@ https://github.com/Qkessler/consult-project-extra, for project
 
 
 * language interaction
+
+** breadcrumb
+
+#+begin_src emacs-lisp
+(use-package breadcrumb
+  :straight t)
+#+end_src
+
 ** citre
 
 #+begin_src emacs-lisp
@@ -2186,4 +2253,35 @@ https://github.com/renzmann/treesit-auto
 ;;      :program "a.out"
 ;;      :args []
 ;;      :stopAtBeginningOfMainSubprogram nil)))
+#+end_src
+
+* fns
+
+From https://blog.plover.com/prog/revert-all.html
+
+#+begin_src emacs-lisp
+(defun revert-all-buffers ()
+  "Refreshes all open buffers from their respective files"
+  (interactive)
+  (let* ((list (buffer-list))
+         (buffer (car list)))
+    (while buffer
+      (when (and (buffer-file-name buffer)
+                 (not (buffer-modified-p buffer)))
+        (set-buffer buffer)
+        (revert-buffer t t t))
+      (setq list (cdr list))
+      (setq buffer (car list))))
+  (message "Refreshed open files"))
+#+end_src
+
+* terminal
+
+See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
+
+#+begin_src emacs-lisp
+(use-package clipetty
+  :straight t
+  :ensure t
+  :bind ("M-w" . clipetty-kill-ring-save))
 #+end_src
