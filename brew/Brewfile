@@ -1,6 +1,6 @@
 # # Taps
 
-tap "d12frosted/emacs-plus"
+# tap "d12frosted/emacs-plus"
 tap "kgarner7/feishin"
 
 # # Brews
@@ -71,8 +71,9 @@ brew "taplo"
 brew "z3"
 
 # # Casks
+
 cask  "appcleaner"
-cask  "emacs-plus-app"
+cask  "calibre"
 # cask  "feishin"
 cask  "hammerspoon"
 cask  "iina"
