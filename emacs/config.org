@@ -38,6 +38,7 @@ CFLAGS='-march=native -O3' \
 https://github.com/editorconfig/editorconfig-emacs?tab=readme-ov-file https://editorconfig.org
 https://github.com/pierre-rouleau/pel
 https://whhone.com/emacs-config/
+https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emacs
 
 
 * startup
@@ -1359,6 +1360,11 @@ https://github.com/llvm/llvm-project.git
     (setq-local python-shell-virtualenv-root (pet-virtualenv-root))
     (pet-eglot-setup)
     (pet-dape-setup))
+
+  :init
+  (setq pet-find-file-functions '(pet-find-file-from-project-root
+                                  pet-locate-dominating-file
+                                  pet-find-file-from-project-root-natively))
 
   :hook
   (python-base-mode . 'python-local-setup))
