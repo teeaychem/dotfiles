@@ -14,6 +14,7 @@ export SAVEHIST=10000                # Maximum events in history file
 typeset -gU path fpath # ensure path arrays do not contain duplicates.
 
 export REPOS_DIR="${HOME}/repos/"
+export LLVM_SRC="${HOME}/repos/llvm/"
 
 # Languages, etc.
 

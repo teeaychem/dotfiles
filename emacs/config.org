@@ -1260,25 +1260,25 @@ https://github.com/llvm/llvm-project.git
 (with-eval-after-load 'exec-path-from-shell
   (eval-and-compile
     (defun repos-load-path (load-path)
-      (concat (getenv "REPOS_DIR") load-path)))
+      (concat (getenv "LLVM_SRC") load-path)))
 
     (use-package llvm-mode
-      :load-path (lambda () (list (repos-load-path "/llvm/llvm/utils/emacs")))
+      :load-path (lambda () (list (repos-load-path "/llvm/utils/emacs")))
       :mode "\\.ll\\'"
       :commands llvm-mode)
 
     (use-package llvm-mir-mode
-      :load-path (lambda () (list (repos-load-path "/llvm/llvm/utils/emacs")))
+      :load-path (lambda () (list (repos-load-path "/llvm/utils/emacs")))
       :mode "\\.mir\\'"
       :commands llvm-mir-mode)
 
     (use-package mlir-mode
-      :load-path (lambda () (list (repos-load-path "/llvm/mlir/utils/emacs")))
+      :load-path (lambda () (list (repos-load-path "/mlir/utils/emacs")))
       :mode "\\.mlir\\'"
       :commands mlir-mode)
 
     (use-package tablegen-mode
-      :load-path (lambda () (list (repos-load-path "/llvm/llvm/utils/emacs")))
+      :load-path (lambda () (list (repos-load-path "/llvm/utils/emacs")))
       :mode "\\.td\\'"
 
       :config
