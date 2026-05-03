@@ -1,4 +1,3 @@
-# antidote
 # # https://getantidote.github.io/usage
 
 if [[ ! -d ${ZDOTDIR:-$HOME}/.antidote ]]; then
@@ -17,7 +16,7 @@ function cdf() {
 
 # de-quarantine $1
 function dq {
-    eval "xattr -r -d com.apple.quarantine $1"
+    xattr -r -d com.apple.quarantine "$1"
 }
 
 function rmdsstore {
@@ -59,7 +58,7 @@ darwin*)
     export HOMEBREW_NO_AUTO_UPDATE
     export HOMEBREW_BUNDLE_FILE="$XDG_CONFIG_HOME/brew/Brewfile"
 
-    [[ -x $(which bat) ]] && export HOMEBREW_BAT=1
+    if command -v bat &>/dev/null; then export HOMEBREW_BAT=1; fi
     ;;
 linux*) ;;
 *)
@@ -70,7 +69,7 @@ esac
 
 # options
 
-export EDITOR=nvim
+EDITOR=nvim
 
 # # misc
 
@@ -132,18 +131,6 @@ local history_to_ignore=(
 
 HISTORY_IGNORE="${(j:|:)history_to_ignore}"
 
-# HISTORY_IGNORE_CONFIG="${ZDOTDIR}/history_ignore_config"
-# if [ -f "${HISTORY_IGNORE_CONFIG}" ]; then
-#     . "${HISTORY_IGNORE_CONFIG}"
-#     HISTORY_IGNORE="(${(j:|:)IGNORE_COMMANDS})${HISTORY_IGNORE}"
-# fi
-
-# to stop history being added in the first place...
-# zshaddhistory() {
-#     emulate -L zsh
-#     [[ $1 != ${~HISTORY_IGNORE} ]]
-# }
-
 # # # corrections
 # setopt CORRECT
 # setopt CORRECT_ALL
@@ -196,10 +183,7 @@ alias pyfind='find . -name "*.py"'
 alias pygrep='rg -g "*.py" -g "!**/site-packages/"'
 
 function venv-activate() {
-    local venv_root=".venv"
-    if [ $1 ]; then
-        venv_root=$1
-    fi
+    local venv_root="${1:-.venv}";
 
     if [ -d "${venv_root}" ] && [ -f "${venv_root}/bin/activate" ]; then
         echo "Activated venv: ${venv_root}"

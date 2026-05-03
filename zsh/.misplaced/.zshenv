@@ -2,19 +2,24 @@
 export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
 export XDG_CACHE_HOME=${XDG_CACHE_HOME:-$HOME/.cache}
 export XDG_DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}
-export XDG_STATE_HOME=${XDG_CACHE_HOME:-$HOME/.state}
+export XDG_STATE_HOME=${XDG_STATE_HOME:-$HOME/.local/state}
+
+mkdir -p \
+    -- "$XDG_CONFIG_HOME" \
+    -- "$XDG_CACHE_HOME" \
+    -- "$XDG_DATA_HOME" \
+    -- "$XDG_STATE_HOME"
 
 export ZDOTDIR=${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}
+mkdir -p -- ${ZDOTDIR}
 
 # ZSH
 export HISTFILE="$ZDOTDIR/.zhistory" # History filepath
 export HISTSIZE=10000                # Maximum events for internal history
 export SAVEHIST=10000                # Maximum events in history file
 
-typeset -gU path fpath # ensure path arrays do not contain duplicates.
-
-export REPOS_DIR="${HOME}/repos/"
-export LLVM_SRC="${HOME}/repos/llvm/"
+export REPOS_DIR="${HOME}/repos"
+export LLVM_SRC="${HOME}/repos/llvm"
 
 # Languages, etc.
 
@@ -54,3 +59,5 @@ export DICPATH="${XDG_CONFIG_HOME}/hunspell/dictionaries"
 
 # # less
 export LESSHISTFILE="${XDG_STATE_HOME}/less/history"
+
+typeset -gU path fpath # ensure path arrays do not contain duplicates.
