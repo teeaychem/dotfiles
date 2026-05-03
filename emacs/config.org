@@ -1,3 +1,9 @@
+:PROPERTIES:
+:GPTEL_MODEL: test
+:GPTEL_BACKEND: llama-cpp
+:GPTEL_SYSTEM: You are a large language model living in Emacs and a helpful assistant. Respond concisely.
+:GPTEL_TOOLS:
+:END:
 -*- mode: org -*-
 #+startup: show2levels
 #+PROPERTY: header-args :results silent
@@ -2290,4 +2296,42 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
   :straight t
   :ensure t
   :bind ("M-w" . clipetty-kill-ring-save))
+#+end_src
+
+* llm
+
+#+begin_src emacs-lisp
+(use-package gptel
+  :straight t
+  :bind (:prefix-map gptel-prefix-map
+                     :prefix "C-c z")
+  :bind (:repeat-map gptel-prefix-map
+                     ("a" . gptel-add)
+                     ("c"  . gptel)
+                     ("r" . gptel-rewrite)
+                     ("m"  . gptel-menu)
+                     ("p" . gptel-preset)
+                     ("s" . gptel-send)
+                     ("t"  . gptel-tools)
+                     ("v"  . gptel-context-visit))
+
+  :config
+  (gptel-make-openai "llama-cpp"
+    :stream t
+    :protocol "http"
+    :host "localhost:8080"
+    :models '(llama-model))
+
+  (gptel-make-preset 'explain
+    :system "Explain what this code does to a novice programmer.")
+
+  (setq-default gptel-include-reasoning nil)
+  (setq-default gptel-log-level 'info)
+  (setq-default gptel-cache t))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package gptel-agent
+  :straight t
+  :config (gptel-agent-update))         ;Read files from agents directories
 #+end_src
