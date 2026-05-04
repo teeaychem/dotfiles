@@ -9,6 +9,9 @@
 #+PROPERTY: header-args :results silent
 
 * notes
+
+https://www.emacswiki.org/emacs/GnusAuthinfo
+
 ** compilation
 
 Run autogen, if needed.
