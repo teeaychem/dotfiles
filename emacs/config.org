@@ -744,6 +744,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (push '(gersemi . ("gersemi" "-")) apheleia-formatters)
   (setf (alist-get 'cmake-ts-mode apheleia-mode-alist) '(gersemi))
 
+  (push '(raco-fmt . ("raco" "fmt")) apheleia-formatters)
+  (setf (alist-get 'racket-mode apheleia-mode-alist) '(raco-fmt))
+
   (push '(taplo . ("taplo" "format")) apheleia-formatters)
   (setf (alist-get 'toml-mode apheleia-mode-alist) '(taplo))
 
@@ -1383,7 +1386,17 @@ https://github.com/llvm/llvm-project.git
   :disabled
   :hook (python-mode-hook . uv-mode-auto-activate-hook))
 #+end_src
+** racket
 
+#+begin_src sh
+raco pkg install --auto drracket
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package racket-mode
+  :straight t
+  :mode "\\.rkt\\'")
+#+end_src
 ** rust
 
 https://robert.kra.hn/posts/rust-emacs-setup/
@@ -2072,6 +2085,7 @@ maybe: https://github.com/casouri/eldoc-box
   (add-to-list 'eglot-server-programs '(mlir-pdll-mode . ("mlir-pdll-lsp-server")))
   (add-to-list 'eglot-server-programs '(nix-mode . ("nil")))
   (add-to-list 'eglot-server-programs '(python-mode . ("ty" "server")))
+  (add-to-list 'eglot-server-programs '(racket-mode . ("racket" "-l" "racket-langserver")))
   (add-to-list 'eglot-server-programs '((rust-ts-mode rust-mode) .
                                         ("rust-analyzer"
                                          :initializationOptions (:check (:command "clippy")))))
@@ -2080,6 +2094,7 @@ maybe: https://github.com/casouri/eldoc-box
   (add-to-list 'eglot-server-programs '((sh-mode bash-ts-mode) . ("bash-language-server" "start"))))
 #+end_src
 *** eglot-x
+
 https://github.com/nemethf/eglot-x#rust-analyzer-extensions
 for rust dev
 
