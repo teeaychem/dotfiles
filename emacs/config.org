@@ -1006,7 +1006,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 ** projectile
 #+begin_src emacs-lisp
 (use-package projectile
-  ;; :disabled
   :straight t
   :demand t
 
@@ -1100,7 +1099,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (diff-hl-margin-mode)
   (diff-hl-flydiff-mode nil)
   (diff-hl-show-hunk-mouse-mode nil)
-  (diff-hl-update-async t)
+  ;; (diff-hl-update-async t)
 
   :custom-face
   ;; (diff-hl-change ((t (:background ,(face-attribute 'default :background)))))
@@ -1633,7 +1632,6 @@ https://github.com/radian-software/apheleia/issues/278
 #+begin_src emacs-lisp :noweb yes
 (use-package consult
   :straight t
-  :after projectile
 
   :bind ((:prefix-map consult-search-prefix-map :prefix "C-c s")
          (:map consult-search-prefix-map
@@ -1686,10 +1684,6 @@ https://github.com/radian-software/apheleia/issues/278
          :map minibuffer-local-map
          ("M-s" . consult-history)                 ;; orig. next-matching-history-element
          ("M-r" . consult-history))                 ;; orig. previous-matching-history-element
-
-  ;; Enable automatic preview at point in the *Completions* buffer. This is relevant when you use the default completion UI.
-  :hook
-  (completion-list-mode . consult-preview-at-point-mode)
 
   :init
   ;; Configure the register formatting.
@@ -1921,9 +1915,7 @@ https://github.com/Qkessler/consult-project-extra, for project
 #+begin_src emacs-lisp
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
-  :straight t
-  :hook
-  (embark-collect-mode . consult-preview-at-point-mode))
+  :straight t)
 #+end_src
 
 
