@@ -217,6 +217,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
    ("s-:" . 'eval-expression)
    ("s-x" . 'execute-extended-command)
+   ("s-c" . kill-ring-save)
 
    ("RET" . newline)))
 #+end_src
@@ -2295,7 +2296,9 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 (use-package clipetty
   :straight t
   :ensure t
-  :bind ("M-w" . clipetty-kill-ring-save))
+  :bind
+  ("M-w" . clipetty-kill-ring-save)
+  ("s-c" . clipetty-kill-ring-save))
 #+end_src
 
 * llm
@@ -2305,15 +2308,15 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
   :straight t
   :bind (:prefix-map gptel-prefix-map
                      :prefix "C-c z")
-  :bind (:repeat-map gptel-prefix-map
-                     ("a" . gptel-add)
-                     ("c"  . gptel)
-                     ("r" . gptel-rewrite)
-                     ("m"  . gptel-menu)
-                     ("p" . gptel-preset)
-                     ("s" . gptel-send)
-                     ("t"  . gptel-tools)
-                     ("v"  . gptel-context-visit))
+  :bind (:map gptel-prefix-map
+              ("a" . gptel-add)
+              ("c"  . gptel)
+              ("r" . gptel-rewrite)
+              ("m"  . gptel-menu)
+              ("p" . gptel-preset)
+              ("s" . gptel-send)
+              ("t"  . gptel-tools)
+              ("v"  . gptel-context-visit))
 
   :config
   (gptel-make-openai "llama-cpp"
