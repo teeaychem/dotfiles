@@ -391,6 +391,26 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (add-hook 'prog-mode-hook #'electric-pair-mode)
 #+end_src
 
+** dabbrev
+
+#+begin_src emacs-lisp
+(use-package dabbrev
+  :config
+  (dolist (regexp '("\\` " "\\.log\\'" "\\.min\\.js\\'" "\\.csv\\'"))
+    (add-to-list 'dabbrev-ignored-buffer-regexps regexp))
+  (add-to-list 'dabbrev-ignored-buffer-modes 'authinfo-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'doc-view-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
+
+(defun my-silent-dabbrev-search (orig-fun &rest args)
+  "Silence the 'Scanning for dabbrevs' message during search."
+  (let ((inhibit-message t)
+        (message-log-max nil))
+    (apply orig-fun args)))
+
+(advice-add 'dabbrev--find-expansion :around #'my-silent-dabbrev-search)
+#+end_src
 ** dired
 
 #+begin_src emacs-lisp
