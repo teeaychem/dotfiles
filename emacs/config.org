@@ -108,6 +108,7 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
   (translate-upper-case-key-bindings nil)
   (mouse-yank-at-point t)
   (kill-whole-line t)
+  (desktop-load-locked-desktop t)
 
   (kill-do-not-save-duplicates t)
   (save-interprogram-paste-before-kill t)
@@ -189,40 +190,60 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (define-key global-map (kbd "C-g") #'prot/keyboard-quit-dwim)
 
   :config
-  (unbind-key "C-<wheel-up>")
-  (unbind-key "C-<wheel-down>")
-  (unbind-key "<mouse-2>")
-  (unbind-key "C-z")
-  (unbind-key "M-z")
-  (unbind-key "s-:")
+  (keymap-global-unset "<mouse-2>")
+  (keymap-global-unset "<mouse-3>")
+  (keymap-global-unset "C-<wheel-down>")
+  (keymap-global-unset "C-<wheel-up>")
+
+  (keymap-global-unset "C-_")
+  (keymap-global-unset "C-z")
+  (keymap-global-unset "M-z")
+  (keymap-global-unset "s-:")
+
 
   :bind
-  (("<mouse-3>" . context-menu-open)
-   ("C-<tab>" . completion-at-point)
-   ("<backtab>" . completion-at-point)
-   ("C-<backspace>" . backward-delete-word)
+  (("<mouse-3>" . #'context-menu-open)
+   ("C-<tab>" . #'completion-at-point)
+   ("<backtab>" . #'completion-at-point)
+   ("C-<backspace>" . #'backward-delete-word)
    ("C-g" . #'prot/keyboard-quit-dwim)
-   ("C-k" . forward-delete-line)
-   ("C-x k" . kill-current-buffer)
-   ("C-x K" . kill-buffer)
-   ("C-x C-r" . 'execute-extended-command)
+   ("C-k" . #'forward-delete-line)
 
-   ("s-." . 'xref-find-definitions)
-   ("M-." . 'xref-find-definitions)
-   ("M-s-," . 'xref-go-back)
-   ("M-s-." . 'xref-go-forward)
+   ("C-x k" . #'kill-current-buffer)
+   ("C-x K" . #'kill-buffer)
 
-   ("M-DEL" . backward-delete-word)
+   ;; xref
+   ("s-." . #'xref-find-definitions)
+   ("M-." . #'xref-find-definitions)
+   ("M-s-," . #'xref-go-back)
+   ("M-s-." . #'xref-go-forward)
 
-   ("M-u" . 'upcase-dwim)
-   ("M-l" . 'downcase-dwim)
-   ("M-c" . 'capitalize-dwim)
+   ("M-DEL" . #'backward-delete-word)
 
-   ("s-:" . 'eval-expression)
-   ("s-x" . 'execute-extended-command)
-   ("s-c" . kill-ring-save)
+   ("M-c" . #'capitalize-dwim)
+   ("M-l" . #'downcase-dwim)
+   ("M-u" . #'upcase-dwim)
+
+   ("s-:" . #'eval-expression)
+
+   ("C-x C-r" . #'execute-extended-command)
+   ("s-x" . #'execute-extended-command)
+
 
    ("RET" . newline)))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package emacs
+  :config
+  (keymap-global-unset "s-w")
+  (keymap-global-unset "s-q")
+
+  :bind
+  ("s-c" . #'kill-ring-save)
+  ("s-v" . #'yank)
+  ("s-s" . #'save-buffer)
+  ("s-u" . #'revert-buffer))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -275,6 +296,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   (set-frame-parameter nil 'internal-border-width 2)
 
+  :config
+  (context-menu-mode 1)
+
   :custom
   (comint-scroll-to-bottom-on-output t)
 
@@ -305,7 +329,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (split-height-threshold 0) ;; When split is automatic, always split windows vertically
   (split-width-threshold nil)
 
-  (warning-minimum-level :error))
+  (warning-minimum-level :error)
+
+  (context-menu-functions (delete 'context-menu-undo context-menu-functions)))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -362,7 +388,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 * internal
 
 #+begin_src emacs-lisp
-(add-hook 'prog-mode-hook #'context-menu-mode)
 (add-hook 'prog-mode-hook #'electric-pair-mode)
 #+end_src
 
@@ -409,6 +434,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 (use-package eldoc
   :straight t
+
+  :delight eldoc-mode
 
   :init
   (global-eldoc-mode)
@@ -577,14 +604,18 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package which-key
   :demand t
+
   :custom
   (which-key-sort-order 'which-key-prefix-then-key-order)
   (which-key-idle-delay 1.0)
   (which-key-max-display-columns nil)
+
   :config
   (which-key-mode t)
   (which-key-setup-minibuffer)
-  (set-face-attribute 'which-key-local-map-description-face nil :weight 'bold))
+  (set-face-attribute 'which-key-local-map-description-face nil :weight 'bold)
+
+  :delight which-key-mode)
 #+end_src
 ** winner
 
@@ -782,6 +813,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package ctrlf
   :straight t
+  :disabled
   :init
   (ctrlf-mode t))
 #+end_src
@@ -1075,6 +1107,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :custom
   (ws-butler-keep-whitespace-before-point nil)
 
+  :delight ws-butler-mode
+
   :hook
   (((org-mode prog-mode text-mode) . ws-butler-mode)))
 #+end_src
@@ -1255,6 +1289,14 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   - Skim's displayline is used for forward search (from .tex to .pdf)
   - option -r relaods the file; option -b highlights the current line; option -g opens Skim in the background
   - For this to work, it seems one needs no spaces in the file name
+** lean4
+
+#+begin_src emacs-lisp
+(use-package lean4-mode
+  ;; :straight (nael :type git :host codeberg :repo "mekeor/nael")
+  :straight (lean4-mode :type git :host github :repo "bustercopley/lean4-mode" :files ("*.el" "data"))
+  :mode "\\.lean\\'")
+#+end_src
 ** lua
 
 #+begin_src emacs-lisp
@@ -1310,7 +1352,6 @@ https://github.com/llvm/llvm-project.git
       :commands tablegen-mode)
     )
 #+end_src
-
 ** nix
 
 #+begin_src emacs-lisp
