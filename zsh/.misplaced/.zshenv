@@ -27,7 +27,7 @@ export LLVM_SRC="${HOME}/repos/llvm"
 export KERAS_HOME="${XDG_DATA_HOME}/keras"
 
 # # lean
-export ELAN_HOME="${XDG_DATA_HOME}/elan"
+export ELAN_HOME="${HOME}/.local/opt/elan"
 
 # # npm / node
 # export NPM_CONFIG_USERCONFIG="${XDG_CONFIG_HOME}/npm/npmrc"

@@ -55,6 +55,7 @@ darwin*)
     # export CMAKE_PREFIX_PATH="/opt/homebrew/opt/llvm"
     path_add "/usr/local/texlive/2026basic/bin/universal-darwin/" "prepend"
     path_add "${HOME}/.local/opt/emacs/bin/" "prepend"
+    path_add "${HOME}/.local/opt/elan/bin/" "prepend"
 
     export HOMEBREW_NO_AUTO_UPDATE
     export HOMEBREW_BUNDLE_FILE="$XDG_CONFIG_HOME/brew/Brewfile"

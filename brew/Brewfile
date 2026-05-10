@@ -49,6 +49,9 @@ brew "git-filter-repo"
 brew "git-lfs"
 brew "gitui"
 
+# lisp
+brew "minimal-racket"
+
 # lua
 brew "luarocks"
 
@@ -69,6 +72,9 @@ brew "taplo"
 
 # tools
 brew "z3"
+
+# emacs dependencies
+brew libgccjit
 
 # # Casks
 
