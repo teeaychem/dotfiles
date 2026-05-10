@@ -1,8 +1,18 @@
 [alias]
 	l = "log --graph --decorate --pretty=format:'%C(auto)%h %Cblue%ad %Cred%aN %C(auto)%d %n    %s' --date=human"
+  # https://stackoverflow.com/questions/957928#comment9747528_957978
+	exec = "!exec "
+	root = rev-list --max-parents=0 HEAD
+
+[apply]
+	whitespace = fix
 
 [core]
+  autocrlf = false
 	pager = "delta"
+  # https://github.blog/2022-06-29-improve-git-monorepo-performance-with-a-file-system-monitor/
+	fsmonitor = true
+	untrackedcache = true
 
 [delta]
 	dark = true
@@ -23,16 +33,20 @@
 [interactive]
 	diffFilter = "delta --color-only"
 
+[pull]
+	ff = only
+
+[rebase]
+	autosquash = true
+
 [rerere]
 	enabled = false
 
 [status]
 	branch = true
 	short = false
+  submodulesummary = true
 
 [user]
 	email = "bsparkes@alumni.stanford.edu"
 	name = "teeaychem"
-
-[apply]
-	whitespace = fix
