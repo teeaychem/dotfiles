@@ -58,7 +58,8 @@ darwin*)
     path_add "${HOME}/.local/opt/elan/bin/" "prepend"
 
     export HOMEBREW_NO_AUTO_UPDATE
-    export HOMEBREW_BUNDLE_FILE="$XDG_CONFIG_HOME/brew/Brewfile"
+    export HOMEBREW_BUNDLE_FILE="${XDG_CONFIG_HOME}/brew/Brewfile"
+    export HOMEBREW_NO_ENV_HINTS=1
 
     if command -v bat &>/dev/null; then export HOMEBREW_BAT=1; fi
     ;;
