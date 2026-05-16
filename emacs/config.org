@@ -461,20 +461,26 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 (use-package eldoc
   :straight t
-
   :delight eldoc-mode
 
   :init
-  (global-eldoc-mode)
+  (add-to-list 'display-buffer-alist
+               '("\\*eldoc*"
+                 (display-buffer-at-bottom)
+                 (window-height . 8)))
 
-  (advice-add #'eglot-signature-eldoc-function
-              :override #'eglot-signature-eldoc-talkative)
+  :config
+  (with-eval-after-load 'eglot
+    (advice-add #'eglot-signature-eldoc-function
+                :override #'eglot-signature-eldoc-talkative))
 
-  ;; Try to ensure flymake errors come before any other eldoc messages
+    ;; Try to ensure flymake errors come before any other eldoc messages
   (defun eldoc-promote-flymake ()
     (setq eldoc-documentation-functions
           (cons #'flymake-eldoc-function
                 (remove #'flymake-eldoc-function eldoc-documentation-functions))))
+
+
 
   (defun quit-eldoc-buffer (args)
     (interactive "P")
@@ -482,10 +488,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
       (progn
         (quit-restore-window (get-buffer-window "*eldoc*")))))
 
-  (add-to-list 'display-buffer-alist
-               '("\\*eldoc*"
-                 (display-buffer-at-bottom)
-                 (window-height . 8)))
+
+  (global-eldoc-mode 1)
 
   :custom
   (eldoc-echo-area-prefer-doc-buffer t)
@@ -497,7 +501,10 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
                      ("d" . #'eldoc)
                      ("b" . #'eldoc-doc-buffer)
                      ("t" . #'eldoc-print-current-symbol-info)
-                     ("q" . #'quit-eldoc-buffer)))
+                     ("q" . #'quit-eldoc-buffer))
+
+  :hook
+  (eldoc-mode-hook . eldoc-promote-flymake))
 #+end_src
 
 ** recentf
