@@ -33,8 +33,6 @@ brew "zoxide"
 brew "tree-sitter"
 brew "tree-sitter-cli"
 
-brew "universal-ctags"
-
 # linting
 brew "gersemi" # cmake
 brew "prettier"
@@ -76,8 +74,9 @@ brew "taplo"
 # tools
 brew "z3"
 
-# emacs dependencies
-brew libgccjit
+# libs
+brew "libgccjit"
+brew "openblas"
 
 # # Casks
 
