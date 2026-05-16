@@ -76,6 +76,9 @@ EDITOR=nvim
 
 # # misc
 
+unsetopt CLOBBER
+unsetopt NOMATCH
+
 # # history
 
 # # # no duplication
