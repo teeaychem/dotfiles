@@ -1312,10 +1312,11 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 ** lean4
 
 #+begin_src emacs-lisp
-(use-package lean4-mode
+(use-package nael-mode
   ;; :straight (nael :type git :host codeberg :repo "mekeor/nael")
-  :straight (lean4-mode :type git :host github :repo "bustercopley/lean4-mode" :files ("*.el" "data"))
-  :mode "\\.lean\\'")
+  :straight (nael-mode :type git :repo "https://codeberg.org/mekeor/nael.git" :branch "release" :files ("nael/*.el"))
+  :mode "\\.lean\\'"
+  :commands (nael-mode))
 #+end_src
 ** lua
 
