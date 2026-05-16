@@ -143,8 +143,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (kept-old-versions 0)      ; don't bother with old versions
   (delete-old-versions t)    ; don't ask about deleting old versions
   (version-control t)        ; number backups
-  (vc-make-backup-files nil) ; backup version controlled files
-  )
+  (vc-make-backup-files nil))
 #+end_src
 
 ** locale
@@ -297,44 +296,32 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   (set-frame-parameter nil 'internal-border-width 2)
 
+  (auto-fill-mode 1) ;; wrap lines automatically
+  (column-number-mode 1)
+  (line-number-mode 1)
+
+  (tooltip-mode -1)
+  ;; (scroll-bar-mode -1)
+  ;; (horizontal-scroll-bar-mode -1)
+
   :config
   (context-menu-mode 1)
+  (setq context-menu-functions (delete 'context-menu-undo context-menu-functions))
 
   :custom
   (comint-scroll-to-bottom-on-output t)
-
-  (use-short-answers t)
-
-  (uniquify-buffer-name-style 'forward) ; unique buffer names
-
-  (column-number-mode t) ; show column-number in the mode line
-  (line-number-mode t) ; show line-number in the mode line
-
-  (auto-fill-mode t) ;; wrap lines automatically
-
-  (horizontal-scroll-bar-mode nil)
-  (scroll-bar-mode nil)
-  (tool-bar-mode nil)
-  (tooltip-mode nil)
-  (use-dialog-box nil)
-
-  (truncate-string-ellipsis "…")
-
-  (cursor-in-non-selected-windows t)  ; hide the cursor in inactive windows
-  (help-window-select t)              ; select help window so it's easy to quit it with 'q')
-
+  (cursor-in-non-selected-windows t)
+  (help-window-select t)
+  (mouse-wheel-follow-mouse t)
+  (right-margin-width 1)
   (scroll-preserve-screen-position t)
-
-  (mouse-wheel-follow-mouse 't)
-
   (split-height-threshold 0) ;; When split is automatic, always split windows vertically
   (split-width-threshold nil)
-
-  (warning-minimum-level :error)
-
-  (right-margin-width 1)
-
-  (context-menu-functions (delete 'context-menu-undo context-menu-functions)))
+  (truncate-string-ellipsis "…")
+  (uniquify-buffer-name-style 'forward) ; unique buffer names
+  (use-dialog-box nil)
+  (use-short-answers t)
+  (warning-minimum-level :error))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -352,11 +339,12 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (use-package emacs
   :init
   (setq-default line-spacing nil)
-  (global-font-lock-mode t)
-  (global-hi-lock-mode t)
+
+  :config
+  (global-font-lock-mode 1)
+  (global-hi-lock-mode 1)
 
   :custom
-  (font-lock-maximum-decoration t)
   (treesit-font-lock-level 4))
 #+end_src
 
@@ -373,15 +361,16 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package emacs
   :if (memq system-type '(darwin))
+
+  :init
+  (menu-bar-mode 1)
+
   :custom
   (ns-command-modifier 'super)
   (ns-control-modifier 'control)
   (ns-option-modifier 'meta)
   (ns-pass-command-to-system t)
   (ns-right-option-modifier 'none)
-
-  (menu-bar-mode t)
-
   (ns-pop-up-frames nil)
   (ns-use-thin-smoothing t)
   (ns-antialias-text t)
@@ -401,20 +390,23 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package dabbrev
   :config
-  (dolist (regexp '("\\` " "\\.log\\'" "\\.min\\.js\\'" "\\.csv\\'"))
+  (dolist (regexp '("\\` "
+                    "\\.log\\'"
+                    "\\.min\\.js\\'"
+                    "\\.csv\\'"))
     (add-to-list 'dabbrev-ignored-buffer-regexps regexp))
-  (add-to-list 'dabbrev-ignored-buffer-modes 'authinfo-mode)
-  (add-to-list 'dabbrev-ignored-buffer-modes 'doc-view-mode)
-  (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
-  (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
 
-(defun my-silent-dabbrev-search (orig-fun &rest args)
-  "Silence the 'Scanning for dabbrevs' message during search."
-  (let ((inhibit-message t)
-        (message-log-max nil))
-    (apply orig-fun args)))
+  (dolist (mode '(authinfo-mode
+                  doc-view-mode
+                  pdf-view-mode
+                  tags-table-mode))
+    (add-to-list 'dabbrev-ignored-buffer-modes mode))
 
-(advice-add 'dabbrev--find-expansion :around #'my-silent-dabbrev-search)
+  (advice-add 'dabbrev--find-expansion :around
+              (lambda (orig-fun &rest args)
+                (let ((inhibit-message t)
+                      (message-log-max nil))
+                  (apply orig-fun args)))))
 #+end_src
 
 ** dired
@@ -536,10 +528,11 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package repeat
+  :init (repeat-mode 1)
+
   :custom
   (repeat-exit-key "C-g")
-  (set-mark-command-repeat-pop t)
-  :init (repeat-mode t))
+  (set-mark-command-repeat-pop t))
 #+end_src
 
 ** savehist
@@ -646,6 +639,10 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package which-key
   :demand t
+  :delight which-key-mode
+
+  :init
+  (which-key-mode 1)
 
   :custom
   (which-key-sort-order 'which-key-prefix-then-key-order)
@@ -653,18 +650,15 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (which-key-max-display-columns nil)
 
   :config
-  (which-key-mode t)
   (which-key-setup-minibuffer)
-  (set-face-attribute 'which-key-local-map-description-face nil :weight 'bold)
-
-  :delight which-key-mode)
+  (set-face-attribute 'which-key-local-map-description-face nil :weight 'bold))
 #+end_src
 
 ** winner
 
 #+begin_src emacs-lisp
 (use-package winner
-  :init (winner-mode +1))
+  :init (winner-mode 1))
 #+end_src
 
 ** xclip
@@ -894,8 +888,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (use-package ctrlf
   :straight t
   :disabled
+
   :init
-  (ctrlf-mode t))
+  (ctrlf-mode 1))
 #+end_src
 
 ** COMMENT devdocs
@@ -1051,9 +1046,10 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (use-package gumshoe
   :disabled
   :straight t
+
   :init
   ;; Enabing global-gumshoe-mode will initiate tracking
-  (global-gumshoe-mode +1)
+  (global-gumshoe-mode 1)
   ;; customize peruse slot display if you like
   (setf gumshoe-slot-schema '(time buffer position line))
   ;; personally, I use perspectives
@@ -1106,6 +1102,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (use-package kkp
   :straight t
   :demand t
+
   :hook (tty-setup . global-kkp-mode))
 #+end_src
 
@@ -1148,11 +1145,10 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :demand t
 
   :config
-  (projectile-mode +1)
+  (projectile-mode 1)
 
   :bind-keymap
-  ("C-x p" . projectile-command-map)
-  )
+  ("C-x p" . projectile-command-map))
 #+end_src
 
 ** rainbow delimiters
@@ -1225,11 +1221,10 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package ws-butler
   :straight (ws-butler :type git :host github :repo "lewang/ws-butler" :branch "master")
+  :delight ws-butler-mode
 
   :custom
   (ws-butler-keep-whitespace-before-point nil)
-
-  :delight ws-butler-mode
 
   :hook
   (((org-mode prog-mode text-mode) . ws-butler-mode)))
@@ -1257,10 +1252,10 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   ;; (diff-hl-update-async 'thread)
 
   :config
-  (global-diff-hl-mode)
-  (diff-hl-margin-mode)
-  (diff-hl-flydiff-mode nil)
-  (diff-hl-show-hunk-mouse-mode nil)
+  (global-diff-hl-mode 1)
+  (diff-hl-margin-mode 1)
+  (diff-hl-flydiff-mode -1)
+  (diff-hl-show-hunk-mouse-mode -1)
   ;; (diff-hl-update-async t)
 
   :custom-face
@@ -1309,7 +1304,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :after magit
 
   :config
-  (magit-prime-mode t))
+  (magit-prime-mode 1))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -1317,7 +1312,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :straight t
   :after magit
 
-  :config (magit-todos-mode t))
+  :config (magit-todos-mode 1))
 #+end_src
 
 
