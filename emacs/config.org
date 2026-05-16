@@ -867,7 +867,10 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package breadcrumb
-  :straight t)
+  :straight t
+
+  :hook
+  (prog-mode-hook . breadcrumb-local-mode))
 #+end_src
 
 ** browse kill ring
@@ -2235,6 +2238,23 @@ maybe: https://github.com/casouri/eldoc-box
 
   :config
   ;; (add-to-list 'eglot-stay-out-of 'flymake)
+  (setf (alist-get '(c-mode c++-mode) eglot-server-programs nil nil #'equal)
+        '("clangd"
+          "--query-driver=/**/*"
+          "--background-index"
+          "--clang-tidy"
+          "--completion-style=detailed"
+          "--header-insertion=never"
+          "--fallback-style=None"
+          "-j=4"))
+
+  (dolist (server-rule '((latex-mode "texlab")
+                         (nix-mode "nil")
+                         (python-mode "ty" "server")
+                         ((sh-mode bash-ts-mode) "bash-language-server" "start")))
+    (let ((modes (car server-rule))
+          (args (cdr server-rule)))
+      (setf (alist-get modes eglot-server-programs nil nil #'equal) args)))
 
   :bind (("C-c l l" . eglot)
          :map eglot-mode-map
@@ -2265,24 +2285,6 @@ maybe: https://github.com/casouri/eldoc-box
   ((eglot-managed-mode . eldoc-promote-flymake)))
 #+end_src
 
-#+begin_src emacs-lisp
-(with-eval-after-load 'eglot
-  (add-to-list 'eglot-server-programs `((c-mode c++-mode) "clangd"
-                                        "--query-driver=/**/*"
-                                        "--background-index"
-                                        "--clang-tidy"
-                                        "--completion-style=detailed"
-                                        "--header-insertion=never"
-                                        "--fallback-style=None"
-                                        "-j=4"))
-  (add-to-list 'eglot-server-programs '(latex-mode . ("texlab")))
-  (let* ((config-path (concat (getenv "XDG_CONFIG_HOME") "/.luarc.json"))
-         (config-arg (if (file-exists-p config-path) (concat "--configpath=" config-path) "")))
-    (add-to-list 'eglot-server-programs `(lua-mode . ("lua-language-server" ,config-arg))))
-  (add-to-list 'eglot-server-programs '(nix-mode . ("nil")))
-  (add-to-list 'eglot-server-programs '(python-mode . ("ty" "server")))
-  (add-to-list 'eglot-server-programs '((sh-mode bash-ts-mode) . ("bash-language-server" "start"))))
-#+end_src
 *** eglot-x
 
 https://github.com/nemethf/eglot-x#rust-analyzer-extensions
@@ -2347,19 +2349,36 @@ https://github.com/renzmann/treesit-auto
 #+begin_src emacs-lisp
 (use-package treesit-auto
   :straight t
+  :defer t
+
 
   :custom
   (treesit-auto-install 'prompt)
 
   :config
+  (let ((llvm-recipe
+         (make-treesit-auto-recipe
+          :lang 'llvm
+          :ts-mode 'llvm-ts-mode
+          :url "https://github.com/benwilliamgraham/tree-sitter-llvm"
+          :ext "\\.ll\\'"))
+        (tablegen-recipe
+         (make-treesit-auto-recipe
+          :lang 'tablegen
+          :ts-mode 'tablegen-ts-mode
+          :url "https://github.com/tree-sitter-grammars/tree-sitter-tablegen"
+          :ext "\\.td\\'")))
+
+    (add-to-list 'treesit-auto-recipe-list llvm-recipe)
+    (add-to-list 'treesit-auto-recipe-list tablegen-recipe))
+
+
+  (add-to-list 'treesit-auto-langs 'llvm)
+  (add-to-list 'treesit-auto-langs 'tablegen)
+
   (treesit-auto-add-to-auto-mode-alist 'all)
 
-  (add-to-list 'treesit-language-source-alist
-               '(llvm "https://github.com/benwilliamgraham/tree-sitter-llvm"))
-  (add-to-list 'treesit-language-source-alist
-               '(tablegen "https://github.com/tree-sitter-grammars/tree-sitter-tablegen"))
-  ;; (global-treesit-auto-mode)
-  )
+  (global-treesit-auto-mode 1))
 #+end_src
 
 
