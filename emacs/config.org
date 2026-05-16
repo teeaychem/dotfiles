@@ -42,6 +42,7 @@ CFLAGS='-march=native -O3' \
     --without-compress-install
 #+end_src
 
+
 * to investigate
 
 https://github.com/editorconfig/editorconfig-emacs?tab=readme-ov-file https://editorconfig.org
@@ -59,7 +60,6 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
 
 * general
 
-** emacs
 
 #+begin_src emacs-lisp
 ;; Optimization from doom-start.el
@@ -124,7 +124,7 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
   )
 #+end_src
 
-*** saving & backups
+** saving & backups
 
 Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
@@ -144,7 +144,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   )
 #+end_src
 
-*** locale
+** locale
 
 #+begin_src emacs-lisp
 (prefer-coding-system       'utf-8)
@@ -344,6 +344,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (setq visible-bell t)
 (setq ring-bell-function #'visible-bell-invert)
 #+end_src
+
 ** font
 
 #+begin_src emacs-lisp
@@ -366,6 +367,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
                       :family "M PLUS 1 Code"; "Maple Mono NF" "JuliaMono"
                       :height 150))
 #+end_src
+
 ** macos
 #+begin_src emacs-lisp
 (use-package emacs
@@ -413,6 +415,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 (advice-add 'dabbrev--find-expansion :around #'my-silent-dabbrev-search)
 #+end_src
+
 ** dired
 
 #+begin_src emacs-lisp
@@ -439,6 +442,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 ;; issues with dired and non-gnu darwin ls
 #+end_src
+
 ** editorconfig
 
 #+begin_src emacs-lisp
@@ -446,6 +450,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :config
   (editorconfig-mode 1))
 #+end_src
+
 ** eldoc
 
 #+begin_src emacs-lisp
@@ -493,6 +498,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
                      ("t" . #'eldoc-print-current-symbol-info)
                      ("q" . #'quit-eldoc-buffer)))
 #+end_src
+
 ** recentf
 
 #+begin_src emacs-lisp
@@ -517,6 +523,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   ;; to ensure `recentf-cleanup` runs before `recentf-save-list`
   (add-hook 'kill-emacs-hook #'recentf-cleanup -90))
 #+end_src
+
 ** repeat
 
 #+begin_src emacs-lisp
@@ -526,6 +533,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (set-mark-command-repeat-pop t)
   :init (repeat-mode t))
 #+end_src
+
 ** savehist
 
 #+begin_src emacs-lisp
@@ -547,6 +555,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (savehist-autosave-interval 600))
 
 #+end_src
+
 ** skeletons
 
 #+begin_src emacs-lisp
@@ -567,6 +576,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (global-set-key "(" 'quoted-parentheses)
 (global-set-key "[" 'quoted-brackets)
 #+end_src
+
 ** ispell
 
 #+begin_src emacs-lisp
@@ -587,6 +597,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   ;; (prog-mode . flyspell-mode)
   )
 #+end_src
+
 ** isearch
 
 #+begin_src emacs-lisp
@@ -597,6 +608,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (setq lazy-count-suffix-format nil)
   (setq search-whitespace-regexp ".*?"))
 #+end_src
+
 ** tramp
 
 #+begin_src emacs-lisp
@@ -620,6 +632,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (tramp-verbose 2)
 )
 #+end_src
+
 ** which-key
 
 #+begin_src emacs-lisp
@@ -638,12 +651,14 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   :delight which-key-mode)
 #+end_src
+
 ** winner
 
 #+begin_src emacs-lisp
 (use-package winner
   :init (winner-mode +1))
 #+end_src
+
 ** xclip
 #+begin_src emacs-lisp
 (use-package xclip
@@ -651,6 +666,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :config
   (xclip-mode 1))
 #+end_src
+
 
 * internal straight
 
@@ -689,6 +705,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (flymake-fringe-indicator-position 'right-fringe)
   (flymake-wrap-around t))
 #+end_src
+
 ** project
 
 #+begin_src emacs-lisp
@@ -700,6 +717,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (add-to-list 'project-vc-extra-root-markers ".dir-locals.el")
   )
 #+end_src
+
 
 * other configs
 
@@ -739,6 +757,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (load-theme 'batppuccin-mocha t)
 #+end_src
 
+
 * external, etc.
 
 ** COMMENT compile-angel
@@ -766,6 +785,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   ;; A global mode that compiles .el files before they are loaded using `load' or `require'.
   (compile-angel-on-load-mode t))
 #+end_src
+
 ** apheleia
 #+begin_src emacs-lisp
 (use-package apheleia
@@ -813,6 +833,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :bind (:map format-prefix-map
               ("a" . apheleia-format-buffer)))
 #+end_src
+
 ** blamer
 
 #+begin_src emacs-lisp
@@ -833,28 +854,33 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (blamer-min-offset 40)
   (blamer-view 'overlay))
 #+end_src
+
 ** bookmark+
 #+begin_src emacs-lisp
 (use-package bookmark+
   :straight t)
 #+end_src
+
 ** breadcrumb
 
 #+begin_src emacs-lisp
 (use-package breadcrumb
   :straight t)
 #+end_src
+
 ** browse kill ring
 #+begin_src emacs-lisp
 (use-package browse-kill-ring
   :straight t)
 #+end_src
+
 ** crux
 
 #+begin_src emacs-lisp
 (use-package crux
   :straight t)
 #+end_src
+
 ** ctrlf
 #+begin_src emacs-lisp
 (use-package ctrlf
@@ -863,6 +889,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :init
   (ctrlf-mode t))
 #+end_src
+
 ** COMMENT devdocs
 #+begin_src emacs-lisp
 (use-package devdocs
@@ -870,11 +897,13 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :disabled
   :bind (("C-h D" . 'devdocs-lookup)))
 #+end_src
+
 ** diminish
 #+begin_src emacs-lisp
 (use-package delight
   :straight t)
 #+end_src
+
 ** dirvish
 #+begin_src emacs-lisp
 (use-package emacs
@@ -926,6 +955,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
    ("M-b" . dirvish-history-go-backward)
    ("M-e" . dirvish-emerge-menu)))
 #+end_src
+
 ** dumb-jump
 #+begin_src emacs-lisp
 (use-package dumb-jump
@@ -937,6 +967,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (add-hook 'xref-backend-functions #'dumb-jump-xref-activate t)
 (setq xref-show-definitions-function #'xref-show-definitions-completing-read)
 #+end_src
+
 ** editoronfig
 #+begin_src emacs-lisp
 (use-package editorconfig
@@ -947,6 +978,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :config
   (editorconfig-mode 1))
 #+end_src
+
 ** envrc
 #+begin_src emacs-lisp
 (use-package envrc
@@ -956,6 +988,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (envrc-show-summary-in-minibuffer nil)
   :hook (after-init . envrc-global-mode))
 #+end_src
+
 ** exec-path-from-shell
 
 #+begin_src emacs-lisp
@@ -982,6 +1015,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 ;; (getenv "PATH")
 #+end_src
+
 ** fzf
 #+begin_src emacs-lisp
 (use-package fzf
@@ -1000,6 +1034,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
         fzf/position-bottom t
         fzf/window-height 15))
 #+end_src
+
 ** gumshoe
 
 #+begin_src emacs-lisp
@@ -1017,6 +1052,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (setf gumshoe-auto-cancel-backtracking-p nil)
   )
 #+end_src
+
 ** helpful
 #+begin_src emacs-lisp
 (use-package helpful
@@ -1036,6 +1072,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :custom
   (helpful-max-buffers 7))
 #+end_src
+
 ** highlight indentation
 - To highlight indentations
   - Options are fill, column, and character
@@ -1053,6 +1090,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :hook
   (prog-mode . highlight-indent-guides-mode))
 #+end_src
+
 ** kkp
 
 #+begin_src emacs-lisp
@@ -1061,6 +1099,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :demand t
   :hook (tty-setup . global-kkp-mode))
 #+end_src
+
 ** multiple cursors
 #+begin_src emacs-lisp
 (use-package multiple-cursors
@@ -1072,6 +1111,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
          ("C-c C-SPC" . mc/edit-lines)
          ("M-<M-down-mouse-1>" . mc/add-cursor-on-click)))
 #+end_src
+
 ** no-littering
 #+begin_src emacs-lisp
 (use-package no-littering
@@ -1091,6 +1131,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
         kept-old-versions 2
         version-control t))
 #+end_src
+
 ** projectile
 #+begin_src emacs-lisp
 (use-package projectile
@@ -1104,6 +1145,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   ("C-x p" . projectile-command-map)
   )
 #+end_src
+
 ** rainbow delimiters
 #+begin_src emacs-lisp
 (use-package rainbow-delimiters
@@ -1111,6 +1153,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :hook
   (prog-mode . rainbow-delimiters-mode))
 #+end_src
+
 ** rg
 
 #+begin_src emacs-lisp
@@ -1129,6 +1172,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (rg-ignore-case 'smart)
   (rg-default-alias-fallback "all"))
 #+end_src
+
 ** undo and redo
 #+begin_src emacs-lisp
 (use-package undo-fu
@@ -1167,6 +1211,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (setq vundo-compact-display t)
   (global-set-key (kbd "C-x u") 'vundo))
 #+end_src
+
 ** ws-butler
 #+begin_src emacs-lisp
 (use-package ws-butler
@@ -1218,6 +1263,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (magit-pre-refresh . diff-hl-magit-pre-refresh)
   (magit-post-refresh . diff-hl-magit-post-refresh))
 #+end_src
+
 ** magit
 
 #+begin_src emacs-lisp
@@ -1268,6 +1314,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 * languages
 
+
 ** COMMENT ASP
 
 #+begin_src emacs-lisp
@@ -1277,6 +1324,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :vc (:fetcher github :repo teeaychem/clingo-asp-mode))
 ;;   :load-path (lambda() (concat user-emacs-directory "../../projects/emacs/clingo-asp-mode/")))
 #+end_src
+
 ** C/++
 
 #+begin_src emacs-lisp
@@ -1296,6 +1344,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
              :repo "emacsmirror/cmake-mode"
              :branch "master"))
 #+end_src
+
 ** elf
 
 #+begin_src emacs-lisp
@@ -1303,6 +1352,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :disabled
   :magic ("ELF" . elf-mode))
 #+end_src
+
 ** fish
 
 #+begin_src emacs-lisp
@@ -1310,6 +1360,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :straight t
   :mode "\\.fish\\'")
 #+end_src
+
 ** LaTeX
 
 #+begin_src emacs-lisp
@@ -1357,6 +1408,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   - Skim's displayline is used for forward search (from .tex to .pdf)
   - option -r relaods the file; option -b highlights the current line; option -g opens Skim in the background
   - For this to work, it seems one needs no spaces in the file name
+
 ** lean4
 
 #+begin_src emacs-lisp
@@ -1366,6 +1418,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :mode "\\.lean\\'"
   :commands (nael-mode))
 #+end_src
+
 ** lua
 
 #+begin_src emacs-lisp
@@ -1375,6 +1428,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :custom
   (lua-indent-level 2))
 #+end_src
+
 ** llvm
 
 https://github.com/llvm/llvm-project.git
@@ -1458,6 +1512,7 @@ Get the relevant package subdirectories from the llvm source
   :straight nil
   :mode "\\.mir\\'")
 #+end_src
+
 ** nix
 
 #+begin_src emacs-lisp
@@ -1465,6 +1520,7 @@ Get the relevant package subdirectories from the llvm source
   :straight t
   :mode "\\.nix\\'")
 #+end_src
+
 ** COMMENT OCaml
 
 #+begin_src emacs-lisp
@@ -1491,6 +1547,7 @@ Get the relevant package subdirectories from the llvm source
   (tuareg-mode . ocaml-eglot)
   (ocaml-eglot . eglot-ensure))
 #+end_src
+
 ** python
 
 #+begin_src emacs-lisp
@@ -1536,6 +1593,7 @@ Get the relevant package subdirectories from the llvm source
   :disabled
   :hook (python-mode-hook . uv-mode-auto-activate-hook))
 #+end_src
+
 ** racket
 
 #+begin_src sh
@@ -1550,6 +1608,7 @@ raco pkg install --auto drracket
   :config
   (add-to-list 'eglot-server-programs '(racket-mode . ("racket" "-l" "racket-langserver"))))
 #+end_src
+
 ** rust
 
 https://robert.kra.hn/posts/rust-emacs-setup/
@@ -1613,6 +1672,7 @@ https://github.com/radian-software/apheleia/issues/278
 
 
 * markup
+
 ** json
 
 #+begin_src emacs-lisp
@@ -1620,6 +1680,7 @@ https://github.com/radian-software/apheleia/issues/278
   :straight t
   :mode ("\\.json\\'" . json-ts-mode))
 #+end_src
+
 ** markdown
 
 #+begin_src emacs-lisp
@@ -1640,6 +1701,7 @@ https://github.com/radian-software/apheleia/issues/278
   (setq markdown-header-scaling t)
   (setq-default markdown-enable-math t))
 #+end_src
+
 ** math-preview
 #+begin_src emacs-lisp
 (use-package math-preview
@@ -1647,6 +1709,7 @@ https://github.com/radian-software/apheleia/issues/278
 
   :custom (math-preview-command "~/.npm-packages/bin/math-preview"))
 #+end_src
+
 ** toml
 
 #+begin_src emacs-lisp
@@ -1657,6 +1720,7 @@ https://github.com/radian-software/apheleia/issues/278
   :config
   (add-to-list 'eglot-server-programs '(toml-mode . ("taplo" "lsp" "stdio"))))
 #+end_src
+
 ** yaml
 
 #+begin_src emacs-lisp
@@ -1681,8 +1745,6 @@ https://github.com/radian-software/apheleia/issues/278
   (org-adapt-indentation nil) ;; prevent demoting heading also shifting text inside sections
   (org-catch-invisible-edits 'show-and-error) ;; if editing in an invisible region, complain.
   (org-confirm-babel-evaluate t) ;; ask when evaluating every src block
-
-  (org-cycle-separator-lines 1)
 
   (org-default-notes-file (concat org-directory "/org_capture.org"))
 
@@ -1752,6 +1814,7 @@ https://github.com/radian-software/apheleia/issues/278
   :config
   (push ".DS_store" completion-ignored-extensions))
 #+end_src
+
 ** cape
 
 #+begin_src emacs-lisp
@@ -1793,6 +1856,7 @@ https://github.com/radian-software/apheleia/issues/278
 #+begin_src emacs-lisp
 ;; (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
 #+end_src
+
 ** consult
 
 #+begin_src emacs-lisp :noweb yes
@@ -1920,6 +1984,7 @@ These buffers can be seen by using space
     (add-to-list 'recentf-exclude regex)
     (add-to-list 'consult-buffer-filter regex)))
 #+end_src
+
 **** narrowing
 
 Set project to use uppercase key
@@ -1966,6 +2031,7 @@ Instances of the macro
   (consult-filter-macro "TeX" '(latex-mode LaTeX-mode tex-mode TeX-mode) ?t))
 #+end_src
 
+
 *** consult-project-extra
 
 https://gitlab.com/OlMon/consult-projectile
@@ -1981,6 +2047,7 @@ https://github.com/Qkessler/consult-project-extra, for project
                ("d" . consult-projectile-find-dir)
                ("f" . consult-projectile-find-file))))
 #+end_src
+
 ** corfu
 
 #+begin_src emacs-lisp
@@ -2005,6 +2072,7 @@ https://github.com/Qkessler/consult-project-extra, for project
   :init
   (global-corfu-mode))
 #+end_src
+
 ** marginalia
 
 #+begin_src emacs-lisp :result silent
@@ -2022,6 +2090,7 @@ https://github.com/Qkessler/consult-project-extra, for project
               ("M-A" . marginalia-cycle)))
 
 #+end_src
+
 ** orderless
 
 #+begin_src emacs-lisp
@@ -2035,6 +2104,7 @@ https://github.com/Qkessler/consult-project-extra, for project
   ;; (completion-category-overrides '((file (styles partial-completion))))
   )
 #+end_src
+
 ** vertico
 
 #+begin_src emacs-lisp
@@ -2052,6 +2122,7 @@ https://github.com/Qkessler/consult-project-extra, for project
   (vertico-mode)
   (vertico-multiform-mode))
 #+end_src
+
 ** embark
 
 #+begin_src emacs-lisp
@@ -2081,6 +2152,7 @@ https://github.com/Qkessler/consult-project-extra, for project
 
 
 * language interaction
+
 
 ** eglot
 *** eglot
@@ -2223,6 +2295,7 @@ for rust dev
 ;;                                          :useLibraryCodeForTypes :json-false
 ;;                                          :verboseOutput :json-false))))))
 #+end_src
+
 ** tree sitter
 
 (treesit-library-abi-version)
