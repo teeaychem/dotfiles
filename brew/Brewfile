@@ -64,6 +64,9 @@ brew "ruff"
 brew "ty"
 brew "uv"
 
+# rust
+brew "rust-analyzer"
+
 # sh
 brew "bash-language-server" # mostly works for zsh
 

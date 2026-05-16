@@ -1459,7 +1459,10 @@ raco pkg install --auto drracket
 #+begin_src emacs-lisp
 (use-package racket-mode
   :straight t
-  :mode "\\.rkt\\'")
+  :after eglot
+  :mode "\\.rkt\\'"
+  :config
+  (add-to-list 'eglot-server-programs '(racket-mode . ("racket" "-l" "racket-langserver"))))
 #+end_src
 ** rust
 
@@ -1468,7 +1471,13 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 #+begin_src emacs-lisp
 (use-package rust-mode
   :straight t
+  :after eglot
   :mode "\\.rs\\'"
+
+  :config
+  (add-to-list 'eglot-server-programs '((rust-ts-mode rust-mode) .
+                                        ("rust-analyzer"
+                                         :initializationOptions (:check (:command "clippy")))))
 
   :init
   (setq rust-mode-treesitter-derive t)
@@ -1557,7 +1566,10 @@ https://github.com/radian-software/apheleia/issues/278
 #+begin_src emacs-lisp
 (use-package toml-mode
   :straight t
-  :mode "\\.toml\\'")
+  :after eglot
+  :mode "\\.toml\\'"
+  :config
+  (add-to-list 'eglot-server-programs '(toml-mode . ("taplo" "lsp" "stdio"))))
 #+end_src
 ** yaml
 
@@ -2128,33 +2140,20 @@ maybe: https://github.com/casouri/eldoc-box
 
 #+begin_src emacs-lisp
 (with-eval-after-load 'eglot
-  (let* ((query-driver (if (eq system-type 'windows-nt)
-                           "--query-driver=*:\\**\\*"
-                         "--query-driver=/**/*")))
-    (add-to-list 'eglot-server-programs `((c-mode c++-mode) "clangd"
-                                          ,query-driver
-                                          "--background-index"
-                                          "--clang-tidy"
-                                          "--completion-style=detailed"
-                                          "--header-insertion=never"
-                                          ;; "--header-insertion-decorators"
-                                          "--fallback-style=None"
-                                          "-j=4")))
-  (add-to-list 'eglot-server-programs '(csharp-mode . ("omnisharp" "*.sln" "-lsp")))
+  (add-to-list 'eglot-server-programs `((c-mode c++-mode) "clangd"
+                                        "--query-driver=/**/*"
+                                        "--background-index"
+                                        "--clang-tidy"
+                                        "--completion-style=detailed"
+                                        "--header-insertion=never"
+                                        "--fallback-style=None"
+                                        "-j=4"))
   (add-to-list 'eglot-server-programs '(latex-mode . ("texlab")))
   (let* ((config-path (concat (getenv "XDG_CONFIG_HOME") "/.luarc.json"))
          (config-arg (if (file-exists-p config-path) (concat "--configpath=" config-path) "")))
     (add-to-list 'eglot-server-programs `(lua-mode . ("lua-language-server" ,config-arg))))
-  (add-to-list 'eglot-server-programs '(mlir-mode . ("mlir-lsp-server")))
-  (add-to-list 'eglot-server-programs '(mlir-pdll-mode . ("mlir-pdll-lsp-server")))
   (add-to-list 'eglot-server-programs '(nix-mode . ("nil")))
   (add-to-list 'eglot-server-programs '(python-mode . ("ty" "server")))
-  (add-to-list 'eglot-server-programs '(racket-mode . ("racket" "-l" "racket-langserver")))
-  (add-to-list 'eglot-server-programs '((rust-ts-mode rust-mode) .
-                                        ("rust-analyzer"
-                                         :initializationOptions (:check (:command "clippy")))))
-  (add-to-list 'eglot-server-programs '(tablegen-mode . ("tblgen-lsp-server")))
-  (add-to-list 'eglot-server-programs '(toml-mode . ("taplo" "lsp" "stdio")))
   (add-to-list 'eglot-server-programs '((sh-mode bash-ts-mode) . ("bash-language-server" "start"))))
 #+end_src
 *** eglot-x
@@ -2208,6 +2207,7 @@ for rust dev
 ;;                                          :useLibraryCodeForTypes :json-false
 ;;                                          :verboseOutput :json-false))))))
 #+end_src
+
 ** tree sitter
 
 (treesit-library-abi-version)
