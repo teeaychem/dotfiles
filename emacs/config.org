@@ -299,6 +299,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (auto-fill-mode 1) ;; wrap lines automatically
   (column-number-mode 1)
   (line-number-mode 1)
+  (global-visual-line-mode 1)
+  (global-visual-wrap-prefix-mode 1)
 
   (tooltip-mode -1)
   ;; (scroll-bar-mode -1)
@@ -1082,13 +1084,15 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 ** highlight indentation
-- To highlight indentations
+
+To highlight indentations
   - Options are fill, column, and character
   - There's no way to get indentation on empty lines as of now
 
 #+begin_src emacs-lisp
 (use-package highlight-indent-guides
   :straight t
+  :disabled
 
   :custom
   (highlight-indent-guides-method 'character)
@@ -1097,6 +1101,72 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (highlight-indent-guides-auto-character-face-perc 80)
   :hook
   (prog-mode . highlight-indent-guides-mode))
+#+end_src
+
+** indent-bars
+
+#+begin_src emacs-lisp
+(use-package indent-bars
+  :straight t
+
+  :config
+  (defun my/safe-enable-indent-bars ()
+    "Safely activate indent-bars only in active code buffers."
+    (when (derived-mode-p 'prog-mode)
+      (indent-bars-mode 1)))
+
+  (add-hook 'tty-setup-hook
+            (lambda ()
+              (dolist (buf (buffer-list))
+                (with-current-buffer buf
+                  (my/safe-enable-indent-bars)))))
+
+  :custom
+  (indent-bars-no-stipple-char ?│)
+
+  (indent-bars-starting-column 0)
+
+  (indent-bars-color '(highlight :face-bg default :default "#ffffff"))
+
+  (indent-bars-highlight-current-depth '(:face default :color "#ffaa00"))
+
+  (indent-bars-color-by-depth
+   '(:palette ("#7f5555"   ; Depth 1: Stormy Muted Red
+               "#7f6a55"   ; Depth 2: Overcast Ochre/Orange
+               "#7a7f55"   ; Depth 3: Sage/Muted Yellow-Green
+               "#557f6a"   ; Depth 4: Dark Seafoam / Cloudy Teal
+               "#556a7f"   ; Depth 5: Slate Blue / Rainy Sky
+               "#6a557f"   ; Depth 6: Muted Indigo / Shadow Purple
+               "#7f556a"))) ; Depth 7: Dusty Rose / Fading Violet
+
+  (indent-bars-width-frac 0.2)
+  (indent-bars-pad-frac 0.1)
+  (indent-bars-depth-update-delay 0.1)
+
+
+  ;; tree-sit
+  (indent-bars-treesit-support t)
+
+  (indent-bars-ts-out-of-scope-color '(:face default :color "#808080"))
+
+  (indent-bars-treesit-wrap '((python argument_list parameters
+				                              list list_comprehension
+				                              dictionary dictionary_comprehension
+				                              parenthesized_expression subscript)))
+  (indent-bars-treesit-scope '((python function_definition
+                                       class_definition
+                                       for_statement
+				                               if_statement
+                                       with_statement
+                                       while_statement)))
+
+  (indent-bars-treesit-wrap '((c argument_list parameter_list init_declarator parenthesized_expression)))
+
+  (indent-bars-treesit-ignore-blank-lines-types '("module"))
+  (indent-bars-treesit-scope-selector 'outermost)
+  (indent-bars-treesit-scope-min-lines 3)
+
+  :hook (prog-mode . indent-bars-mode))
 #+end_src
 
 ** kkp
@@ -2349,36 +2419,31 @@ https://github.com/renzmann/treesit-auto
 #+begin_src emacs-lisp
 (use-package treesit-auto
   :straight t
-  :defer t
-
+  :ensure t
+  :demand t
 
   :custom
   (treesit-auto-install 'prompt)
 
+  :init
+  (setq treesit-enabled-modes t)
+
   :config
-  (let ((llvm-recipe
-         (make-treesit-auto-recipe
-          :lang 'llvm
-          :ts-mode 'llvm-ts-mode
-          :url "https://github.com/benwilliamgraham/tree-sitter-llvm"
-          :ext "\\.ll\\'"))
-        (tablegen-recipe
-         (make-treesit-auto-recipe
-          :lang 'tablegen
-          :ts-mode 'tablegen-ts-mode
-          :url "https://github.com/tree-sitter-grammars/tree-sitter-tablegen"
-          :ext "\\.td\\'")))
+  (setq treesit-language-source-alist (treesit-auto--build-treesit-source-alist))
 
-    (add-to-list 'treesit-auto-recipe-list llvm-recipe)
-    (add-to-list 'treesit-auto-recipe-list tablegen-recipe))
+  (dolist (recipe treesit-auto-recipe-list)
+    (let ((orig-mode (treesit-auto-recipe-remap recipe))
+          (ts-mode (treesit-auto-recipe-ts-mode recipe)))
+      (when (and orig-mode ts-mode)
+        (add-to-list 'major-mode-remap-alist (cons orig-mode ts-mode)))))
 
-
-  (add-to-list 'treesit-auto-langs 'llvm)
-  (add-to-list 'treesit-auto-langs 'tablegen)
-
-  (treesit-auto-add-to-auto-mode-alist 'all)
-
-  (global-treesit-auto-mode 1))
+  (defun my/install-all-grammars ()
+    "Interactively compile everything scraped from the treesit-auto database."
+    (interactive)
+    (dolist (source treesit-language-source-alist)
+      (message "Compiling parser for %s..." (car source))
+      (ignore-errors (treesit-install-language-grammar (car source)))
+      (clear-minibuffer-message))))
 #+end_src
 
 
