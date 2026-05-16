@@ -331,6 +331,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   (warning-minimum-level :error)
 
+  (right-margin-width 1)
+
   (context-menu-functions (delete 'context-menu-undo context-menu-functions)))
 #+end_src
 
@@ -1111,6 +1113,24 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :hook
   (prog-mode . rainbow-delimiters-mode))
 #+end_src
+** rg
+
+#+begin_src emacs-lisp
+(use-package rg
+  :straight t
+
+  :bind (("C-c s m" . rg-menu))
+
+  :config
+  (add-to-list 'rg-custom-type-aliases '("mlir" . "*.mlir *.pdll"))
+  (add-to-list 'rg-custom-type-aliases '("tablegen" . "*.td"))
+
+  :custom
+  (rg-group-result t)
+  (rg-show-columns t)
+  (rg-ignore-case 'smart)
+  (rg-default-alias-fallback "all"))
+#+end_src
 ** undo and redo
 #+begin_src emacs-lisp
 (use-package undo-fu
@@ -1724,15 +1744,6 @@ https://github.com/radian-software/apheleia/issues/278
     (keymap-set org-mode-map "M-o n" org-node-org-prefix-map))
   :config
   (org-node-cache-mode))
-#+end_src
-
-
-* search
-** rg
-
-#+begin_src emacs-lisp
-(use-package rg
-  :straight t)
 #+end_src
 
 
