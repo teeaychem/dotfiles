@@ -943,7 +943,11 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
    '("PATH"
      "DICPATH"
      "REPOS_DIR"
-     "XDG_CONFIG_HOME"))
+     "XDG_CONFIG_HOME"
+     "MLIR_LSP_SERVER_BIN"
+     "MLIR_PDLL_LSP_SERVER_BIN"
+     "TABLEGEN_LSP_SERVER_BIN"
+     "TABLEGEN_COMPILATION_DATABASE"))
 
   :config
   (exec-path-from-shell-initialize))
@@ -1331,47 +1335,84 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 https://github.com/llvm/llvm-project.git
 
+Get the relevant package subdirectories from the llvm source
+
 #+begin_src emacs-lisp
 (with-eval-after-load 'exec-path-from-shell
-  (eval-and-compile
-    (defun repos-load-path (load-path)
-      (concat (getenv "LLVM_SRC") load-path)))
+  (let ((llvm-root (getenv "LLVM_SRC")))
+    (when (and llvm-root (file-directory-p llvm-root))
+      (add-to-list 'load-path (expand-file-name "llvm/utils/emacs" llvm-root))
+      (add-to-list 'load-path (expand-file-name "mlir/utils/emacs" llvm-root)))))
+#+end_src
 
-    (use-package llvm-mode
-      :load-path (lambda () (list (repos-load-path "/llvm/utils/emacs")))
-      :mode "\\.ll\\'"
-      :commands llvm-mode)
+*** mlir
 
-    (use-package llvm-mir-mode
-      :load-path (lambda () (list (repos-load-path "/llvm/utils/emacs")))
-      :mode "\\.mir\\'"
-      :commands llvm-mir-mode)
+#+begin_src emacs-lisp
+(defun my-eglot-strict-env-mlir (&optional _interactive)
+  (let ((shell-path (getenv "MLIR_LSP_SERVER_BIN")))
+    (if (and shell-path
+             (not (string-empty-p shell-path))
+             (file-executable-p shell-path))
+        (list shell-path)
+      (user-error "Eglot aborted: MLIR_LSP_SERVER_BIN is unset, empty, or points to a non-executable path (%s)"
+                  (or shell-path "Unset")))))
 
-    (use-package mlir-mode
-      :load-path (lambda () (list (repos-load-path "/mlir/utils/emacs")))
-      :mode "\\.mlir\\'"
-      :commands mlir-mode)
+(defun my-eglot-strict-pdll (&optional _interactive)
+  (let ((shell-path (getenv "MLIR_PDLL_LSP_SERVER_BIN")))
+    (if (and shell-path (not (string-empty-p shell-path)) (file-executable-p shell-path))
+        (list shell-path)
+      (user-error "Eglot aborted: MLIR_PDLL_LSP_SERVER_BIN is invalid or missing (%s)" (or shell-path "Unset")))))
 
-    (use-package tablegen-mode
-      :load-path (lambda () (list (repos-load-path "/llvm/utils/emacs")))
-      :mode "\\.td\\'"
+(use-package mlir-mode
+  :straight nil
+  :after (exec-path-from-shell eglot)
+  :mode (("\\.mlir\\'" . mlir-mode)
+         ("\\.pdll\\'" . mlir-mode))
+  :config
+  (add-to-list 'eglot-server-programs `(mlir-mode . my-eglot-strict-mlir))
+  (add-to-list 'eglot-server-programs `((mlir-mode :language-id "pdll") . my-eglot-strict-pdll)))
+#+end_src
+*** tablegen
 
-      :config
-      (defun tblgen-lsp ()
-        ;; Write a tablegen lsp call to the kill ring, to then be invoked with `C-u M-x eglot`
-        ;; Heuristic is to search for compile commands from the root of the current project
-        ;; ties are resolved by taking the shortest path
-        (let* ((pr (project-current t))
-               (root (project-root pr))
-               (candidates (sort (directory-files-recursively root "tablegen_compile_commands.yml" t nil nil)))
-               (candidate (file-truename (car candidates)))
-               (compilation-db (if candidates
-                                   (concat " --tablegen-compilation-database=" candidate)
-                                 "")))
-          (kill-new (concat "tblgen-lsp-server" compilation-db))))
+#+begin_src emacs-lisp
+(defun my-eglot-strict-tablegen (&optional _interactive)
+  "Locate tablegen server and database strictly via shell environment variables."
+  (let ((server-path (getenv "TABLEGEN_LSP_SERVER_BIN"))
+        (db-path     (getenv "TABLEGEN_COMPILATION_DATABASE")))
 
-      :commands tablegen-mode)
-    )
+    ;; 1. Validate the LSP Server binary
+    (unless (and server-path (not (string-empty-p server-path)) (file-executable-p server-path))
+      (user-error "Eglot aborted: TABLEGEN_LSP_SERVER_BIN is unset or not executable (%s)"
+                  (or server-path "Unset")))
+
+    ;; 2. Validate the TableGen Compilation Database file
+    (unless (and db-path (not (string-empty-p db-path)) (file-exists-p db-path))
+      (user-error "Eglot aborted: TABLEGEN_COMPILATION_DATABASE file is missing or empty (%s)"
+                  (or db-path "Unset")))
+
+    ;; 3. Return the fully formed command array with the formatted flag
+    (list server-path (format "--tablegen-compilation-database=%s" db-path))))
+
+(use-package tablegen-mode
+  :straight nil
+  :after (exec-path-from-shell eglot)
+  :mode "\\.td\\'"
+  :config
+  (add-to-list 'eglot-server-programs `(tablegen-mode . my-eglot-strict-tablegen)))
+#+end_src
+*** llvm
+
+#+begin_src emacs-lisp
+(use-package llvm-mode
+  :straight nil
+  :mode "\\.ll\\'")
+#+end_src
+*** llvm-mir
+
+#+begin_src emacs-lisp
+(use-package llvm-mir-mode
+  :straight nil
+  :mode "\\.mir\\'")
 #+end_src
 ** nix
 
