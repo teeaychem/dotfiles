@@ -432,7 +432,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
                             "\\|^\\.DS_Store\\'"
                             "\\|^\\.\\(?:svn\\|git\\)\\'"
                             "\\|^__pycache__\\'"
-                            "\\|^flycheck_.*"
                             "\\|^flymake_.*"))
 
   :hook
@@ -663,13 +662,13 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (setq python-flymake-command '("ruff" "--quiet" "--stdin-filename=stdin" "-"))
   (setq rust-ts-flymake-command '("cargo" "check" "-"))
 
-  (defun flymake-next-error-error (&optional N INTERACTIVE)
+  (defun flymake-next-error-error (&optional n interactive)
     (interactive (list 1 t))
-    (flymake-goto-next-error N '(error) INTERACTIVE))
+    (flymake-goto-next-error n '(error) interactive))
 
-  (defun flymake-prev-error-error (&optional N INTERACTIVE)
+  (defun flymake-prev-error-error (&optional n interactive)
     (interactive (list 1 t))
-    (flymake-goto-prev-error N '(error) INTERACTIVE))
+    (flymake-goto-prev-error n '(error) interactive))
 
   :config
   (setq flymake-diagnostic-format-alist
@@ -716,7 +715,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 ;; (if (memq system-type '(darwin)) (load-config "config-darwin"))
 (if (memq system-type '(gnu/linux)) (load-config "config-gnu"))
-(if (memq system-type '(windows-nt)) (load-config "config-nt"))
 #+end_src
 
 
@@ -1191,7 +1189,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (use-package diff-hl
   :straight t
   :after magit
-  :if (not (memq system-type '(windows-nt)))
+
   :custom
   (diff-hl-draw-borders nil)
   (diff-hl-side 'left)
@@ -1801,61 +1799,8 @@ https://github.com/radian-software/apheleia/issues/278
 (use-package consult
   :straight t
 
-  :bind ((:prefix-map consult-search-prefix-map :prefix "C-c s")
-         (:map consult-search-prefix-map
-               ("d" . consult-find)                  ;; Alternative: consult-fd
-               ("c" . consult-locate)
-               ("G" . consult-grep)
-               ("g" . consult-git-grep)
-               ("r" . consult-ripgrep)
-               ("s" . consult-line)
-               ("L" . consult-line-multi)
-               ("k" . consult-keep-lines)
-               ("u" . consult-focus-lines)))
-  :bind(  (:prefix-map consult-goto-prefix-map :prefix "C-c g")
-          (:map consult-goto-prefix-map
-                ("e" . consult-compile-error)
-                ("g" . consult-goto-line)             ;; orig. goto-line
-                ("o" . consult-outline)               ;; Alternative: consult-org-heading
-                ("m" . consult-mark)
-                ("k" . consult-global-mark)
-                ("i" . consult-imenu)
-                ("I" . consult-imenu-multi)))
-  :bind (;; C-c bindings in `mode-specific-map'
-         ("C-c c M" . consult-mode-command)
-         ("C-c h" . consult-history)
-         ("C-c k" . consult-kmacro)
-         ("C-c m" . consult-man)
-         ("C-c i" . consult-info)
-         ([remap Info-search] . consult-info)
-         ;; C-x bindings in `ctl-x-map'
-         ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
-         ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
-         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
-         ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
-         ;; ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
-         ;; ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
-         ;; Custom M-# bindings for fast register access
-         ("C-c r l" . consult-register-load)
-         ("C-c r s" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
-         ("C-c r x" . consult-register)
-         ;; Other custom bindings
-         ("M-y" . consult-yank-pop)                ;; orig. yank-pop
-         ;; Isearch integration
-         ("M-s e" . consult-isearch-history)
-         :map isearch-mode-map
-         ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
-         ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
-         ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
-         ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
-         ;; Minibuffer history
-         :map minibuffer-local-map
-         ("M-s" . consult-history)                 ;; orig. next-matching-history-element
-         ("M-r" . consult-history))                 ;; orig. previous-matching-history-element
-
   :init
-  ;; Configure the register formatting.
-  ;; This improves the register preview for `consult-register', `consult-register-load', `consult-register-store' and the Emacs built-ins.
+  ;; Configure the register formatting.  This improves the register preview for `consult-register', `consult-register-load', `consult-register-store' and the Emacs built-ins.
   (setq register-preview-delay 0.5)
   (setq register-preview-function #'consult-register-format)
 
@@ -1868,6 +1813,68 @@ https://github.com/radian-software/apheleia/issues/278
 
   (autoload 'projectile-project-root "projectile")
   (setq consult-project-function (lambda (_) (projectile-project-root)))
+
+
+  (define-prefix-command 'consult-register-prefix-map)
+
+  (bind-keys :prefix-map consult-prefix-map :prefix "C-c c")
+  (bind-keys :prefix-map consult-goto-prefix-map :prefix "C-c g")
+  (bind-keys :prefix-map consult-search-prefix-map :prefix "C-c s")
+
+  :bind
+  (([remap Info-search] . consult-info)
+
+   ("C-c h" . consult-history)
+   ("C-c k" . consult-kmacro)
+   ("C-c i" . consult-info)
+   ;; C-x bindings in `ctl-x-map'
+   ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+   ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+   ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+   ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+   ;; ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
+   ("M-y" . consult-yank-pop)
+   ("M-s e" . consult-isearch-history)
+
+   :map isearch-mode-map
+       ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+       ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+       ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+       ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+
+   :map minibuffer-local-map
+       ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+       ("M-r" . consult-history)                 ;; orig. previous-matching-history-element
+
+   :map consult-search-prefix-map
+        ("d" . consult-find)                  ;; Alternative: consult-fd
+        ("c" . consult-locate)
+        ("G" . consult-grep)
+        ("g" . consult-git-grep)
+        ("r" . consult-ripgrep)
+        ("s" . consult-line)
+        ("L" . consult-line-multi)
+        ("k" . consult-keep-lines)
+        ("u" . consult-focus-lines)
+
+    :map consult-goto-prefix-map
+        ("b" . consult-bookmark)
+        ("e" . consult-compile-error)
+        ("g" . consult-goto-line)             ;; orig. goto-line
+        ("i" . consult-imenu)
+        ("I" . consult-imenu-multi)
+        ("k" . consult-global-mark)
+        ("m" . consult-mark)
+        ("o" . consult-outline)               ;; Alternative: consult-org-heading
+
+    :map consult-prefix-map
+        ("M" . consult-mode-command)
+        ("r" . consult-register-prefix-map)
+
+    :map consult-register-prefix-map
+        ("l" . consult-register-load)
+        ("s" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+        ("x" . consult-register))
 
   :config
   (setq consult-peek-key '(:debounce 0.5 any))
@@ -1889,7 +1896,7 @@ https://github.com/radian-software/apheleia/issues/278
    consult-source-file-register
    consult-source-recent-file
    consult-source-project-recent-file
-   ;; :preview-key "M-."
+
    :preview-key '(:debounce 0.5 any))
 
   (setq consult-narrow-key "<"))
@@ -1897,25 +1904,21 @@ https://github.com/radian-software/apheleia/issues/278
 
 *** macros
 
-Macro to add the same regex to a collection of consult filters.
 These buffers can be seen by using space
 
 #+begin_src emacs-lisp
-(defmacro add-to-consult-hide-filter (regex)
-  `(progn
-     (with-eval-after-load 'consult
-       (add-to-list 'recentf-exclude ,(format "%s" regex))
-       (add-to-list 'consult-buffer-filter ,(format "%s" regex)))))
-
-(add-to-consult-hide-filter "\*Async-native-compile")
-(add-to-consult-hide-filter "\*EGLOT")
-(add-to-consult-hide-filter "\*Flymake")
-(add-to-consult-hide-filter "\*aphelelia")
-(add-to-consult-hide-filter "\*envrc")
-(add-to-consult-hide-filter "\*straight")
-(add-to-consult-hide-filter "clangd")
-(add-to-consult-hide-filter "lsp")
-(add-to-consult-hide-filter "magit")
+(with-eval-after-load 'consult
+  (dolist (regex '("\\*Async-native-compile"
+                   "\\*EGLOT"
+                   "\\*Flymake"
+                   "\\*aphelelia"
+                   "\\*envrc"
+                   "\\*straight"
+                   "clangd"
+                   "lsp"
+                   "magit"))
+    (add-to-list 'recentf-exclude regex)
+    (add-to-list 'consult-buffer-filter regex)))
 #+end_src
 **** narrowing
 
@@ -1962,17 +1965,7 @@ Instances of the macro
   (consult-filter-macro "Rust" '(rust-mode rust-ts-mode) ?r)
   (consult-filter-macro "TeX" '(latex-mode LaTeX-mode tex-mode TeX-mode) ?t))
 #+end_src
-***** other
 
-Something like this can be used to hide custom buffer sources without specifying hidden.
-From: https://github.com/minad/consult/wiki#hide-all-sources-except-normal-buffers-in-consult-buffer-by-default
-
-#+begin_src emacs-lisp
-;; (with-eval-after-load 'consult
-;;   (dolist (src consult-buffer-sources)
-;;     (unless (eq src 'consult--source-buffer)
-;;       (set src (plist-put (symbol-value src) :hidden t)))))
-#+end_src
 *** consult-project-extra
 
 https://gitlab.com/OlMon/consult-projectile
