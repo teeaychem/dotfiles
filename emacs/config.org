@@ -1333,20 +1333,47 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package cc-mode
-  :bind (:map c++-mode-map
-              ;; ("C-c C-h" . ff-find-other-file)
-              ("C-c h" . ff-find-other-file-other-window))
-  :config
-  ;; do not override the open link (c-set-offset)
-  (keymap-unset c++-mode-map "C-c C-o"))
+  :straight nil
+
+  :custom
+  (c-default-style '((c++-mode . "linux")
+                     (c-mode . "linux")
+                     (other . "gnu"))))
 #+end_src
 
 #+begin_src emacs-lisp
+(use-package c++-mode
+  :straight nil
+
+  :bind (:map c++-mode-map
+              ("C-c h" . ff-find-other-file-other-window)
+              ("C-c C-o" . nil))
+
+  :custom
+  (c-doc-comment-style '((c++-mode . doxygen))))
+#+end_src
+
+c-ts-mode is shared by both c and c++
+
+#+begin_src emacs-lisp
+(use-package c-ts-mode
+  :straight nil
+
+  :bind ((:map c++-ts-mode-map
+               ("C-c h" . ff-find-other-file-other-window)
+               ("C-c C-o" . nil))
+         (:map c-ts-mode-map
+               ("C-c h" . ff-find-other-file-other-window)))
+
+  :custom
+  (c-ts-mode-indent-style 'linux))
+#+end_src
+
+
+#+begin_src emacs-lisp
 (use-package cmake-mode
-  :mode ("\\CMakeLists.txt\\'" . cmake-ts-mode)
-  :straight (:host github
-             :repo "emacsmirror/cmake-mode"
-             :branch "master"))
+  :straight (:host github :repo "emacsmirror/cmake-mode" :branch "master")
+  :mode ("\\CMakeLists.txt\\'" . cmake-ts-mode))
 #+end_src
 
 ** elf
@@ -1428,9 +1455,17 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package lua-mode
   :straight t
+  :after eglot
 
   :custom
-  (lua-indent-level 2))
+  (lua-indent-level 2)
+
+  :config
+    (let* ((config-path (concat (getenv "XDG_CONFIG_HOME") "/.luarc.json"))
+         (lua-args (if (file-exists-p config-path)
+                       (list "lua-language-server" (concat "--configpath=" config-path))
+                     '("lua-language-server"))))
+    (setf (alist-get 'lua-mode eglot-server-programs nil nil #'equal) lua-args)))
 #+end_src
 
 ** llvm
@@ -1556,11 +1591,11 @@ Get the relevant package subdirectories from the llvm source
 
 #+begin_src emacs-lisp
 (use-package python
-  :straight t
+  :straight nil
 
-  :config
-  (setq-default python-indent-offset 4)
-  (setq-default python-indent-guess-indent-offset-verbose nil))
+  :custom
+  (python-indent-offset 4)
+  (python-indent-guess-indent-offset-verbose nil))
 #+end_src
 
 #+begin_src emacs-lisp
