@@ -813,6 +813,26 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :bind (:map format-prefix-map
               ("a" . apheleia-format-buffer)))
 #+end_src
+** blamer
+
+#+begin_src emacs-lisp
+(use-package blamer
+  :straight t
+  :defer 20
+  :bind
+  ("C-c v B" . blamer-mode)
+  ("s-i" . blamer-show-commit-info)
+
+  :config
+  (setq blamer-author-formatter " ✎ %s ")
+  (setq blamer-datetime-formatter "[%s] ")
+  (setq blamer-commit-formatter "/ %s")
+
+  :custom
+  (blamer-idle-time 0.3)
+  (blamer-min-offset 40)
+  (blamer-view 'overlay))
+#+end_src
 ** bookmark+
 #+begin_src emacs-lisp
 (use-package bookmark+
