@@ -131,9 +131,12 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package emacs
   :init
-  (setq-default delete-by-moving-to-trash t)
+  (let ((backup-dir (concat user-emacs-directory "var/backups")))
+    (unless (file-directory-p backup-dir)
+      (make-directory backup-dir t)))
 
   :custom
+  (delete-by-moving-to-trash t)
   (backup-directory-alist `(("." . ,(concat user-emacs-directory "var/backups"))))
   (backup-by-copying t)      ; don't clobber symlinks
   (kept-new-versions 10)     ; keep 10 latest versions
@@ -147,12 +150,10 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 ** locale
 
 #+begin_src emacs-lisp
-(prefer-coding-system       'utf-8)
-(set-default-coding-systems 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(set-charset-priority 'unicode)
-(setq locale-coding-system 'utf-8)
+(use-package emacs
+  :init
+  (set-language-environment "UTF-8")
+  (setq locale-coding-system 'utf-8))
 #+end_src
 
 
@@ -984,8 +985,10 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (use-package envrc
   :disabled
   :straight t
+
   :custom
   (envrc-show-summary-in-minibuffer nil)
+
   :hook (after-init . envrc-global-mode))
 #+end_src
 
@@ -1049,8 +1052,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   ;; personally, I use perspectives
   ;; (setf gumshoe-slot-schema '(perspective time buffer position line))
   ;; disable auto-cancel of backtracking
-  (setf gumshoe-auto-cancel-backtracking-p nil)
-  )
+  (setf gumshoe-auto-cancel-backtracking-p nil))
 #+end_src
 
 ** helpful
@@ -2260,6 +2262,7 @@ for rust dev
   :config
   (eglot-x-setup))
 #+end_src
+
 *** eglot-tempel
 #+begin_src emacs-lisp
 (use-package eglot-tempel
@@ -2269,12 +2272,14 @@ for rust dev
   :init
   (eglot-tempel-mode t))
 #+end_src
+
 *** consult
 #+begin_src emacs-lisp
 (use-package consult-eglot
   :straight t
   :after eglot)
 #+end_src
+
 *** workspaces
 #+begin_src emacs-lisp
 ;; (add-hook 'python-base-mode-hook
