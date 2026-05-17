@@ -36,6 +36,9 @@ require("catppuccin").setup({
 vim.pack.add({
   "https://github.com/echasnovski/mini.nvim"
 })
+require("mini.statusline").setup({
+    use_icons = false,
+})
 
 vim.pack.add({
   "https://github.com/folke/which-key.nvim",
@@ -75,7 +78,7 @@ require('telescope').setup {
 vim.api.nvim_create_autocmd('InsertEnter', {
   once = true,
   callback = function()
-    require("mini.pairs").setup({
+      require("mini.pairs").setup({
       modes = { insert = true, command = true, terminal = false },
       -- skip autopair when next character is one of these
       skip_next = [=[[%w%%%'%[%"%.%`%$]]=],
