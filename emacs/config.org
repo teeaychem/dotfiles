@@ -74,7 +74,6 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
 
   (delete-selection-mode t) ;; delete selected text by typing
   (global-auto-revert-mode t) ; for reloading bib files, etc.
-  (global-subword-mode)
 
   (save-place-mode t)
 
@@ -111,6 +110,16 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
                                             cursor-intangible t
                                             face minibuffer-prompt))
   )
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package subword
+  :straight nil
+  :delight subword-mode
+
+  :init
+  (global-subword-mode))
+
 #+end_src
 
 ** saving & backups
@@ -1202,6 +1211,10 @@ To highlight indentations
 
   :config
   (projectile-mode 1)
+
+  :custom
+  (projectile-mode-line-function
+   '(lambda () (format " projectile[%s]" (projectile-project-name))))
 
   :bind-keymap
   ("C-x p" . projectile-command-map))
