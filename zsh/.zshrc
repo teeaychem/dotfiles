@@ -7,6 +7,7 @@ fi
 source ${ZDOTDIR:-$HOME}/.antidote/antidote.zsh
 antidote load
 
+
 # fns
 
 # Change working directory to the top finder window location
@@ -24,8 +25,8 @@ function rmdsstore {
 }
 
 function path_add {
-    element=${1%/}
-    if [ -d "$1" ] && ! echo $PATH | grep -E -q "(^|:)$element($|:)"; then
+    local target="${1%/}"
+    if [[ -d "$target" ]] && (( ! ${PATH[(I)$target]} )); then
         case "$2" in
         "append")
             PATH="${PATH:+${PATH}:}$1"
@@ -37,7 +38,7 @@ function path_add {
             PATH="$1${PATH:+:${PATH}}"
             ;;
         *)
-            echo -N "Unexpected path_add specification: ${2}"
+            echo -e "Unexpected path_add specification: ${2}"
             ;;
         esac
     fi
@@ -57,8 +58,8 @@ darwin*)
     path_add "${HOME}/.local/opt/emacs/bin/" "prepend"
     path_add "${HOME}/.local/opt/elan/bin/" "prepend"
 
-    export HOMEBREW_NO_AUTO_UPDATE
     export HOMEBREW_BUNDLE_FILE="${XDG_CONFIG_HOME}/brew/Brewfile"
+    export HOMEBREW_NO_AUTO_UPDATE
     export HOMEBREW_NO_ENV_HINTS=1
 
     if command -v bat &>/dev/null; then export HOMEBREW_BAT=1; fi
@@ -96,11 +97,7 @@ setopt share_history # hare command history data, append history and read on eac
 
 setopt EXTENDED_HISTORY # record timestamp of command
 
-local history_to_ignore=(
-    # 'apt'
-    # 'apt-get'
-    # 'brew'
-    # 'dnf'
+local -a history_to_ignore=(
     'clear'
     'date'
     'df'
@@ -173,8 +170,19 @@ setopt NO_MENU_COMPLETE # do not autoselect the first completion entry
 
 # Tools
 
+# #
+export FD_OPTIONS="--hidden --follow"
+
+alias fdd="fd --type d"             # Find directories only
+alias fdf="fd --type f"             # Find files only
+alias fda="fd --no-ignore --hidden" # Find everything (ignores .gitignore)
+alias fde="fd --type f --extension" # Find files by extension (e.g., fde py)
+
 # # grep
 alias grep='grep --color=auto'
+
+# # ls
+alias ll="ls -lh"
 
 # # man
 export MANPAGER="nvim +Man!"
@@ -185,25 +193,25 @@ alias py="python3"
 alias python="python3"
 
 alias pyfind='find . -name "*.py"'
-# alias pygrep='grep -nr --include="*.py"'
 alias pygrep='rg -g "*.py" -g "!**/site-packages/"'
 
 function venv-activate() {
-    local venv_root="${1:-.venv}";
+    local venv_root="${1:-.venv}"
 
-    if [ -d "${venv_root}" ] && [ -f "${venv_root}/bin/activate" ]; then
-        echo "Activated venv: ${venv_root}"
+     if [[ -d "$venv_root" && -f "${venv_root}/bin/activate" ]]; then
+        echo "Activated venv: $venv_root"
         source "${venv_root}/bin/activate"
     else
         echo "Unable to activate venv: ${venv_root}"
+        return 1
     fi
 }
 
 function pyclean {
-    find "${@:-.}" -type f -name "*.py[co]" -delete
-    find "${@:-.}" -type d -name "__pycache__" -delete
-    find "${@:-.}" -depth -type d -name ".mypy_cache" -exec rm -r "{}" +
-    find "${@:-.}" -depth -type d -name ".pytest_cache" -exec rm -r "{}" +
+    find "${@:-.}" \
+         \( -type f -name "*.py[co]" -delete \) -o \
+         \( -type d -name "__pycache__" -delete \) -o \
+         \( -type d \( -name ".mypy_cache" -o -name ".pytest_cache" \) -prune -exec rm -rf {} + \)
 }
 
 # # rust
@@ -216,10 +224,12 @@ if [[ -d $CARGO_HOME ]]; then
     fi
 fi
 
-# Extensions
+
+# extensions
 
 FZF_CTRL_T_COMMAND=
-if source <(fzf --zsh); then
+source <(fzf --zsh)
+if (( $+commands[fzf] )); then
     # preview
     function fzfp {
         fzf --layout='default' \
@@ -233,10 +243,12 @@ if source <(fzf --zsh); then
     }
 fi
 
+if (( $+commands[tree] )); then
+    export FZF_ALT_C_OPTS="--preview 'tree -C {} | head -50'"
+fi
+
 eval "$(zoxide init zsh)"
 
-# alibi
-alias ll="ls -lh"
 
 # closing
 autoload -Uz compinit
