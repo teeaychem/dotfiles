@@ -8,6 +8,10 @@ source ${ZDOTDIR:-$HOME}/.antidote/antidote.zsh
 antidote load
 
 
+if [[ ! -d ${XDG_CONFIG_HOME:-$HOME}/local.env ]]; then
+    export $(grep -v '^#' ${XDG_CONFIG_HOME:-$HOME}/local.env | xargs)
+fi
+
 # fns
 
 # Change working directory to the top finder window location

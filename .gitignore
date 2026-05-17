@@ -1,5 +1,7 @@
 **.DS_Store
 
+/local.env
+
 /cache/
 
 /docker/
@@ -50,3 +52,5 @@ hunspell/dictionaries/README*
 /zsh/.zhistory
 /zsh/.zsh_history
 /zsh/.zsh_sessions/*
+
+/.agent-shell/

@@ -2589,6 +2589,8 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 
 * llm
 
+** gptel
+
 #+begin_src emacs-lisp
 (use-package gptel
   :straight t
@@ -2624,6 +2626,27 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
   :straight t
   :config (gptel-agent-update))         ;Read files from agents directories
 #+end_src
+
+** agent-shell
+
+#+begin_src emacs-lisp
+(use-package agent-shell
+  :ensure t
+  :straight t
+  ;; :ensure-system-package
+  ;; ((codex-acp . "brew install codex-acp"))
+
+  :config
+  (let ((local-env (substitute-env-vars "${XDG_CONFIG_HOME}/local.env")))
+    (setq agent-shell-openai-codex-environment
+          (if (file-exists-p local-env)
+              (agent-shell-make-environment-variables
+               :load-env local-env
+               :inherit-env t)
+            (agent-shell-make-environment-variables
+             :inherit-env t)))))
+#+end_src
+
 
 * workspaces (maybe)
 
