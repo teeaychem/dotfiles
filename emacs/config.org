@@ -1,9 +1,3 @@
-:PROPERTIES:
-:GPTEL_MODEL: test
-:GPTEL_BACKEND: llama-cpp
-:GPTEL_SYSTEM: You are a large language model living in Emacs and a helpful assistant. Respond concisely.
-:GPTEL_TOOLS:
-:END:
 -*- mode: org -*-
 #+startup: show2levels
 #+PROPERTY: header-args :results silent
@@ -60,7 +54,6 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
 
 * general
 
-
 #+begin_src emacs-lisp
 ;; Optimization from doom-start.el
 (setq auto-mode-case-fold nil)
@@ -77,11 +70,6 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
   (defun crm-indicator (args) (cons (format "[CRM%s] %s" (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" "" crm-separator) (car args)) (cdr args)))
   (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
-  ;; Hide commands in M-x which do not work in the current mode.
-  ;; Vertico commands are hidden in normal buffers.
-  ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
-  (setq read-extended-command-predicate #'command-completion-default-include-p)
-
   (setq-default indent-tabs-mode nil)
 
   (delete-selection-mode t) ;; delete selected text by typing
@@ -90,7 +78,6 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
 
   (save-place-mode t)
 
-  (setq native-comp-async-report-warnings-errors nil)
   (setopt package-install-upgrade-built-in t) ;; show updates to built in packages
 
   :custom
@@ -109,6 +96,8 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
   (mouse-yank-at-point t)
   (kill-whole-line t)
   (desktop-load-locked-desktop t)
+  (native-comp-async-report-warnings-errors nil)
+  (read-extended-command-predicate #'command-completion-default-include-p)   ;; Hide commands in M-x which do not work in the current mode.
 
   (kill-do-not-save-duplicates t)
   (save-interprogram-paste-before-kill t)
@@ -186,8 +175,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
      ((> (minibuffer-depth) 0) (abort-recursive-edit))
      ;;In every other case use the regular `keyboard-quit'.
      (t (keyboard-quit))))
-
-  (define-key global-map (kbd "C-g") #'prot/keyboard-quit-dwim)
 
   :config
   (keymap-global-unset "<mouse-2>")
@@ -2373,6 +2360,7 @@ for rust dev
 #+end_src
 
 *** eglot-tempel
+
 #+begin_src emacs-lisp
 (use-package eglot-tempel
   :straight t
@@ -2383,6 +2371,7 @@ for rust dev
 #+end_src
 
 *** consult
+
 #+begin_src emacs-lisp
 (use-package consult-eglot
   :straight t
@@ -2553,6 +2542,7 @@ https://github.com/renzmann/treesit-auto
 ;;      :stopAtBeginningOfMainSubprogram nil)))
 #+end_src
 
+
 * fns
 
 From https://blog.plover.com/prog/revert-all.html
@@ -2573,6 +2563,7 @@ From https://blog.plover.com/prog/revert-all.html
   (message "Refreshed open files"))
 #+end_src
 
+
 * terminal
 
 See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
@@ -2585,6 +2576,7 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
   ("M-w" . clipetty-kill-ring-save)
   ("s-c" . clipetty-kill-ring-save))
 #+end_src
+
 
 * llm
 
@@ -2622,4 +2614,50 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 (use-package gptel-agent
   :straight t
   :config (gptel-agent-update))         ;Read files from agents directories
+#+end_src
+
+* workspaces (maybe)
+
+#+begin_src emacs-lisp
+;; Core Registration Function
+(defun my/register-workspaces (workspaces-alist &optional subfolder)
+  "Register an ALIST of (name . path) workspaces.
+Prioritizes a .dir-locals.el inside the project path.
+Falls back to a file in USER-EMACS-DIRECTORY under SUBFOLDER."
+  (let* ((folder (or subfolder "workspace-configs"))
+         (config-dir (expand-file-name folder user-emacs-directory)))
+    (pcase-dolist (`(,name . ,target-path) workspaces-alist)
+      (when (and target-path (file-directory-p target-path))
+        (let* ((class-name (intern (concat name "-locals")))
+               (local-file (expand-file-name ".dir-locals.el" target-path))
+               (fallback-file (expand-file-name (concat name ".el") config-dir))
+               (target-file (if (file-exists-p local-file) local-file fallback-file)))
+
+          (when (string= target-file fallback-file)
+            (make-directory config-dir t)
+            (unless (file-exists-p fallback-file)
+              (write-region "((nil . ()))" nil fallback-file)))
+
+          (dir-locals-set-class-variables class-name target-file)
+          (dir-locals-set-directory-class target-path class-name))))))
+#+end_src
+
+#+begin_src emacs-lisp
+(let ((workspaces-script (expand-file-name "workspaces.el" (concat user-emacs-directory "var/"))))
+  (unless (file-exists-p workspaces-script)
+    ;; Force create the enclosing directory if it doesn't exist yet
+    (make-directory (file-name-directory workspaces-script) t)
+    ;; Write file with raw append permissions to clear buffer limits
+    (with-temp-file workspaces-script
+      (insert ";;; workspaces.el --- Workspace Mappings -*- lexical-binding: t; -*-\n\n")
+      (insert ";; (setq my-personal-workspaces\n")
+      (insert ";;       '((\"project-alpha\" . \"/home/user/workspaces/project-alpha/\")\n")
+      (insert ";;         (\"project-beta\"  . \"/home/user/workspaces/project-beta/\")))\n\n")))
+
+  ;; Load the mapping file
+  (load workspaces-script 'noerror))
+#+end_src
+
+#+begin_src emacs-lisp
+(my/register-workspaces my-personal-workspaces)
 #+end_src
