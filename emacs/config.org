@@ -409,6 +409,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
     (setq insert-directory-program (executable-find "gls")))
 
   :custom
+  (global-dired-omit-mode t)
   (dired-kill-when-opening-new-dired-buffer t)
   (dired-recursive-copies 'always)
   (dired-recursive-deletes 'always)
@@ -417,12 +418,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
                             "\\|^\\.DS_Store\\'"
                             "\\|^\\.\\(?:svn\\|git\\)\\'"
                             "\\|^__pycache__\\'"
-                            "\\|^flymake_.*"))
-
-  :hook
-  (dired-mode . #'dired-omit-mode))
-
-;; issues with dired and non-gnu darwin ls
+                            "\\|^flymake_.*")))
 #+end_src
 
 ** editorconfig
@@ -2643,21 +2639,18 @@ Falls back to a file in USER-EMACS-DIRECTORY under SUBFOLDER."
 #+end_src
 
 #+begin_src emacs-lisp
-(let ((workspaces-script (expand-file-name "workspaces.el" (concat user-emacs-directory "var/"))))
-  (unless (file-exists-p workspaces-script)
-    ;; Force create the enclosing directory if it doesn't exist yet
-    (make-directory (file-name-directory workspaces-script) t)
-    ;; Write file with raw append permissions to clear buffer limits
-    (with-temp-file workspaces-script
-      (insert ";;; workspaces.el --- Workspace Mappings -*- lexical-binding: t; -*-\n\n")
-      (insert ";; (setq my-personal-workspaces\n")
-      (insert ";;       '((\"project-alpha\" . \"/home/user/workspaces/project-alpha/\")\n")
-      (insert ";;         (\"project-beta\"  . \"/home/user/workspaces/project-beta/\")))\n\n")))
+(let ((workspaces-el (expand-file-name "workspaces.el" (concat user-emacs-directory "var/"))))
+  (unless (file-exists-p workspaces-el)
+    (make-directory (file-name-directory workspaces-el) t)
+    (with-temp-file workspaces-el
+      (insert "(")
+      (insert ";;(\"project-alpha\" . \"/home/user/workspaces/project-alpha/\")\n")
+      (insert ")")))
 
-  ;; Load the mapping file
-  (load workspaces-script 'noerror))
-#+end_src
+  (let ((my-personal-workspaces (with-temp-buffer
+                                  (insert-file-contents workspaces-el)
+                                  (goto-char (point-min))
+                                  (read (current-buffer)))))
 
-#+begin_src emacs-lisp
-(my/register-workspaces my-personal-workspaces)
+    (my/register-workspaces my-personal-workspaces)))
 #+end_src
