@@ -760,6 +760,16 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 * external, etc.
 
+** avy
+
+#+begin_src emacs-lisp
+(use-package avy
+  :straight t
+  :bind (("C-'" . avy-goto-char-timer)
+         ("M-g w" . avy-goto-word-1)
+         ("M-g l" . avy-goto-line)))
+#+end_src
+
 ** COMMENT compile-angel
 #+begin_src emacs-lisp
 (use-package compile-angel
@@ -2131,7 +2141,6 @@ Instances of the macro
   (consult-filter-macro "TeX" '(latex-mode LaTeX-mode tex-mode TeX-mode) ?t))
 #+end_src
 
-
 *** consult-project-extra
 
 https://gitlab.com/OlMon/consult-projectile
@@ -2146,6 +2155,17 @@ https://github.com/Qkessler/consult-project-extra, for project
                ("b" . consult-projectile-switch-to-buffer)
                ("d" . consult-projectile-find-dir)
                ("f" . consult-projectile-find-file))))
+#+end_src
+
+*** consult-dir
+
+#+begin_src emacs-lisp
+(use-package consult-dir
+  :straight t
+  :bind (("C-x C-d" . consult-dir)
+         :map minibuffer-local-completion-map
+         ("C-x C-d" . consult-dir)
+         ("C-x C-j" . consult-dir-jump-file)))
 #+end_src
 
 ** corfu
@@ -2254,8 +2274,8 @@ https://github.com/Qkessler/consult-project-extra, for project
 * language interaction
 
 
+* eglot
 ** eglot
-*** eglot
 
 
 #+begin_src emacs-lisp
@@ -2343,7 +2363,7 @@ maybe: https://github.com/casouri/eldoc-box
   ((eglot-managed-mode . eldoc-promote-flymake)))
 #+end_src
 
-*** eglot-x
+** eglot-x
 
 https://github.com/nemethf/eglot-x#rust-analyzer-extensions
 for rust dev
@@ -2360,7 +2380,7 @@ for rust dev
   (eglot-x-setup))
 #+end_src
 
-*** eglot-tempel
+** eglot-tempel
 
 #+begin_src emacs-lisp
 (use-package eglot-tempel
@@ -2371,7 +2391,7 @@ for rust dev
   (eglot-tempel-mode t))
 #+end_src
 
-*** consult
+** consult
 
 #+begin_src emacs-lisp
 (use-package consult-eglot
@@ -2379,7 +2399,7 @@ for rust dev
   :after eglot)
 #+end_src
 
-*** workspaces
+** workspaces
 #+begin_src emacs-lisp
 ;; (add-hook 'python-base-mode-hook
 ;;           (lambda ()
@@ -2400,7 +2420,19 @@ for rust dev
 ;;                                          :verboseOutput :json-false))))))
 #+end_src
 
-** tree sitter
+
+* tree sitter
+
+** combobulate
+
+#+begin_src emacs-lisp
+(use-package combobulate
+  :straight (:host github :repo "mickeynp/combobulate")
+  :hook ((python-ts-mode
+          c-ts-mode) . combobulate-mode))
+#+end_src
+
+** treesit-auto
 
 (treesit-library-abi-version)
 
@@ -2436,6 +2468,14 @@ https://github.com/renzmann/treesit-auto
       (clear-minibuffer-message))))
 #+end_src
 
+** treesit-fold
+
+#+begin_src emacs-lisp
+(use-package treesit-fold
+  :straight (:host github :repo "emacs-tree-sitter/treesit-fold")
+  :bind (:map prog-mode-map
+              ("C-c TAB" . treesit-fold-toggle)))
+#+end_src
 
 * tempel
 
