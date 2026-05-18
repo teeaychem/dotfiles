@@ -88,7 +88,7 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
   (enable-recursive-minibuffers t)
   (tab-always-indent t)
   (custom-buffer-indent 4)
-  (desktop-save-mode t)
+  (desktop-save-mode 1)
   (tab-width 2)
   (xterm-mouse-mode t)
   (translate-upper-case-key-bindings nil)
@@ -159,7 +159,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package emacs
   :init
-  (defun foward-delete-word (arg) (interactive "p")
+  (defun forward-delete-word (arg) (interactive "p")
          (delete-region (point) (progn (forward-word arg) (point))))
 
   (defun backward-delete-word (arg) (interactive "p")
@@ -372,8 +372,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (ns-pop-up-frames nil)
   (ns-use-thin-smoothing t)
   (ns-antialias-text t)
-
-  (setq-default trash-directory "~/.Trash/emacs"))
+  (trash-directory "~/.Trash/emacs"))
 #+end_src
 
 
@@ -434,6 +433,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package editorconfig
+  :demand t
+  :delight
   :config
   (editorconfig-mode 1))
 #+end_src
@@ -580,11 +581,14 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :after exec-path-from-shell
 
   :if (executable-find "hunspell")
-  :custom
+
+  :config
   (add-to-list
    'ispell-hunspell-dictionary-alist
    '(("en_GB" "[[:alpha:]]" "[^[:alpha]]" "[0-9']"
       nil nil utf-8)))
+
+  :custom
   (ispell-program-name "hunspell")
   (ispell-personal-dictionary (concat (getenv "DICPATH") "/hunspell_personal"))
   (ispell-dictionary "en_GB")
@@ -966,17 +970,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (setq xref-backend-functions (remq 'etags--xref-backend xref-backend-functions))
 (add-hook 'xref-backend-functions #'dumb-jump-xref-activate t)
 (setq xref-show-definitions-function #'xref-show-definitions-completing-read)
-#+end_src
-
-** editoronfig
-#+begin_src emacs-lisp
-(use-package editorconfig
-  :straight t
-  :demand t
-  :delight
-
-  :config
-  (editorconfig-mode 1))
 #+end_src
 
 ** envrc
@@ -1554,7 +1547,7 @@ Get the relevant package subdirectories from the llvm source
 *** mlir
 
 #+begin_src emacs-lisp
-(defun my-eglot-strict-env-mlir (&optional _interactive)
+(defun my-eglot-strict-mlir (&optional _interactive)
   (let ((shell-path (getenv "MLIR_LSP_SERVER_BIN")))
     (if (and shell-path
              (not (string-empty-p shell-path))
@@ -1878,7 +1871,6 @@ https://github.com/radian-software/apheleia/issues/278
 
   (org-list-allow-alphabetical t)
 
-  (org-log-done 'time) ;; Auto add time and closing note to done
   (org-log-done 'note)
 
   :config
