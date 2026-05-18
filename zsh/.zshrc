@@ -7,69 +7,29 @@ fi
 source ${ZDOTDIR:-$HOME}/.antidote/antidote.zsh
 antidote load
 
+source ${XDG_CONFIG_HOME}/shell/utils.sh
 
-if [[ ! -d ${XDG_CONFIG_HOME:-$HOME}/local.env ]]; then
+
+if [[ -f ${XDG_CONFIG_HOME:-$HOME}/local.env ]]; then
     export $(grep -v '^#' ${XDG_CONFIG_HOME:-$HOME}/local.env | xargs)
 fi
 
 # fns
 
-# Change working directory to the top finder window location
-function cdf() {
-    cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')"
-}
-
-# de-quarantine $1
-function dq {
-    xattr -r -d com.apple.quarantine "$1"
-}
-
-function rmdsstore {
-    find "${@:-.}" -type f -name .DS_Store -delete
-}
-
-function path_add {
-    local target="${1%/}"
-    if [[ -d "$target" ]] && (( ! ${PATH[(I)$target]} )); then
-        case "$2" in
-        "append")
-            PATH="${PATH:+${PATH}:}$1"
-            ;;
-        "prepend")
-            PATH="$1${PATH:+:${PATH}}"
-            ;;
-        "")
-            PATH="$1${PATH:+:${PATH}}"
-            ;;
-        *)
-            echo -e "Unexpected path_add specification: ${2}"
-            ;;
-        esac
-    fi
-}
-
 # Path configuration, as macOS executes path_helper *after* sourcing zshenv
 # https://apple.stackexchange.com/questions/432226/homebrew-path-set-in-zshenv-is-overridden
 case "$OSTYPE" in
-darwin*)
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-    # llvm
-    path_add "/opt/homebrew/opt/llvm/bin/" "append"
-    # export LDFLAGS="-L/opt/homebrew/opt/llvm/lib -L/opt/homebrew/opt/llvm/lib/c++ -L/opt/homebrew/opt/llvm/lib/unwind -lunwind"
-    # export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
-    # export CMAKE_PREFIX_PATH="/opt/homebrew/opt/llvm"
-    path_add "/usr/local/texlive/2026basic/bin/universal-darwin/" "prepend"
-    path_add "${HOME}/.local/opt/emacs/bin/" "prepend"
-    path_add "${HOME}/.local/opt/elan/bin/" "prepend"
-
-    export HOMEBREW_BUNDLE_FILE="${XDG_CONFIG_HOME}/brew/Brewfile"
-    export HOMEBREW_NO_AUTO_UPDATE
-    export HOMEBREW_NO_ENV_HINTS=1
-
-    if command -v bat &>/dev/null; then export HOMEBREW_BAT=1; fi
+    darwin*)
+    if [[ -f ${XDG_CONFIG_HOME}/shell/darwin.sh ]]; then
+        source ${XDG_CONFIG_HOME}/shell/darwin.sh
+    fi
     ;;
-linux*) ;;
-*)
+    linux*)
+    if [[ -f ${XDG_CONFIG_HOME}/shell/linux.sh ]]; then
+        source ${XDG_CONFIG_HOME}/shell/linux.sh
+    fi
+    ;;
+    *)
     echo "No configuration for: $OSTYPE"
     ;;
 esac
