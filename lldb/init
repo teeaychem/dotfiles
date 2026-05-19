@@ -1,0 +1,8 @@
+settings set target.inline-breakpoint-strategy always
+settings set target.process.thread.step-avoid-regexp ^std::|^__|^_?pthread_|^objc_
+settings set target.process.optimization-warnings true
+settings set stop-disassembly-count 8
+
+command alias btall thread backtrace all
+command alias bta thread backtrace all
+command alias pp expression --
