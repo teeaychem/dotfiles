@@ -3,6 +3,8 @@
 # ghostty +show-config --default --docs
 # https://ghostty.org/docs/config.
 
+config-file = ?config.local
+
 auto-update = off
 
 cursor-style = block
@@ -33,6 +35,6 @@ macos-titlebar-proxy-icon = hidden
 
 mouse-hide-while-typing = true
 
-shell-integration-features = no-sudo,title,ssh-env,no-ssh-terminfo,path
+shell-integration-features = no-cursor,sudo,title,ssh-env,ssh-terminfo,path
 
-unfocused-split-opacity = 0.5
+unfocused-split-opacity = 0.66
