@@ -1040,6 +1040,19 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
         fzf/window-height 15))
 #+end_src
 
+** ghostel
+
+#+begin_src emacs-lisp
+(use-package ghostel
+  :straight (:url "https://github.com/dakra/ghostel"
+             :lisp-dir "lisp"
+             :rev :newest)
+
+  :custom
+  (ghostel-tramp-shell-integration nil))
+
+#+end_src
+
 ** gumshoe
 
 #+begin_src emacs-lisp
