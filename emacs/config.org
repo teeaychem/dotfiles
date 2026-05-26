@@ -1430,6 +1430,11 @@ To highlight indentations
 (use-package c++-mode
   :straight nil
 
+  :mode (("\\.\\(?:C\\|H\\|cc\\|hh\\|cpp\\|hpp\\|cxx\\|hxx\\|c++\\|h++\\|ipp\\|ixx\\|cppm\\)\\'" . c++-mode)
+         ("\\.\\(?:cc\\|cpp\\|cxx\\|h\\|hh\\|hpp\\|hxx\\)\\.inc\\'" . c++-mode)
+         ("\\.inc\\'" . c++-mode)
+         ("\\.def\\'" . c++-mode))
+
   :bind (:map c++-mode-map
               ("C-c h" . ff-find-other-file-other-window)
               ("C-c C-o" . nil))
@@ -1458,7 +1463,8 @@ c-ts-mode is shared by both c and c++
 #+begin_src emacs-lisp
 (use-package cmake-mode
   :straight (:host github :repo "emacsmirror/cmake-mode" :branch "master")
-  :mode ("\\CMakeLists.txt\\'" . cmake-ts-mode))
+  :mode (("CMakeLists\\.txt\\'" . cmake-ts-mode)
+         ("\\.cmake\\'" . cmake-ts-mode)))
 #+end_src
 
 ** elf
@@ -1850,7 +1856,7 @@ https://github.com/radian-software/apheleia/issues/278
 #+begin_src emacs-lisp
 (use-package yaml-mode
   :straight t
-  :mode "\\.yml\\'")
+  :mode "\\.ya?ml\\'")
 #+end_src
 
 
