@@ -1,47 +1,46 @@
 # https://wiki.archlinux.org/title/XDG_Base_Directory
 # https://specifications.freedesktop.org/basedir-spec/latest/
 
+function load_env_file
+    argparse 'm/mandatory' -- $argv
+    or return 1
 
-set -x XDG_CONFIG_HOME "$HOME/.config"
-set -x XDG_STATE_HOME "$HOME/.local/state"
-set -x XDG_DATA_HOME "$HOME/.local/share"
-set -x XDG_CACHE_HOME "$HOME/.cache"
+    set -l file $argv
 
-# https://www.freedesktop.org/wiki/Software/xdg-user-dirs/
-set -x XDG_DESKTOP_DIR "$HOME/Desktop"
-set -x XDG_DOWNLOAD_DIR "$HOME/Downloads"
-set -x XDG_TEMPLATES_DIR "$HOME/Templates"
-set -x XDG_PUBLICSHARE_DIR "$HOME/Public"
-set -x XDG_DOCUMENTS_DIR "$HOME/Documents"
-set -x XDG_MUSIC_DIR "$HOME/Music"
-set -x XDG_PICTURES_DIR "$HOME/Pictures"
-set -x XDG_VIDEOS_DIR "$HOME/Videos"
-
-if test (uname) = Darwin
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-    fish_add_path "/opt/homebrew/opt/llvm/bin/"
+    if test -f "$file"
+        string match -vr '^\s*(#|$)' < "$file" | \
+            string split -m 1 ' ' | \
+            while read -l k; read -l v
+                set -l expanded_v (eval echo $v)
+                set -gx $k $expanded_v
+            end
+    else if set -q _flag_mandatory
+        set_color red; echo "Error: Mandatory env file missing -> $file" >&2; set_color normal
+    end
 end
 
-# docker
-set -gx DOCKER_CONFIG "$XDG_CONFIG_HOME/docker"
+# Usage inside config.fish:
+load_env_file -m "$XDG_CONFIG_HOME/shell/default.env"
+load_env_file    "$XDG_CONFIG_HOME/shell/local.env"
+
+
+switch (uname)
+    case Darwin
+        source $__fish_config_dir/darwin.fish
+    case Linux
+        source $__fish_config_dir/linux.fish
+    case '*'
+        echo "No configuration for: "(uname)
+end
 
 # hammerspoon
 # defaults write org.hammerspoon.Hammerspoon MJConfigFile "~/.config/hammerspoon/init.lua"
 
-# hunspell
-set -gx DICPATH "$XDG_CONFIG_HOME/hunspell/dictionaries"
-
-# keras
-set -gx KERAS_HOME "$XDG_DATA_HOME/keras"
-
-# lean
-set -gx ELAN_HOME "$XDG_DATA_HOME/elan"
-
-# less
-set -gx LESSHISTFILE "$XDG_STATE_HOME/less/history"
-
 # man
 set -x MANPAGER "nvim +Man!"
+
+# editor
+set -gx EDITOR nvim
 
 # npm / node
 set -gx NPM_CONFIG_USERCONFIG "$XDG_CONFIG_HOME/npm/npmrc"
@@ -53,15 +52,6 @@ set -gx OPAMROOT "$XDG_DATA_HOME/opam"
 # This adds: the correct directories to the PATH, auto-completion for the opam binary
 test -r '/Users/sparkes/.share/opam/opam-init/init.fish' && source '/Users/sparkes/.share/opam/opam-init/init.fish' >/dev/null 2>/dev/null; or true
 
-# python
-set -gx PYTHONPYCACHEPREFIX "$XDG_CACHE_HOME/python_cache"
-set -gx PYTHON_HISTORY "$XDG_CACHE_HOME/python/history"
-set -gx IPYTHONDIR "$XDG_CACHE_HOME/ipython"
-set -gx MPLCONFIGDIR "$XDG_CACHE_HOME/matplotlib"
-
-# rust
-source "$HOME/.cargo/env.fish"
-
 # etc
 
 ## https://fishshell.com/docs/current/faq.html#faq-history
@@ -71,58 +61,109 @@ end
 abbr -a !! --position anywhere --function last_history_item
 
 function fish_should_add_to_history
-    # Ignore all uses of the following
-    for cmd in man which ls cd z pkgconf pkg-config
-        string match -qr "^$cmd" -- "$argv"; and return 1
-    end
-
-    # Ignore specific cargo commands
-    if string match -qr "^cargo (init)" -- "$argv"
+    # Ignore base commands safely, accounting for symbols like dashes
+    if string match -qr "^(man|which|ls|cd|z|pkgconf|pkg-config)" -- $argv
         return 1
     end
 
-    # Ignore specific git
-    if string match -qr "^git (add|commit|pop|remove|rename|restore|rm|stash|status|submodule)" -- "$argv"
+    # Ignore specific cargo subcommands
+    if string match -qr "^cargo\s+(init)" -- $argv
         return 1
     end
 
-    # Ignore some `-` terminating args
-    if string match -qr "\-(v|V|h|H)\$" -- "$argv"
+    # Ignore specific git subcommands
+    if string match -qr "^git\s+(add|commit|pop|remove|rename|restore|rm|stash|status|submodule)" -- $argv
         return 1
     end
 
-    # Ignore some `--` terminating args
-    if string match -qr "\-\-(help)\$" -- "$argv"
+    # Ignore flags (-v, -V, -h, -H, or --help) at the very end of a line
+    if string match -qr "\s+-{1,2}(v|V|h|H|help)\$" -- $argv
         return 1
     end
 
     return 0
 end
 
+# tools
+set -gx FD_OPTIONS "--hidden --follow"
+
+abbr -a fdd "fd --type d"
+abbr -a fdf "fd --type f"
+abbr -a fda "fd --no-ignore --hidden"
+abbr -a fde "fd --type f --extension"
+
+abbr -a grep "grep --color=auto"
+abbr -a ll "ls -lh"
+
+abbr -a py python3
+abbr -a python python3
+abbr -a pyfind 'find . -name "*.py"'
+abbr -a pygrep 'rg -g "*.py" -g "!**/site-packages/"'
+
+function venv-activate
+    # Fallback to .venv if no path argument is provided
+    set -l venv_root $argv[1]; or set venv_root .venv
+
+    # Strip any trailing slashes
+    set venv_root (string replace -r '/$' '' -- "$venv_root")
+
+    if test -f "$venv_root/bin/activate.fish"
+        source "$venv_root/bin/activate.fish"
+        echo "Activated venv: $venv_root"
+    else
+        echo "Unable to activate venv: $venv_root" >&2
+        return 1
+    end
+end
+
+function pyclean
+    set -l roots $argv; or set roots .
+    # fd ignores hidden folders, so explicitly target the directories and extensions.
+    fd -IH '(__pycache__|\.mypy_cache|\.pytest_cache)$' -t d $roots -x rm -rf
+    fd -IH '\.py[co]$' -t f $roots -x rm
+end
+
 # fzf
 set -gx FZF_DEFAULT_COMMAND 'fd --type f --hidden --follow --exclude .git'
 
-function fzfp
-    fzf --layout='default' \
-        --ansi \
-        --preview-window=top,75%,sharp,wrap \
-        --bind 'focus:transform-header:file --brief {}' \
-        --bind='ctrl-d:abort' \
-        --bind='ctrl-s:change-preview(stat {})' \
-        --bind='ctrl-e:change-preview(bat -n --color=always {})' \
-        --bind='ctrl-w:toggle-preview'
+if command -q fzf
+    fzf --fish | source
+
+    function fzfp
+        fzf --layout='default' \
+            --ansi \
+            --preview-window=top,75%,sharp,wrap \
+            --bind 'focus:transform-header:file --brief {}' \
+            --bind='ctrl-d:abort' \
+            --bind='ctrl-s:change-preview(stat {})' \
+            --bind='ctrl-e:change-preview(bat -n --color=always {})' \
+            --bind='ctrl-w:toggle-preview'
+    end
+
+    if test -f "$XDG_CONFIG_HOME/fzf/default_ops"
+        set -x FZF_DEFAULT_OPTS_FILE "$XDG_CONFIG_HOME/fzf/default_ops"
+    end
+
+    if command -q tree
+        set -gx FZF_ALT_C_OPTS "--preview 'tree -C {} | head -50'"
+    end
 end
 
 # setup
 
 if status is-interactive
-    # Commands to run in interactive sessions can go here
+    fish_default_key_bindings
+
+    bind ctrl-h backward-kill-word
+    bind shift-tab accept-autosuggestion
+    bind alt-b backward-word
+    bind alt-f forward-word
 end
-starship init fish | source
 
-set -x FZF_DEFAULT_OPTS_FILE $XDG_CONFIG_HOME/fzf/default_ops
-fzf --fish | source
+if command -q zoxide
+    zoxide init fish | source
+end
 
-zoxide init fish | source
-
-direnv hook fish | source
+if command -q direnv
+    direnv hook fish | source
+end

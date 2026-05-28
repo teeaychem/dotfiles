@@ -9,11 +9,6 @@ antidote load
 
 source ${XDG_CONFIG_HOME}/shell/utils.sh
 
-
-if [[ -f ${XDG_CONFIG_HOME:-$HOME}/local.env ]]; then
-    export $(grep -v '^#' ${XDG_CONFIG_HOME:-$HOME}/local.env | xargs)
-fi
-
 # fns
 
 # Path configuration, as macOS executes path_helper *after* sourcing zshenv
@@ -33,7 +28,6 @@ case "$OSTYPE" in
     echo "No configuration for: $OSTYPE"
     ;;
 esac
-
 
 # options
 

@@ -1,8 +1,30 @@
-# XDG
-export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
-export XDG_CACHE_HOME=${XDG_CACHE_HOME:-$HOME/.cache}
-export XDG_DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}
-export XDG_STATE_HOME=${XDG_STATE_HOME:-$HOME/.local/state}
+function load_env_file() {
+    local mandatory=false
+
+    if [[ "$1" == "-m" || "$1" == "--mandatory" ]]; then
+        mandatory=true
+        shift
+    fi
+
+    local file="$1" line
+
+    if [[ -f "$file" ]]; then
+        while read -r line; do
+            [[ -z "$line" || "$line" == '#'* ]] && continue
+
+            local key="${line%% *}"
+            local raw_val="${line#* }"
+
+            # The (e) flag forces Zsh to expand variables like $HOME inside the text
+            export "$key"="${(e)raw_val}"
+        done < "$file"
+    elif [[ "$mandatory" == true ]]; then
+        print -u2 "${(%):-%F{red}}Error: Mandatory env file missing -> $file%f"
+    fi
+}
+
+load_env_file -m ~/.config/shell/default.env
+load_env_file ~/.config/shell/local.env
 
 mkdir -p \
     "$XDG_CONFIG_HOME" \
@@ -23,11 +45,7 @@ export LLVM_SRC="${HOME}/repos/llvm"
 
 # Languages, etc.
 
-# # keras
-export KERAS_HOME="${XDG_DATA_HOME}/keras"
 
-# # lean
-export ELAN_HOME="${HOME}/.local/opt/elan"
 
 # # npm / node
 # export NPM_CONFIG_USERCONFIG="${XDG_CONFIG_HOME}/npm/npmrc"
@@ -38,26 +56,9 @@ export ELAN_HOME="${HOME}/.local/opt/elan"
 
 # # python
 
-export PYTHONPYCACHEPREFIX="${XDG_CACHE_HOME}/python_cache"
-export PYTHON_HISTORY="${XDG_CACHE_HOME}/python/history"
-export IPYTHONDIR="${XDG_CACHE_HOME}/ipython"
-export MPLCONFIGDIR="${XDG_CACHE_HOME}/matplotlib"
-
-# Utils
-
-# # docker
-export DOCKER_CONFIG="${XDG_CONFIG_HOME}/docker"
+typeset -gU path fpath # ensure path arrays do not contain duplicates.
 
 # # gpg
 
 # https://www.gnupg.org/(it)/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html
 export GPG_TTY=$(tty)
-
-# # hunspell
-export DICTIONARY="en_GB"
-export DICPATH="${XDG_CONFIG_HOME}/hunspell/dictionaries"
-
-# # less
-export LESSHISTFILE="${XDG_STATE_HOME}/less/history"
-
-typeset -gU path fpath # ensure path arrays do not contain duplicates.
