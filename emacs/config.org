@@ -292,7 +292,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :init
   (setq-default fill-column 1024)
   (setq-default indicate-empty-lines t)
-  (setq-default tool-bar-mode nil)
+  (tool-bar-mode -1)
 
   (set-frame-parameter nil 'internal-border-width 2)
 
@@ -1721,7 +1721,7 @@ Get the relevant package subdirectories from the llvm source
                                   pet-find-file-from-project-root-natively))
 
   :hook
-  (python-base-mode . 'python-local-setup))
+  (python-base-mode . python-local-setup))
 #+end_src
 *** uv
 
@@ -2480,21 +2480,8 @@ https://github.com/renzmann/treesit-auto
   (setq treesit-enabled-modes t)
 
   :config
-  (setq treesit-language-source-alist (treesit-auto--build-treesit-source-alist))
-
-  (dolist (recipe treesit-auto-recipe-list)
-    (let ((orig-mode (treesit-auto-recipe-remap recipe))
-          (ts-mode (treesit-auto-recipe-ts-mode recipe)))
-      (when (and orig-mode ts-mode)
-        (add-to-list 'major-mode-remap-alist (cons orig-mode ts-mode)))))
-
-  (defun my/install-all-grammars ()
-    "Interactively compile everything scraped from the treesit-auto database."
-    (interactive)
-    (dolist (source treesit-language-source-alist)
-      (message "Compiling parser for %s..." (car source))
-      (ignore-errors (treesit-install-language-grammar (car source)))
-      (clear-minibuffer-message))))
+  (setq treesit-auto-langs (seq-difference treesit-auto-langs '(cobol verilog)))
+  (global-treesit-auto-mode))
 #+end_src
 
 ** treesit-fold
