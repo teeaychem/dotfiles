@@ -1716,20 +1716,9 @@ Get the relevant package subdirectories from the llvm source
 #+begin_src emacs-lisp
 (use-package pet
   :straight t
-  :demand t
 
   :custom
   (python-shell-interpreter "python")
-
-  :config
-  (add-hook 'python-base-mode-hook 'pet-mode -10)
-
-  (defun python-local-setup ()
-    (message "Performing local python setup")
-    (setq-local python-shell-interpreter (pet-executable-find "python3"))
-    (setq-local python-shell-virtualenv-root (pet-virtualenv-root))
-    (pet-eglot-setup)
-    (pet-dape-setup))
 
   :init
   (setq pet-find-file-functions '(pet-find-file-from-project-root
@@ -1737,7 +1726,7 @@ Get the relevant package subdirectories from the llvm source
                                   pet-find-file-from-project-root-natively))
 
   :hook
-  (python-base-mode . python-local-setup))
+  (python-base-mode . pet-mode))
 #+end_src
 *** uv
 
