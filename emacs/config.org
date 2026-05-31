@@ -86,10 +86,10 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
 
   (setq-default indent-tabs-mode nil)
 
-  (delete-selection-mode t) ;; delete selected text by typing
-  (global-auto-revert-mode t) ; for reloading bib files, etc.
+  (delete-selection-mode 1) ;; delete selected text by typing
+  (global-auto-revert-mode 1) ; for reloading bib files, etc.
 
-  (save-place-mode t)
+  (save-place-mode 1)
 
   (setopt package-install-upgrade-built-in t) ;; show updates to built in packages
 
@@ -104,7 +104,7 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
   (custom-buffer-indent 4)
   (desktop-save-mode 1)
   (tab-width 2)
-  (xterm-mouse-mode t)
+  (xterm-mouse-mode 1)
   (translate-upper-case-key-bindings nil)
   (mouse-yank-at-point t)
   (kill-whole-line t)
@@ -132,7 +132,7 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
   :delight subword-mode
 
   :init
-  (global-subword-mode))
+  (global-subword-mode 1))
 
 #+end_src
 
@@ -431,7 +431,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
     (setq insert-directory-program (executable-find "gls")))
 
   :custom
-  (global-dired-omit-mode t)
+  (global-dired-omit-mode 1)
   (dired-kill-when-opening-new-dired-buffer t)
   (dired-recursive-copies 'always)
   (dired-recursive-deletes 'always)
@@ -824,7 +824,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   ;; (add-hook 'emacs-lisp-mode-hook #'compile-angel-on-save-local-mode)
 
   ;; A global mode that compiles .el files before they are loaded using `load' or `require'.
-  (compile-angel-on-load-mode t))
+  (compile-angel-on-load-mode 1))
 #+end_src
 
 ** apheleia
@@ -956,7 +956,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :straight t
 
   :init
-  (dirvish-override-dired-mode)
+  (dirvish-override-dired-mode 1)
 
   :custom
   (dirvish-quick-access-entries ; It's a custom option, `setq' won't work
@@ -964,7 +964,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
      ("p" "~/projects/" "projects")))
 
   :config
-  (dirvish-peek-mode)
+  (dirvish-peek-mode 1)
   (setq dirvish-peek-key '(:debounce 0.5 any))
   (setq dirvish-mode-line-format '(:left (sort symlink) :right (omit yank index)))
   (setq dirvish-attributes '(subtree-state collapse file-time file-size)) ; The order *matters* for some attributes
@@ -1936,7 +1936,7 @@ https://github.com/radian-software/apheleia/issues/278
 
   :config
   (setq org-mem-watch-dirs (list "~/org-notes/"))
-  (org-mem-updater-mode))
+  (org-mem-updater-mode 1))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -1950,7 +1950,7 @@ https://github.com/radian-software/apheleia/issues/278
   (with-eval-after-load 'org
     (keymap-set org-mode-map "M-o n" org-node-org-prefix-map))
   :config
-  (org-node-cache-mode))
+  (org-node-cache-mode 1))
 #+end_src
 
 
@@ -2230,7 +2230,7 @@ https://github.com/Qkessler/consult-project-extra, for project
   ;; (corfu-on-exact-match nil)
 
   :init
-  (global-corfu-mode))
+  (global-corfu-mode 1))
 #+end_src
 
 ** marginalia
@@ -2244,7 +2244,7 @@ https://github.com/Qkessler/consult-project-extra, for project
   (marginalia-align 'right)
 
   :init
-  (marginalia-mode)
+  (marginalia-mode 1)
 
   :bind (:map minibuffer-local-map
               ("M-A" . marginalia-cycle)))
@@ -2279,8 +2279,8 @@ https://github.com/Qkessler/consult-project-extra, for project
   (vertico-multiform-commands '((find-file (vertico-sort-function . vertico-sort-alpha))))
 
   :init
-  (vertico-mode)
-  (vertico-multiform-mode))
+  (vertico-mode 1)
+  (vertico-multiform-mode 1))
 #+end_src
 
 ** embark
@@ -2428,9 +2428,8 @@ for rust dev
   :after eglot
   :defer t
 
-  :preface (eglot-tempel-mode)
   :init
-  (eglot-tempel-mode t))
+  (eglot-tempel-mode 1))
 #+end_src
 
 ** consult
@@ -2572,7 +2571,7 @@ https://github.com/renzmann/treesit-auto
   :config
 
   ;; Turn on global bindings for setting breakpoints with mouse
-  (dape-breakpoint-global-mode)
+  (dape-breakpoint-global-mode 1)
 
   ;; Info buffers to the right
   ;; (setq dape-buffer-window-arrangement 'right)
