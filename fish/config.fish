@@ -43,8 +43,8 @@ set -gx XDG_CONFIG_HOME $HOME/.config/
 
 
 # Usage inside config.fish:
-load_env "$XDG_CONFIG_HOME/shell/default.env"
-load_env "$XDG_CONFIG_HOME/shell/local.env"
+load_env "$XDG_CONFIG_HOME/envs/default.env"
+load_env "$XDG_CONFIG_HOME/envs/local.env"
 
 switch (uname)
     case Darwin
