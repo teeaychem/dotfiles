@@ -1211,9 +1211,15 @@ To highlight indentations
 #+begin_src emacs-lisp
 (use-package kkp
   :straight t
-  :demand t
+  :commands global-kkp-mode
 
-  :hook (tty-setup . global-kkp-mode))
+  :preface
+  (defun my/enable-global-kkp-mode ()
+    "Enable KKP support for terminal frames."
+    (global-kkp-mode 1))
+
+  :hook
+  (tty-setup . my/enable-global-kkp-mode))
 #+end_src
 
 ** multiple cursors
