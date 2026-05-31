@@ -62,32 +62,32 @@ local -a history_to_ignore=(
     'dirs'
     'du'
     'echo'
-    'echo*'
+    'echo(| *)'
     'exit'
     'fc'
-    'git (add|commit|log|reset|restore|rm|status) *'
+    'git (add|commit|log|reset|restore|rm|status)(| *)'
     'help'
     'history'
     'htop'
     'info'
     'll'
     'll'
-    'ls*'
-    'man*'
+    'ls(| *)'
+    'man(| *)'
     'mkdir'
     'open'
     'pbcopy'
     'pbpaste'
     'popd'
-    'ps*'
+    'ps(| *)'
     'pushd'
     'pwd'
-    'rm*'
+    'rm(| *)'
     'rmdir'
     'time'
     'top'
-    'touch*'
-    'which*'
+    'touch(| *)'
+    'which(| *)'
 )
 
 HISTORY_IGNORE="${(j:|:)history_to_ignore}"
@@ -182,12 +182,16 @@ if [[ -d $CARGO_HOME ]]; then
     fi
 fi
 
+# # OCaml
+export OPAMROOT="${XDG_DATA_HOME}/opam"
+[[ -r "$OPAMROOT/opam-init/init.zsh" ]] && source "$OPAMROOT/opam-init/init.zsh" >/dev/null 2>/dev/null
 
 # extensions
 
 FZF_CTRL_T_COMMAND=
-source <(fzf --zsh)
-if (( $+commands[fzf] )); then
+if [[ -o interactive ]] && (( $+commands[fzf] )); then
+    source <(fzf --zsh)
+
     # preview
     function fzfp {
         fzf --layout='default' \
@@ -205,7 +209,9 @@ if (( $+commands[tree] )); then
     export FZF_ALT_C_OPTS="--preview 'tree -C {} | head -50'"
 fi
 
-eval "$(zoxide init zsh)"
+if [[ -o interactive ]] && (( $+commands[zoxide] )); then
+    eval "$(zoxide init zsh)"
+fi
 
 
 # closing
