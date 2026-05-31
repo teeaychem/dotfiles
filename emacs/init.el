@@ -59,9 +59,7 @@
 
 (setq vc-follow-symlinks t)
 
-;; load a fresh tangle of config.org
-(if (file-exists-p (expand-file-name "config.el" user-emacs-directory))
-    (delete-file (expand-file-name "config.el" user-emacs-directory)))
+;; Load the tangle, regenerating it when config.org is newer.
 (org-babel-load-file (expand-file-name "config.org" user-emacs-directory))
 
 ;; start emacs in server mode for communcation between skim, etc.

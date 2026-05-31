@@ -6,6 +6,15 @@
 ;; -*- lexical-binding: t; -*-
 #+end_src
 
+* COMMENT profiling-start
+
+#+begin_src emacs-lisp
+;; (setq use-package-compute-statistics t)
+
+;; (profiler-start 'cpu)
+#+end_src
+
+
 * notes
 
 https://www.emacswiki.org/emacs/GnusAuthinfo
@@ -386,6 +395,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 * internal
 
+
 ** dabbrev
 
 #+begin_src emacs-lisp
@@ -414,7 +424,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package dired
-  :demand
+  :demand t
 
   :init
   (when (and (eq system-type 'darwin) (executable-find "gls"))
@@ -448,24 +458,24 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package eglot-signature-eldoc-talkative
   :straight t
-  :demand t)
+  :after eglot)
+#+end_src
 
+#+begin_src emacs-lisp
 (use-package eldoc
   :straight t
   :delight eldoc-mode
 
   :init
   (add-to-list 'display-buffer-alist
-               '("\\*eldoc*"
-                 (display-buffer-at-bottom)
-                 (window-height . 8)))
+               '("\\*eldoc*" (display-buffer-at-bottom) (window-height . 8)))
 
   :config
   (with-eval-after-load 'eglot
     (advice-add #'eglot-signature-eldoc-function
                 :override #'eglot-signature-eldoc-talkative))
 
-    ;; Try to ensure flymake errors come before any other eldoc messages
+  ;; Try to ensure flymake errors come before any other eldoc messages
   (defun eldoc-promote-flymake ()
     (setq eldoc-documentation-functions
           (cons #'flymake-eldoc-function
@@ -772,6 +782,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 
 * external, etc.
+
 
 ** avy
 
@@ -1364,7 +1375,7 @@ To highlight indentations
 #+begin_src emacs-lisp
 (use-package magit
   :straight t
-  :demand t
+
   :bind (:prefix-map magit-prefix-map
          :prefix "C-c v"
          ("s" . magit-status)
@@ -1869,6 +1880,7 @@ https://github.com/radian-software/apheleia/issues/278
 
 * org
 
+
 ** org
 
 #+begin_src emacs-lisp
@@ -2299,7 +2311,8 @@ https://github.com/Qkessler/consult-project-extra, for project
 #+begin_src emacs-lisp
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
-  :straight t)
+  :straight t
+  :after (embark consult))
 #+end_src
 
 
@@ -2417,6 +2430,8 @@ for rust dev
 (use-package eglot-tempel
   :straight t
   :after eglot
+  :defer t
+
   :preface (eglot-tempel-mode)
   :init
   (eglot-tempel-mode t))
@@ -2478,13 +2493,23 @@ https://github.com/renzmann/treesit-auto
 
   :custom
   (treesit-auto-install 'prompt)
+  (treesit-auto-langs '(bash
+                        c
+                        cpp
+                        cmake
+                        json
+                        lua
+                        ;; nix
+                        python
+                        rust
+                        toml
+                        yaml))
 
   :init
   (setq treesit-enabled-modes t)
 
   :config
-  (setq treesit-auto-langs (seq-difference treesit-auto-langs '(cobol verilog)))
-  (global-treesit-auto-mode))
+  (treesit-auto-add-to-auto-mode-alist))
 #+end_src
 
 ** treesit-fold
@@ -2629,6 +2654,7 @@ From https://blog.plover.com/prog/revert-all.html
 
 See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 
+
 ** clipetty
 
 #+begin_src emacs-lisp
@@ -2679,6 +2705,8 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 #+begin_src emacs-lisp
 (use-package gptel-agent
   :straight t
+  :defer t
+
   :config (gptel-agent-update))         ;Read files from agents directories
 #+end_src
 
@@ -2686,8 +2714,9 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 
 #+begin_src emacs-lisp
 (use-package agent-shell
-  :ensure t
   :straight t
+  :defer t
+
   ;; :ensure-system-package
   ;; ((codex-acp . "brew install codex-acp"))
 
@@ -2744,4 +2773,12 @@ Falls back to a file in USER-EMACS-DIRECTORY under SUBFOLDER."
                                   (read (current-buffer)))))
 
     (my/register-workspaces my-personal-workspaces)))
+#+end_src
+
+
+* COMMENT profiling-end
+
+#+begin_src emacs-lisp
+;; (add-hook 'emacs-startup-hook #'profiler-report)
+;; (add-hook 'emacs-startup-hook #'profiler-stop)
 #+end_src
