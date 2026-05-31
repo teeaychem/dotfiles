@@ -328,7 +328,11 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (cursor-in-non-selected-windows t)
   (help-window-select t)
   (mouse-wheel-follow-mouse t)
+  (fast-but-imprecise-scrolling t)
+  (redisplay-skip-fontification-on-input t)
+  ;; (jit-lock-defer-time 0.1) ;; defer fontification while input is pending
   (right-margin-width 1)
+  (scroll-conservatively 101)
   (scroll-preserve-screen-position t)
   (split-height-threshold 0) ;; When split is automatic, always split windows vertically
   (split-width-threshold nil)
