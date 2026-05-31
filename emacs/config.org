@@ -614,9 +614,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (ispell-program-name "hunspell")
   (ispell-personal-dictionary (concat (getenv "DICPATH") "/hunspell_personal"))
   (ispell-dictionary "en_GB")
-  ;; :hook
-  ;; (prog-mode . flyspell-mode)
-  )
+
+  :hook
+  (prog-mode . flyspell-prog-mode))
 #+end_src
 
 ** isearch
