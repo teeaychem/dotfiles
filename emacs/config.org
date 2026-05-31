@@ -515,7 +515,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   :custom
   (recentf-auto-cleanup (if (daemonp) 300 'never))
-  (recentf-exclude '((expand-file-name package-user-dir)
+  (recentf-exclude `(,(regexp-quote (expand-file-name package-user-dir))
                      ":" ;; tramp
                      ".cache"
                      "bookmarks"
@@ -681,6 +681,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 * internal straight
 
+
 ** flymake
 #+begin_src emacs-lisp :result silent
 (use-package flymake
@@ -722,11 +723,12 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package project
   :straight t
-  :config
-  (add-to-list 'project-vc-extra-root-markers "INSTALL_RECEIPT.json") ;; brewed libraries, etc.
-  (add-to-list 'project-vc-extra-root-markers ".project") ;; custom
-  (add-to-list 'project-vc-extra-root-markers ".dir-locals.el")
-  )
+
+  :custom
+  (project-vc-extra-root-markers
+   '("INSTALL_RECEIPT.json" ;; brewed libraries, etc.
+     ".project"             ;; custom
+     ".dir-locals.el")))
 #+end_src
 
 
@@ -905,7 +907,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :straight t)
 #+end_src
 
-** ctrlf
+** COMMENT ctrlf
 #+begin_src emacs-lisp
 (use-package ctrlf
   :straight t
@@ -913,14 +915,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   :init
   (ctrlf-mode 1))
-#+end_src
-
-** COMMENT devdocs
-#+begin_src emacs-lisp
-(use-package devdocs
-  :straight t
-  :disabled
-  :bind (("C-h D" . 'devdocs-lookup)))
 #+end_src
 
 ** diminish
@@ -1875,6 +1869,8 @@ https://github.com/radian-software/apheleia/issues/278
 
 * org
 
+** org
+
 #+begin_src emacs-lisp
 (use-package org
   :straight nil
@@ -1952,12 +1948,14 @@ https://github.com/radian-software/apheleia/issues/278
 
 * completion
 
+
+** emacs
+
 #+begin_src emacs-lisp
 (use-package emacs
-  :config
-  (push ".DS_store" completion-ignored-extensions))
+  :init
+  (add-to-list 'completion-ignored-extensions ".DS_Store"))
 #+end_src
-
 
 ** cape
 
@@ -2306,6 +2304,7 @@ https://github.com/Qkessler/consult-project-extra, for project
 
 
 * eglot
+
 
 ** eglot
 
