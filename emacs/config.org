@@ -458,7 +458,11 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package eglot-signature-eldoc-talkative
   :straight t
-  :after eglot)
+  :after eglot
+
+  :config
+  (advice-add #'eglot-signature-eldoc-function
+              :override #'eglot-signature-eldoc-talkative))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -471,10 +475,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
                '("\\*eldoc*" (display-buffer-at-bottom) (window-height . 8)))
 
   :config
-  (with-eval-after-load 'eglot
-    (advice-add #'eglot-signature-eldoc-function
-                :override #'eglot-signature-eldoc-talkative))
-
   ;; Try to ensure flymake errors come before any other eldoc messages
   (defun eldoc-promote-flymake ()
     (setq eldoc-documentation-functions
@@ -1578,17 +1578,9 @@ c-ts-mode is shared by both c and c++
 #+begin_src emacs-lisp
 (use-package lua-mode
   :straight t
-  :after eglot
 
   :custom
-  (lua-indent-level 2)
-
-  :config
-    (let* ((config-path (concat (getenv "XDG_CONFIG_HOME") "/.luarc.json"))
-         (lua-args (if (file-exists-p config-path)
-                       (list "lua-language-server" (concat "--configpath=" config-path))
-                     '("lua-language-server"))))
-    (setf (alist-get '(lua-mode lua-ts-mode) eglot-server-programs nil nil #'equal) lua-args)))
+  (lua-indent-level 2))
 #+end_src
 
 ** llvm
@@ -1625,12 +1617,12 @@ Get the relevant package subdirectories from the llvm source
 
 (use-package mlir-mode
   :straight nil
-  :after (exec-path-from-shell eglot)
+  :after exec-path-from-shell
   :mode (("\\.mlir\\'" . mlir-mode)
-         ("\\.pdll\\'" . mlir-mode))
+         ("\\.pdll\\'" . pdll-mode))
+
   :config
-  (add-to-list 'eglot-server-programs `(mlir-mode . my-eglot-strict-mlir))
-  (add-to-list 'eglot-server-programs `((mlir-mode :language-id "pdll") . my-eglot-strict-pdll)))
+  (define-derived-mode pdll-mode mlir-mode "PDLL"))
 #+end_src
 *** tablegen
 
@@ -1655,10 +1647,8 @@ Get the relevant package subdirectories from the llvm source
 
 (use-package tablegen-mode
   :straight nil
-  :after (exec-path-from-shell eglot)
-  :mode "\\.td\\'"
-  :config
-  (add-to-list 'eglot-server-programs `(tablegen-mode . my-eglot-strict-tablegen)))
+  :after exec-path-from-shell
+  :mode "\\.td\\'")
 #+end_src
 *** llvm
 
@@ -1764,13 +1754,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 #+begin_src emacs-lisp
 (use-package rust-mode
   :straight t
-  :after eglot
   :mode "\\.rs\\'"
-
-  :config
-  (add-to-list 'eglot-server-programs '((rust-ts-mode rust-mode) .
-                                        ("rust-analyzer"
-                                         :initializationOptions (:check (:command "clippy")))))
 
   :init
   (setq rust-mode-treesitter-derive t)
@@ -1864,11 +1848,7 @@ https://github.com/radian-software/apheleia/issues/278
 #+begin_src emacs-lisp
 (use-package toml-mode
   :straight t
-  :after eglot
-  :mode "\\.toml\\'"
-  :config
-  (add-to-list 'eglot-server-programs '((toml-mode toml-ts-mode conf-toml-mode) .
-                                        ("taplo" "lsp" "stdio"))))
+  :mode "\\.toml\\'")
 #+end_src
 
 ** yaml
@@ -2361,23 +2341,38 @@ maybe: https://github.com/casouri/eldoc-box
 
   :config
   ;; (add-to-list 'eglot-stay-out-of 'flymake)
-  (setf (alist-get '(c-mode c-ts-mode c++-mode c++-ts-mode)
-                   eglot-server-programs nil nil #'equal)
-        '("clangd"
-          "--query-driver=/**/*"
-          "--background-index"
-          "--clang-tidy"
-          "--completion-style=detailed"
-          "--header-insertion=never"
-          "--fallback-style=None"
-          "-j=4"))
+  (let ((clangd-jobs (or (getenv "CLANGD_JOBS") "4")))
+    (add-to-list 'eglot-server-programs
+                 `((c-mode c-ts-mode c++-mode c++-ts-mode) .
+                   ("clangd"
+                    "--query-driver=/**/*"
+                    "--background-index"
+                    "--background-index-priority=background"
+                    "--clang-tidy"
+                    "--completion-style=detailed"
+                    "--header-insertion=never"
+                    "--fallback-style=None"
+                    ,(concat "-j=" clangd-jobs)))))
 
-  (dolist (server-rule '((latex-mode "texlab")
-                         ((nix-mode nix-ts-mode) "nil")
-                         ((python-mode python-ts-mode) "ty" "server")))
-    (let ((modes (car server-rule))
-          (args (cdr server-rule)))
-      (setf (alist-get modes eglot-server-programs nil nil #'equal) args)))
+  (let* ((config-path (concat (getenv "XDG_CONFIG_HOME") "/.luarc.json"))
+         (lua-args (if (file-exists-p config-path)
+                       (list "lua-language-server" (concat "--configpath=" config-path))
+                     '("lua-language-server"))))
+    (setf (alist-get '(lua-mode lua-ts-mode) eglot-server-programs nil nil #'equal)
+          lua-args))
+
+  (add-to-list 'eglot-server-programs '(latex-mode . ("texlab")))
+  (add-to-list 'eglot-server-programs '((nix-mode nix-ts-mode) . ("nil")))
+  (add-to-list 'eglot-server-programs '((python-mode python-ts-mode) . ("ty" "server")))
+  (add-to-list 'eglot-server-programs '((rust-ts-mode rust-mode) .
+                                        ("rust-analyzer"
+                                         :initializationOptions (:check (:command "clippy")))))
+  (add-to-list 'eglot-server-programs '((toml-mode toml-ts-mode conf-toml-mode) .
+                                        ("taplo" "lsp" "stdio")))
+
+  (add-to-list 'eglot-server-programs `(mlir-mode . my-eglot-strict-mlir))
+  (add-to-list 'eglot-server-programs `((pdll-mode :language-id "pdll") . my-eglot-strict-pdll))
+  (add-to-list 'eglot-server-programs `(tablegen-mode . my-eglot-strict-tablegen))
 
   :bind (("C-c l l" . eglot)
          :map eglot-mode-map
@@ -2431,9 +2426,8 @@ for rust dev
 (use-package eglot-tempel
   :straight t
   :after eglot
-  :defer t
 
-  :init
+  :config
   (eglot-tempel-mode 1))
 #+end_src
 
@@ -2442,7 +2436,7 @@ for rust dev
 #+begin_src emacs-lisp
 (use-package consult-eglot
   :straight t
-  :after eglot)
+  :commands consult-eglot-symbols)
 #+end_src
 
 ** workspaces
