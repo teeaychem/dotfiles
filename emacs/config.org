@@ -1588,7 +1588,7 @@ c-ts-mode is shared by both c and c++
          (lua-args (if (file-exists-p config-path)
                        (list "lua-language-server" (concat "--configpath=" config-path))
                      '("lua-language-server"))))
-    (setf (alist-get 'lua-mode eglot-server-programs nil nil #'equal) lua-args)))
+    (setf (alist-get '(lua-mode lua-ts-mode) eglot-server-programs nil nil #'equal) lua-args)))
 #+end_src
 
 ** llvm
@@ -1754,10 +1754,7 @@ raco pkg install --auto drracket
 #+begin_src emacs-lisp
 (use-package racket-mode
   :straight t
-  :after eglot
-  :mode "\\.rkt\\'"
-  :config
-  (add-to-list 'eglot-server-programs '(racket-mode . ("racket" "-l" "racket-langserver"))))
+  :mode "\\.rkt\\'")
 #+end_src
 
 ** rust
@@ -1870,7 +1867,8 @@ https://github.com/radian-software/apheleia/issues/278
   :after eglot
   :mode "\\.toml\\'"
   :config
-  (add-to-list 'eglot-server-programs '(toml-mode . ("taplo" "lsp" "stdio"))))
+  (add-to-list 'eglot-server-programs '((toml-mode toml-ts-mode conf-toml-mode) .
+                                        ("taplo" "lsp" "stdio"))))
 #+end_src
 
 ** yaml
@@ -2356,7 +2354,6 @@ maybe: https://github.com/casouri/eldoc-box
   (eglot-report-progress nil)
   (eglot-extend-to-xref t)
   (corfu-preview-current nil)
-  (eglot-code-action-indicator nil)
   (eglot-events-buffer-config '(:size 0 :format short))
   ;; (eglot-confirm-server-edits t)
   (jsonrpc-event-hook nil)
@@ -2364,7 +2361,8 @@ maybe: https://github.com/casouri/eldoc-box
 
   :config
   ;; (add-to-list 'eglot-stay-out-of 'flymake)
-  (setf (alist-get '(c-mode c++-mode) eglot-server-programs nil nil #'equal)
+  (setf (alist-get '(c-mode c-ts-mode c++-mode c++-ts-mode)
+                   eglot-server-programs nil nil #'equal)
         '("clangd"
           "--query-driver=/**/*"
           "--background-index"
@@ -2375,9 +2373,8 @@ maybe: https://github.com/casouri/eldoc-box
           "-j=4"))
 
   (dolist (server-rule '((latex-mode "texlab")
-                         (nix-mode "nil")
-                         (python-mode "ty" "server")
-                         ((sh-mode bash-ts-mode) "bash-language-server" "start")))
+                         ((nix-mode nix-ts-mode) "nil")
+                         ((python-mode python-ts-mode) "ty" "server")))
     (let ((modes (car server-rule))
           (args (cdr server-rule)))
       (setf (alist-get modes eglot-server-programs nil nil #'equal) args)))
