@@ -610,12 +610,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   :if (executable-find "hunspell")
 
-  :config
-  (add-to-list
-   'ispell-hunspell-dictionary-alist
-   '(("en_GB" "[[:alpha:]]" "[^[:alpha]]" "[0-9']"
-      nil nil utf-8)))
-
   :custom
   (ispell-program-name "hunspell")
   (ispell-personal-dictionary (concat (getenv "DICPATH") "/hunspell_personal"))
