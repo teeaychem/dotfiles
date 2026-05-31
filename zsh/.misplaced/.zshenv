@@ -1,30 +1,21 @@
-function load_env_file() {
-    local mandatory=false
+export XDG_CONFIG_HOME="${HOME}/.config"
 
-    if [[ "$1" == "-m" || "$1" == "--mandatory" ]]; then
-        mandatory=true
-        shift
-    fi
+load_env() {
+  if [ ! -f "$1" ]; then
+    echo "Error: Environment file '$1' does not exist or was not specified." >&2
+    return 1
+  fi
 
-    local file="$1" line
 
-    if [[ -f "$file" ]]; then
-        while read -r line; do
-            [[ -z "$line" || "$line" == '#'* ]] && continue
+  set -a  # auto export all assigned variables
 
-            local key="${line%% *}"
-            local raw_val="${line#* }"
+  source <(sed '/^[[:space:]]*#/d; /^[[:space:]]*$/d' "$1") # | tee /dev/tty)
 
-            # The (e) flag forces Zsh to expand variables like $HOME inside the text
-            export "$key"="${(e)raw_val}"
-        done < "$file"
-    elif [[ "$mandatory" == true ]]; then
-        print -u2 "${(%):-%F{red}}Error: Mandatory env file missing -> $file%f"
-    fi
+  set +a  # de-auto exporting
 }
 
-load_env_file -m ~/.config/shell/default.env
-load_env_file ~/.config/shell/local.env
+load_env "$XDG_CONFIG_HOME/shell/default.env"
+load_env "$XDG_CONFIG_HOME/shell/local.env"
 
 mkdir -p \
     "$XDG_CONFIG_HOME" \

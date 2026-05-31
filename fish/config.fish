@@ -1,28 +1,40 @@
 # https://wiki.archlinux.org/title/XDG_Base_Directory
 # https://specifications.freedesktop.org/basedir-spec/latest/
 
-function load_env_file
-    argparse 'm/mandatory' -- $argv
-    or return 1
+function load_env
+    set -l env_file $argv
 
-    set -l file $argv
-
-    if test -f "$file"
-        string match -vr '^\s*(#|$)' < "$file" | \
-            string split -m 1 ' ' | \
-            while read -l k; read -l v
-                set -l expanded_v (eval echo $v)
-                set -gx $k $expanded_v
-            end
-    else if set -q _flag_mandatory
-        set_color red; echo "Error: Mandatory env file missing -> $file" >&2; set_color normal
+    # Catches both an empty argument and a missing file path
+    if not test -f "$env_file"
+        echo "Error: Environment file '$env_file' does not exist or was not specified." >&2
+        return 1
     end
+
+    while read -l line
+        # Skip lines that are empty or start with '#'
+        string match -q -r '^\s*(#|$)' $line; and continue
+
+        # Split into key and value around the first '=' sign
+        set -l kv (string split -m 1 '=' $line)
+        set -l key $kv[1]
+
+        # 1. Trim surrounding single or double quotes
+        set -l clean_val (string trim -c '"\'' $kv[2])
+
+        # 2. Safely expand embedded variables (e.g. $HOME) using eval
+        set -l expanded_val (eval echo $clean_val)
+
+        # 3. Export the key and the fully expanded value globally
+        set -gx $key $expanded_val
+    end < $env_file
 end
 
-# Usage inside config.fish:
-load_env_file -m "$XDG_CONFIG_HOME/shell/default.env"
-load_env_file    "$XDG_CONFIG_HOME/shell/local.env"
+set -gx XDG_CONFIG_HOME $HOME/.config/
 
+
+# Usage inside config.fish:
+load_env "$XDG_CONFIG_HOME/shell/default.env"
+load_env "$XDG_CONFIG_HOME/shell/local.env"
 
 switch (uname)
     case Darwin
