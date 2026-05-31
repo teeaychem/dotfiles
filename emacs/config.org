@@ -6,6 +6,7 @@
 
 https://www.emacswiki.org/emacs/GnusAuthinfo
 
+
 ** compilation
 
 Run autogen, if needed.
@@ -121,6 +122,7 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
   (global-subword-mode))
 
 #+end_src
+
 
 ** saving & backups
 
@@ -262,6 +264,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
          :prefix "C-c f"))
 #+end_src
 
+
 ** bookmarks
 
 #+begin_src emacs-lisp
@@ -279,6 +282,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 
 * visual
+
 
 ** display
 
@@ -377,10 +381,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 
 * internal
-
-#+begin_src emacs-lisp
-(add-hook 'prog-mode-hook #'electric-pair-mode)
-#+end_src
 
 ** dabbrev
 
@@ -492,6 +492,13 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   :hook
   (eldoc-mode-hook . eldoc-promote-flymake))
+#+end_src
+
+** elec-pair
+
+#+begin_src emacs-lisp
+(use-package elec-pair
+  :hook (prog-mode . electric-pair-mode))
 #+end_src
 
 ** recentf
@@ -1318,6 +1325,7 @@ To highlight indentations
 
 * vc
 
+
 ** diff-hl
 #+begin_src emacs-lisp
 (use-package diff-hl
@@ -1803,6 +1811,7 @@ https://github.com/radian-software/apheleia/issues/278
 
 * markup
 
+
 ** json
 
 #+begin_src emacs-lisp
@@ -1910,6 +1919,7 @@ https://github.com/radian-software/apheleia/issues/278
                                  (scheme . t)))
   (keymap-unset org-mode-map "<backtab>" 'remove))
 #+end_src
+
 ** org-node
 
 #+begin_src emacs-lisp
@@ -1943,6 +1953,7 @@ https://github.com/radian-software/apheleia/issues/278
   :config
   (push ".DS_store" completion-ignored-extensions))
 #+end_src
+
 
 ** cape
 
@@ -2290,10 +2301,8 @@ https://github.com/Qkessler/consult-project-extra, for project
 #+end_src
 
 
-* language interaction
-
-
 * eglot
+
 ** eglot
 
 
@@ -2442,6 +2451,7 @@ for rust dev
 
 * tree sitter
 
+
 ** combobulate
 
 #+begin_src emacs-lisp
@@ -2495,6 +2505,7 @@ https://github.com/renzmann/treesit-auto
   :bind (:map prog-mode-map
               ("C-c TAB" . treesit-fold-toggle)))
 #+end_src
+
 
 * tempel
 
@@ -2628,6 +2639,8 @@ From https://blog.plover.com/prog/revert-all.html
 
 See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 
+** clipetty
+
 #+begin_src emacs-lisp
 (use-package clipetty
   :straight t
@@ -2639,6 +2652,7 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 
 
 * llm
+
 
 ** gptel
 
