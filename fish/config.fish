@@ -6,7 +6,9 @@ function load_env
 
     # Catches both an empty argument and a missing file path
     if not test -f "$env_file"
-        echo "Error: Environment file '$env_file' does not exist or was not specified." >&2
+        if not string match -q 'local*' (path basename "$env_file")
+            echo "Error: Environment file '$env_file' does not exist or was not specified." >&2
+        end
         return 1
     end
 
@@ -21,8 +23,16 @@ function load_env
         # 1. Trim surrounding single or double quotes
         set -l clean_val (string trim -c '"\'' $kv[2])
 
-        # 2. Safely expand embedded variables (e.g. $HOME) using eval
-        set -l expanded_val (eval echo $clean_val)
+        # 2. Expand embedded variables (e.g. $HOME) without evaluating commands
+        set -l expanded_val $clean_val
+        for variable_ref in (string match -ra '\$[A-Za-z_][A-Za-z0-9_]*' -- "$clean_val")
+            set -l variable_name (string sub -s 2 -- $variable_ref)
+            if set -q $variable_name
+                set expanded_val (string replace -a -- "$variable_ref" "$$variable_name" "$expanded_val")
+            else
+                echo "Warning: Environment variable '$variable_name' referenced by '$key' is not set." >&2
+            end
+        end
 
         # 3. Export the key and the fully expanded value globally
         set -gx $key $expanded_val
@@ -62,7 +72,7 @@ fish_add_path "./node_modules/.bin"
 set -gx OPAMROOT "$XDG_DATA_HOME/opam"
 
 # This adds: the correct directories to the PATH, auto-completion for the opam binary
-test -r '/Users/sparkes/.share/opam/opam-init/init.fish' && source '/Users/sparkes/.share/opam/opam-init/init.fish' >/dev/null 2>/dev/null; or true
+test -r "$OPAMROOT/opam-init/init.fish" && source "$OPAMROOT/opam-init/init.fish" >/dev/null 2>/dev/null; or true
 
 # etc
 
@@ -74,17 +84,17 @@ abbr -a !! --position anywhere --function last_history_item
 
 function fish_should_add_to_history
     # Ignore base commands safely, accounting for symbols like dashes
-    if string match -qr "^(man|which|ls|cd|z|pkgconf|pkg-config)" -- $argv
+    if string match -qr "^(man|which|ls|cd|z|pkgconf|pkg-config)(\s|\$)" -- $argv
         return 1
     end
 
     # Ignore specific cargo subcommands
-    if string match -qr "^cargo\s+(init)" -- $argv
+    if string match -qr "^cargo\s+(init)(\s|\$)" -- $argv
         return 1
     end
 
     # Ignore specific git subcommands
-    if string match -qr "^git\s+(add|commit|pop|remove|rename|restore|rm|stash|status|submodule)" -- $argv
+    if string match -qr "^git\s+(add|commit|pop|remove|rename|restore|rm|stash|status|submodule)(\s|\$)" -- $argv
         return 1
     end
 
@@ -114,7 +124,8 @@ abbr -a pygrep 'rg -g "*.py" -g "!**/site-packages/"'
 
 function venv-activate
     # Fallback to .venv if no path argument is provided
-    set -l venv_root $argv[1]; or set venv_root .venv
+    set -l venv_root $argv[1]
+    test -n "$venv_root"; or set venv_root .venv
 
     # Strip any trailing slashes
     set venv_root (string replace -r '/$' '' -- "$venv_root")
@@ -129,7 +140,8 @@ function venv-activate
 end
 
 function pyclean
-    set -l roots $argv; or set roots .
+    set -l roots $argv
+    test (count $roots) -gt 0; or set roots .
     # fd ignores hidden folders, so explicitly target the directories and extensions.
     fd -IH '(__pycache__|\.mypy_cache|\.pytest_cache)$' -t d $roots -x rm -rf
     fd -IH '\.py[co]$' -t f $roots -x rm
@@ -138,7 +150,7 @@ end
 # fzf
 set -gx FZF_DEFAULT_COMMAND 'fd --type f --hidden --follow --exclude .git'
 
-if command -q fzf
+if status is-interactive; and command -q fzf
     fzf --fish | source
 
     function fzfp
@@ -172,10 +184,10 @@ if status is-interactive
     bind alt-f forward-word
 end
 
-if command -q zoxide
+if status is-interactive; and command -q zoxide
     zoxide init fish | source
 end
 
-if command -q direnv
+if status is-interactive; and command -q direnv
     direnv hook fish | source
 end
