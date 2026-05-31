@@ -7,7 +7,7 @@ fi
 source ${ZDOTDIR:-$HOME}/.antidote/antidote.zsh
 antidote load
 
-source ${XDG_CONFIG_HOME}/shell/utils.sh
+source ${XDG_CONFIG_HOME}/zsh/utils.sh
 
 # fns
 
@@ -15,13 +15,13 @@ source ${XDG_CONFIG_HOME}/shell/utils.sh
 # https://apple.stackexchange.com/questions/432226/homebrew-path-set-in-zshenv-is-overridden
 case "$OSTYPE" in
     darwin*)
-    if [[ -f ${XDG_CONFIG_HOME}/shell/darwin.sh ]]; then
-        source ${XDG_CONFIG_HOME}/shell/darwin.sh
+    if [[ -f ${XDG_CONFIG_HOME}/zsh/darwin.sh ]]; then
+        source ${XDG_CONFIG_HOME}/zsh/darwin.sh
     fi
     ;;
     linux*)
-    if [[ -f ${XDG_CONFIG_HOME}/shell/linux.sh ]]; then
-        source ${XDG_CONFIG_HOME}/shell/linux.sh
+    if [[ -f ${XDG_CONFIG_HOME}/zsh/linux.sh ]]; then
+        source ${XDG_CONFIG_HOME}/zsh/linux.sh
     fi
     ;;
     *)
