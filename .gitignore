@@ -25,6 +25,7 @@
 /emacs/undo-tree/*
 /emacs/var/*
 
+/fish/fish_variables
 /fish/functions
 /fist/conf.d/rustup.fish
 
@@ -45,12 +46,12 @@ hunspell/dictionaries/README*
 
 /zellij/config.kdl.bak
 
-/zsh/.zsh_plugins.zsh
 /zsh/.antidote/
 /zsh/.zcompcache/
 /zsh/.zcompdump
 /zsh/.zhistory
 /zsh/.zsh_history
+/zsh/.zsh_plugins.zsh
 /zsh/.zsh_sessions/*
 
 /.agent-shell/
