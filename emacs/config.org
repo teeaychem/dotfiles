@@ -512,7 +512,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package elec-pair
-  :hook (prog-mode . electric-pair-mode))
+  :hook ((prog-mode LaTeX-mode) . electric-pair-mode))
 #+end_src
 
 ** recentf
@@ -573,25 +573,32 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+end_src
 
-** skeletons
+** skeleton
 
 #+begin_src emacs-lisp
-(setq skeleton-pair t) ; enable pairing
+(use-package skeleton
+  :init
+  (defconst slash-escaped-pairs
+    '((?\( . ?\))
+      (?\[ . ?\])
+      (?\{ . ?\}))
+    "Opening and closing characters for backslash-escaped pairs.")
 
-(defun quoted-parentheses (arg)
-  (interactive "P")
-  (if (looking-back "\\\\")
-      (skeleton-insert '(nil "(" _ "\\)") nil)
-    (skeleton-pair-insert-maybe arg)))
+  (defun insert-pair-or-slash-escaped-pair (arg)
+    "Insert ARG copies of the typed character, pairing slash-escaped delimiters."
+    (interactive "p")
+    (let ((closing-char (alist-get last-command-event slash-escaped-pairs)))
+      (if (and closing-char (eq (char-before) ?\\))
+          (skeleton-insert `(nil
+                             ,last-command-event
+                             _
+                             ,(string ?\\ closing-char))
+                           nil)
+        (self-insert-command arg))))
 
-(defun quoted-brackets (arg)
-  (interactive "P")
-  (if (looking-back "\\\\")
-      (skeleton-insert '(nil "[" _ "\\]") nil)
-    (skeleton-pair-insert-maybe arg)))
-
-(global-set-key "(" 'quoted-parentheses)
-(global-set-key "[" 'quoted-brackets)
+  :config
+  (dolist (opening-char (mapcar #'car slash-escaped-pairs))
+    (keymap-global-set (string opening-char) #'insert-pair-or-slash-escaped-pair)))
 #+end_src
 
 ** ispell
