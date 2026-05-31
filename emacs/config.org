@@ -2,6 +2,10 @@
 #+startup: show2levels
 #+PROPERTY: header-args :results silent
 
+#+begin_src emacs-lisp
+;; -*- lexical-binding: t; -*-
+#+end_src
+
 * notes
 
 https://www.emacswiki.org/emacs/GnusAuthinfo

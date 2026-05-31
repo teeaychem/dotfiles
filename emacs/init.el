@@ -59,20 +59,6 @@
 
 (setq vc-follow-symlinks t)
 
-;; ensure lexical binding in tangled files
-;; https://emacs.stackexchange.com/questions/81540/lexical-binding-in-a-tangled-init-el-file
-
-(defun my-ensure-lexical-binding-cookie()
-  (goto-char(point-min)) ;; beginning of tangled code
-  (insert ";; -*- coding: utf-8; lexical-binding: t -*-")
-  (newline)
-  (newline)
-  (let ((inhibit-message t)) ;; Don't show messages from these functions
-    (basic-save-buffer)
-    (kill-buffer) nil))
-
-(add-hook 'org-babel-post-tangle-hook #'my-ensure-lexical-binding-cookie)
-
 ;; load a fresh tangle of config.org
 (if (file-exists-p (expand-file-name "config.el" user-emacs-directory))
     (delete-file (expand-file-name "config.el" user-emacs-directory)))
