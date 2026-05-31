@@ -1183,15 +1183,23 @@ To highlight indentations
   (indent-bars-treesit-wrap '((python argument_list parameters
 				                              list list_comprehension
 				                              dictionary dictionary_comprehension
-				                              parenthesized_expression subscript)))
+				                              parenthesized_expression subscript)
+                              (c argument_list parameter_list init_declarator
+                                 parenthesized_expression)
+                              (cpp argument_list parameter_list init_declarator
+                                   parenthesized_expression)))
   (indent-bars-treesit-scope '((python function_definition
                                        class_definition
                                        for_statement
 				                               if_statement
                                        with_statement
-                                       while_statement)))
-
-  (indent-bars-treesit-wrap '((c argument_list parameter_list init_declarator parenthesized_expression)))
+                                       while_statement)
+                               (cpp function_definition
+                                    class_specifier
+                                    namespace_definition
+                                    for_statement
+                                    if_statement
+                                    while_statement)))
 
   (indent-bars-treesit-ignore-blank-lines-types '("module"))
   (indent-bars-treesit-scope-selector 'outermost)
@@ -2471,7 +2479,9 @@ for rust dev
 (use-package combobulate
   :straight (:host github :repo "mickeynp/combobulate")
   :hook ((python-ts-mode
-          c-ts-mode) . combobulate-mode))
+          json-ts-mode
+          toml-ts-mode
+          yaml-ts-mode) . combobulate-mode))
 #+end_src
 
 ** treesit-auto
