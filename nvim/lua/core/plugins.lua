@@ -48,6 +48,8 @@ which_key.setup({
   preset = "modern",
 })
 which_key.add({
+  { "<leader>f", group = "Find" },
+  { "<leader>h", group = "Help" },
   { "a", desc = "Insert after cursor" },
   { "A", desc = "Insert at end of line" },
   { "i", desc = "Insert before cursor" },
@@ -64,6 +66,7 @@ end, { desc = "All normal-mode keymaps" })
 vim.pack.add({
   "https://github.com/nvim-lua/plenary.nvim",
   "https://github.com/nvim-telescope/telescope.nvim",
+  "https://github.com/nvim-telescope/telescope-ui-select.nvim",
 })
 require('telescope').setup {
   defaults = {
@@ -74,8 +77,11 @@ require('telescope').setup {
     }
   },
   pickers = {},
-  extensions = {}
+  extensions = {
+    ["ui-select"] = require("telescope.themes").get_dropdown({}),
+  }
 }
+require("telescope").load_extension("ui-select")
 
 
 vim.api.nvim_create_autocmd('InsertEnter', {
