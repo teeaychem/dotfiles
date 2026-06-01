@@ -55,3 +55,4 @@ hunspell/dictionaries/README*
 /zsh/.zsh_sessions/*
 
 /.agent-shell/
+/htop/htop_history
