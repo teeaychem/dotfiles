@@ -48,5 +48,6 @@ opt.undofile = true
 opt.undolevels = 10000
 opt.updatetime = 200               -- Save swap file and trigger CursorHold
 opt.virtualedit = "block"          -- Allow cursor to move where there is no text in visual block mode
-opt.wildmode = "longest:full,full" -- Command-line completion mode
+opt.wildmode = "noselect:full"     -- Show command-line matches without inserting one
+opt.wildoptions:append({ "pum", "fuzzy" })
 opt.wrap = true                    -- line wrap

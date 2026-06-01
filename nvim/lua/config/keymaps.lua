@@ -1,2 +1,5 @@
 -- open file explorer with leader key
-vim.api.nvim_set_keymap("n", "<Leader>e", ":Ex<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<Leader>e", "<cmd>Ex<CR>", { desc = "File explorer" })
+
+-- fuzzy-search available commands
+vim.keymap.set("n", "<Leader>x", "<cmd>Telescope commands<CR>", { desc = "Command palette" })

@@ -43,19 +43,22 @@ require("mini.statusline").setup({
 vim.pack.add({
   "https://github.com/folke/which-key.nvim",
 })
-require('which-key').setup({
-  mappings = {
-    {
-      "<leader>?",
-      function() require("which-key").show({ global = false, }) end,
-      desc = "Buffer Local Keymaps (which-key)",
-    },
-  }
+local which_key = require("which-key")
+which_key.setup({
+  preset = "modern",
 })
-vim.cmd("nnoremap <C-c> <cmd>WhichKey<cr>")
-vim.cmd("vnoremap <C-c> <cmd>WhichKey '' v<cr>")
-vim.cmd("inoremap <C-c> <cmd>WhichKey '' i<cr>")
-vim.cmd("cnoremap <C-c> <cmd>WhichKey '' c<cr>")
+which_key.add({
+  { "a", desc = "Insert after cursor" },
+  { "A", desc = "Insert at end of line" },
+  { "i", desc = "Insert before cursor" },
+  { "I", desc = "Insert at start of line" },
+  { "o", desc = "Insert line below" },
+  { "O", desc = "Insert line above" },
+  { "R", desc = "Replace mode" },
+})
+vim.keymap.set("n", "<leader>?", function()
+  which_key.show()
+end, { desc = "All normal-mode keymaps" })
 
 
 vim.pack.add({
