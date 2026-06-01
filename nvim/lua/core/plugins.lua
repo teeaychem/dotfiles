@@ -50,6 +50,7 @@ which_key.setup({
 which_key.add({
   { "<leader>f", group = "Find" },
   { "<leader>h", group = "Help" },
+  { "<leader>l", group = "LSP" },
   { "a", desc = "Insert after cursor" },
   { "A", desc = "Insert at end of line" },
   { "i", desc = "Insert before cursor" },

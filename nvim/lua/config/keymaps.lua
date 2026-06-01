@@ -27,3 +27,14 @@ vim.keymap.set("n", "<Leader>hm", "<cmd>Telescope man_pages<CR>", { desc = "Man 
 vim.keymap.set("n", "<Leader>ho", "<cmd>Telescope vim_options<CR>", { desc = "Options" })
 vim.keymap.set("n", "<Leader>hr", "<cmd>Telescope registers<CR>", { desc = "Registers" })
 vim.keymap.set("n", "<Leader>hs", "<cmd>Telescope search_history<CR>", { desc = "Search history" })
+
+-- LSP navigation, similar to xref and imenu
+vim.keymap.set("n", "<Leader>la", vim.lsp.buf.code_action, { desc = "Code actions" })
+vim.keymap.set("n", "<Leader>ld", "<cmd>Telescope lsp_definitions<CR>", { desc = "Definitions" })
+vim.keymap.set("n", "<Leader>le", "<cmd>Telescope diagnostics bufnr=0<CR>", { desc = "Buffer diagnostics" })
+vim.keymap.set("n", "<Leader>li", "<cmd>Telescope lsp_implementations<CR>", { desc = "Implementations" })
+vim.keymap.set("n", "<Leader>ln", vim.lsp.buf.rename, { desc = "Rename symbol" })
+vim.keymap.set("n", "<Leader>lr", "<cmd>Telescope lsp_references<CR>", { desc = "References" })
+vim.keymap.set("n", "<Leader>ls", "<cmd>Telescope lsp_document_symbols<CR>", { desc = "Buffer symbols" })
+vim.keymap.set("n", "<Leader>lS", "<cmd>Telescope lsp_dynamic_workspace_symbols<CR>", { desc = "Workspace symbols" })
+vim.keymap.set("n", "<Leader>lt", "<cmd>Telescope lsp_type_definitions<CR>", { desc = "Type definitions" })
