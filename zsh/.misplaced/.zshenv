@@ -53,7 +53,7 @@ load_env() {
   done < "$env_file"
 }
 
-load_env "$XDG_CONFIG_HOME/envs/default.env"
+load_env "$XDG_CONFIG_HOME/envs/base.env"
 load_env "$XDG_CONFIG_HOME/envs/local.env"
 
 mkdir -p \
