@@ -873,27 +873,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
               ("a" . apheleia-format-buffer)))
 #+end_src
 
-** blamer
-
-#+begin_src emacs-lisp
-(use-package blamer
-  :straight t
-  :defer 20
-  :bind
-  ("C-c v B" . blamer-mode)
-  ("s-i" . blamer-show-commit-info)
-
-  :config
-  (setq blamer-author-formatter " ✎ %s ")
-  (setq blamer-datetime-formatter "[%s] ")
-  (setq blamer-commit-formatter "/ %s")
-
-  :custom
-  (blamer-idle-time 0.3)
-  (blamer-min-offset 40)
-  (blamer-view 'overlay))
-#+end_src
-
 ** bookmark+
 #+begin_src emacs-lisp
 (use-package bookmark+
@@ -934,6 +913,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 ** diminish
+
 #+begin_src emacs-lisp
 (use-package delight
   :straight t)
@@ -992,6 +972,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 ** dumb-jump
+
 #+begin_src emacs-lisp
 (use-package dumb-jump
   :straight t
@@ -1004,6 +985,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 ** envrc
+
 #+begin_src emacs-lisp
 (use-package envrc
   :disabled
@@ -1043,6 +1025,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 ** fzf
+
 #+begin_src emacs-lisp
 (use-package fzf
   :straight t
@@ -1355,6 +1338,7 @@ To highlight indentations
 
 
 ** diff-hl
+
 #+begin_src emacs-lisp
 (use-package diff-hl
   :straight t
@@ -1389,6 +1373,18 @@ To highlight indentations
   (magit-post-refresh . diff-hl-magit-post-refresh))
 #+end_src
 
+** emsg
+
+
+#+begin_src emacs-lisp
+(use-package emsg-blame
+  :straight (emsg-blame :local-repo "emsg-blame" :type git :host github :repo "ISouthRain/emsg-blame" :branch "master")
+
+  :custom
+  (emsg-blame-background t)
+  (emsg-blame-background-color "#5b6078"))
+#+end_src
+
 ** magit
 
 #+begin_src emacs-lisp
@@ -1410,6 +1406,25 @@ To highlight indentations
   ;; (magit-commit-show-diff nil)
   (magit-branch-direct-configure nil)
   (magit-refresh-status-buffer nil))
+#+end_src
+
+** blamer
+
+#+begin_src emacs-lisp
+(use-package blamer
+  :straight t
+  :defer 20
+  :bind
+  (:map magit-prefix-map
+        ("B" . blamer-mode))
+  ("s-i" . blamer-show-commit-info)
+
+  :custom
+  (blamer-idle-time 0.3)
+  (blamer-type 'echo-area)
+
+  :custom-face
+  (blamer-face ((t (:inherit shadow :background unspecified :slant normal)))))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -1435,6 +1450,7 @@ To highlight indentations
 
   :config (magit-todos-mode 1))
 #+end_src
+
 
 
 * languages
