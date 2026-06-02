@@ -1924,14 +1924,21 @@ https://github.com/radian-software/apheleia/issues/278
 (use-package org-mem
   :straight t
 
+  :init
+  (defvar my-org-node-directory "~/org-node/" "Directory containing org-node notes.")
+
+  :custom
+  (org-mem-watch-dirs (list my-org-node-directory))
+  (org-mem-do-look-everywhere nil)
+
   :config
-  (setq org-mem-watch-dirs (list "~/org-notes/"))
   (org-mem-updater-mode 1))
 #+end_src
 
 #+begin_src emacs-lisp
 (use-package org-node
   :straight t
+  :after org-mem
 
   :init
   ;; Optional key bindings
@@ -1939,6 +1946,10 @@ https://github.com/radian-software/apheleia/issues/278
   (keymap-global-set "M-o n" org-node-global-prefix-map)
   (with-eval-after-load 'org
     (keymap-set org-mode-map "M-o n" org-node-org-prefix-map))
+
+  :custom
+  (org-node-file-directory-ask my-org-node-directory)
+
   :config
   (org-node-cache-mode 1))
 #+end_src
