@@ -686,9 +686,12 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 ** xclip
+
 #+begin_src emacs-lisp
 (use-package xclip
   :straight t
+  :disabled
+
   :config
   (xclip-mode 1))
 #+end_src
@@ -787,7 +790,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 
 * external, etc.
-
 
 ** avy
 
@@ -1336,7 +1338,6 @@ To highlight indentations
 
 * vc
 
-
 ** diff-hl
 
 #+begin_src emacs-lisp
@@ -1427,12 +1428,16 @@ To highlight indentations
   (blamer-face ((t (:inherit shadow :background unspecified :slant normal)))))
 #+end_src
 
+** magit-delta
+
 #+begin_src emacs-lisp
 (use-package magit-delta
   :straight t
   :after magit
   :hook (magit-mode . magit-delta-mode))
 #+end_src
+
+** magit-prime
 
 #+begin_src emacs-lisp
 (use-package magit-prime
@@ -1442,6 +1447,8 @@ To highlight indentations
   :config
   (magit-prime-mode 1))
 #+end_src
+
+** magit-todots
 
 #+begin_src emacs-lisp
 (use-package magit-todos
@@ -1454,7 +1461,6 @@ To highlight indentations
 
 
 * languages
-
 
 ** COMMENT ASP
 
@@ -1825,7 +1831,6 @@ https://github.com/radian-software/apheleia/issues/278
 
 * markup
 
-
 ** json
 
 #+begin_src emacs-lisp
@@ -1881,7 +1886,6 @@ https://github.com/radian-software/apheleia/issues/278
 
 
 * org
-
 
 ** org
 
@@ -1972,7 +1976,6 @@ https://github.com/radian-software/apheleia/issues/278
 
 
 * completion
-
 
 ** emacs
 
@@ -2331,7 +2334,6 @@ https://github.com/Qkessler/consult-project-extra, for project
 
 * eglot
 
-
 ** eglot
 
 
@@ -2494,7 +2496,6 @@ for rust dev
 
 * tree sitter
 
-
 ** combobulate
 
 #+begin_src emacs-lisp
@@ -2582,7 +2583,9 @@ https://github.com/renzmann/treesit-auto
 #+end_src
 
 
-* dap
+* debugging
+
+** dap
 
 #+begin_src emacs-lisp
 (use-package dape
@@ -2681,7 +2684,6 @@ From https://blog.plover.com/prog/revert-all.html
 
 See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 
-
 ** clipetty
 
 #+begin_src emacs-lisp
@@ -2695,7 +2697,6 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 
 
 * llm
-
 
 ** gptel
 
