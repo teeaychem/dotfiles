@@ -102,13 +102,11 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
   (enable-recursive-minibuffers t)
   (tab-always-indent t)
   (custom-buffer-indent 4)
-  (desktop-save-mode 1)
   (tab-width 2)
   (xterm-mouse-mode 1)
   (translate-upper-case-key-bindings nil)
   (mouse-yank-at-point t)
   (kill-whole-line t)
-  (desktop-load-locked-desktop t)
   (native-comp-async-report-warnings-errors nil)
   (read-extended-command-predicate #'command-completion-default-include-p)   ;; Hide commands in M-x which do not work in the current mode.
 
@@ -422,6 +420,29 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
                 (let ((inhibit-message t)
                       (message-log-max nil))
                   (apply orig-fun args)))))
+#+end_src
+
+** desktop
+
+#+begin_src emacs-lisp
+(use-package desktop
+  :straight nil
+
+  :custom
+  (desktop-path (list (expand-file-name "var/desktops/" user-emacs-directory)))
+  (desktop-auto-save-timeout nil)
+  (desktop-load-locked-desktop nil)
+  (desktop-restore-eager 5)
+
+  (desktop-save-mode 1)
+  (desktop-load-locked-desktop t)
+
+  :bind (:prefix-map desktop-prefix-map
+                     :prefix "C-c D"
+                     ("c" . desktop-change-dir)
+                     ("r" . desktop-read)
+                     ("s" . desktop-save)
+                     ("v" . desktop-revert)))
 #+end_src
 
 ** dired
@@ -762,7 +783,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 #+begin_src emacs-lisp
-;; (if (memq system-type '(darwin)) (load-config "config-darwin"))
+(if (memq system-type '(darwin)) (load-config "config-darwin"))
 (if (memq system-type '(gnu/linux)) (load-config "config-gnu"))
 #+end_src
 
