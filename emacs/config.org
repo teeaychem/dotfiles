@@ -2587,17 +2587,30 @@ https://github.com/renzmann/treesit-auto
          ("M-<down>" . tempel-next))
 
   :init
+  (defun my/tempel-eglot-capf ()
+    (funcall (cape-capf-super #'eglot-completion-at-point :with #'tempel-complete)))
+
   (defun tempel-setup-capf () ;; Setup completion at point
-    ;; Add the Tempel Capf to `completion-at-point-functions'.
-    (setq-local completion-at-point-functions (cons #'tempel-expand completion-at-point-functions)))
-  (add-to-list 'completion-at-point-functions #'tempel-complete)
+    ;; Expand exact template names first.  When Eglot owns CAPF, merge
+    ;; Tempel completion into Eglot's CAPF so both candidate sets appear.
+    (let ((capfs completion-at-point-functions))
+      (dolist (capf '(tempel-expand tempel-complete my/tempel-eglot-capf))
+        (setq capfs (remove capf capfs)))
+      (setq-local completion-at-point-functions
+                  (cons #'tempel-expand
+                        (if (memq #'eglot-completion-at-point capfs)
+                            (cons #'my/tempel-eglot-capf
+                                  (remove #'eglot-completion-at-point capfs))
+                          (cons #'tempel-complete capfs))))))
 
   :custom
-  (tempel-path (concat user-emacs-directory "tempel/templates.eld"))
+  (tempel-path (list (concat user-emacs-directory "tempel/common.eld")
+                     (concat user-emacs-directory "tempel/modes/*.eld")))
   ;; (tempel-trigger-prefix "<") ;; Require trigger prefix before template name when completing.
 
   :hook
   ((conf-mode prog-mode text-mode) . tempel-setup-capf)
+  (eglot-managed-mode . tempel-setup-capf)
   (c-ts-base-mode . (lambda ()
                       (tempel-key "C-c c ." dereference c-ts-mode-map)
                       (tempel-key "C-c c >" reference   c-ts-mode-map))))
