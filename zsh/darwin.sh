@@ -1,5 +1,7 @@
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
+path_add "${XDG_CONFIG_HOME}/scripts/darwin"
+
 # llvm
 path_add "/opt/homebrew/opt/llvm/bin/" "append"
 
@@ -19,14 +21,9 @@ if command -v bat &>/dev/null; then export HOMEBREW_BAT=1; fi
 
 # Change working directory to the top finder window location
 function cdf() {
-    cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')"
-}
+    local finder_dir
+    finder_dir="$(finder-pwd)" || return
 
-# de-quarantine $1
-function dq {
-    xattr -r -d com.apple.quarantine "$1"
-}
-
-function rmdsstore {
-    find "${@:-.}" -type f -name .DS_Store -delete
+    [[ -n "$finder_dir" ]] || return 1
+    cd "$finder_dir"
 }

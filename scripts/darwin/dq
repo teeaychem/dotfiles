@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -eu
+
+if [ "$#" -eq 0 ]; then
+    printf '%s\n' 'usage: dq PATH [...]' >&2
+    exit 2
+fi
+
+xattr -r -d com.apple.quarantine "$@"

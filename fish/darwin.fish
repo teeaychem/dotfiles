@@ -2,6 +2,7 @@ if test -x /opt/homebrew/bin/brew
     /opt/homebrew/bin/brew shellenv fish | source
 end
 
+fish_add_path "$XDG_CONFIG_HOME/scripts/darwin"
 fish_add_path --append "/opt/homebrew/opt/llvm/bin/"
 fish_add_path "$HOME/.local/opt/emacs/bin/"
 fish_add_path "$HOME/.local/opt/elan/bin/"
@@ -16,15 +17,11 @@ if command -q bat
 end
 
 function cdf
-    cd (osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')
-end
+    set -l finder_dir (finder-pwd)
+    or return
 
-function dq
-    xattr -r -d com.apple.quarantine $argv[1]
-end
+    test -n "$finder_dir"
+    or return 1
 
-function rmdsstore
-    set -l roots $argv
-    test (count $roots) -gt 0; or set roots .
-    find $roots -type f -name .DS_Store -delete
+    cd "$finder_dir"
 end

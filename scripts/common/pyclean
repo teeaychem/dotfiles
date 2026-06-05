@@ -1,0 +1,21 @@
+#!/bin/sh
+
+set -eu
+
+if command -v fd >/dev/null 2>&1; then
+    if [ "$#" -eq 0 ]; then
+        set -- .
+    fi
+
+    fd -IH '(__pycache__|\.mypy_cache|\.pytest_cache)$' -t d "$@" -x rm -rf
+    fd -IH '\.py[co]$' -t f "$@" -x rm
+    exit
+fi
+
+if [ "$#" -eq 0 ]; then
+    set -- .
+fi
+
+find "$@" \
+    \( -type f \( -name '*.pyc' -o -name '*.pyo' \) -delete \) -o \
+    \( -type d \( -name '__pycache__' -o -name '.mypy_cache' -o -name '.pytest_cache' \) -prune -exec rm -rf {} + \)

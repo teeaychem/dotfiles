@@ -11,6 +11,8 @@ source ${XDG_CONFIG_HOME}/zsh/utils.sh
 
 # fns
 
+path_add "${XDG_CONFIG_HOME}/scripts/common"
+
 # Path configuration, as macOS executes path_helper *after* sourcing zshenv
 # https://apple.stackexchange.com/questions/432226/homebrew-path-set-in-zshenv-is-overridden
 case "$OSTYPE" in
@@ -165,13 +167,6 @@ function venv-activate() {
     fi
 }
 
-function pyclean {
-    find "${@:-.}" \
-         \( -type f -name "*.py[co]" -delete \) -o \
-         \( -type d -name "__pycache__" -delete \) -o \
-         \( -type d \( -name ".mypy_cache" -o -name ".pytest_cache" \) -prune -exec rm -rf {} + \)
-}
-
 # # rust
 export CARGO_HOME="${HOME}/.cargo"
 if [[ -d $CARGO_HOME ]]; then
@@ -191,18 +186,6 @@ export OPAMROOT="${XDG_DATA_HOME}/opam"
 FZF_CTRL_T_COMMAND=
 if [[ -o interactive ]] && (( $+commands[fzf] )); then
     source <(fzf --zsh)
-
-    # preview
-    function fzfp {
-        fzf --layout='default' \
-            --ansi \
-            --preview-window=top,75%,sharp,wrap \
-            --bind 'focus:transform-header:file --brief {}' \
-            --bind='ctrl-d:abort' \
-            --bind='ctrl-s:change-preview(stat {})' \
-            --bind='ctrl-e:change-preview(bat -n --color=always {})' \
-            --bind='ctrl-w:toggle-preview'
-    }
 fi
 
 if (( $+commands[tree] )); then

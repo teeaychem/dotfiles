@@ -46,6 +46,8 @@ set -gx XDG_CONFIG_HOME $HOME/.config/
 load_env "$XDG_CONFIG_HOME/envs/base.env"
 load_env "$XDG_CONFIG_HOME/envs/local.env"
 
+fish_add_path "$XDG_CONFIG_HOME/scripts/common"
+
 switch (uname)
     case Darwin
         source $__fish_config_dir/darwin.fish
@@ -139,30 +141,11 @@ function venv-activate
     end
 end
 
-function pyclean
-    set -l roots $argv
-    test (count $roots) -gt 0; or set roots .
-    # fd ignores hidden folders, so explicitly target the directories and extensions.
-    fd -IH '(__pycache__|\.mypy_cache|\.pytest_cache)$' -t d $roots -x rm -rf
-    fd -IH '\.py[co]$' -t f $roots -x rm
-end
-
 # fzf
 set -gx FZF_DEFAULT_COMMAND 'fd --type f --hidden --follow --exclude .git'
 
 if status is-interactive; and command -q fzf
     fzf --fish | source
-
-    function fzfp
-        fzf --layout='default' \
-            --ansi \
-            --preview-window=top,75%,sharp,wrap \
-            --bind 'focus:transform-header:file --brief {}' \
-            --bind='ctrl-d:abort' \
-            --bind='ctrl-s:change-preview(stat {})' \
-            --bind='ctrl-e:change-preview(bat -n --color=always {})' \
-            --bind='ctrl-w:toggle-preview'
-    end
 
     if test -f "$XDG_CONFIG_HOME/fzf/default_ops"
         set -x FZF_DEFAULT_OPTS_FILE "$XDG_CONFIG_HOME/fzf/default_ops"

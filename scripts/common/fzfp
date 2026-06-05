@@ -1,0 +1,11 @@
+#!/bin/sh
+
+exec fzf --layout='default' \
+    --ansi \
+    --preview-window=top,75%,sharp,wrap \
+    --bind 'focus:transform-header:file --brief {}' \
+    --bind='ctrl-d:abort' \
+    --bind='ctrl-s:change-preview(stat {})' \
+    --bind='ctrl-e:change-preview(bat -n --color=always {})' \
+    --bind='ctrl-w:toggle-preview' \
+    "$@"
