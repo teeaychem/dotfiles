@@ -10,6 +10,7 @@
 /emacs/.emacs.desktop
 /emacs/.org-id-locations
 /emacs/config.el*
+/emacs/config-darwin.el
 /emacs/custom.el
 /emacs/eln-cache/**
 /emacs/elpa/*
