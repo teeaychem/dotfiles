@@ -250,6 +250,12 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
          :prefix "C-c s"))
 #+end_src
 
+#+begin_src emacs-lisp
+(use-package emacs
+  :bind (:prefix-map goto-prefix-map
+         :prefix "C-c g"))
+#+end_src
+
 
 ** bookmarks
 
@@ -768,8 +774,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :config
   (setq flymake-diagnostic-format-alist
         '((t . (origin code message))))
-  :bind (:map flymake-mode-map
-              :prefix "C-c g e"
+  :bind (:map goto-prefix-map
+              :prefix "d"
               :prefix-map flymake-mode-prefix-map)
 
   :bind (:repeat-map flymake-mode-prefix-map
@@ -2099,7 +2105,6 @@ https://github.com/radian-software/apheleia/issues/278
   (define-prefix-command 'consult-register-prefix-map)
 
   (bind-keys :prefix-map consult-prefix-map :prefix "C-c c")
-  (bind-keys :prefix-map consult-goto-prefix-map :prefix "C-c g")
 
   :bind
   (([remap Info-search] . consult-info)
@@ -2137,7 +2142,7 @@ https://github.com/radian-software/apheleia/issues/278
         ("k" . consult-keep-lines)
         ("u" . consult-focus-lines)
 
-    :map consult-goto-prefix-map
+    :map goto-prefix-map
         ("b" . consult-bookmark)
         ("e" . consult-compile-error)
         ("g" . consult-goto-line)             ;; orig. goto-line
