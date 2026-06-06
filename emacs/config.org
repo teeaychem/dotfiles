@@ -2357,7 +2357,6 @@ https://github.com/Qkessler/consult-project-extra, for project
 
 ** eglot
 
-
 #+begin_src emacs-lisp
 (defun set-project-override ()
   "Set `project-current-directory-override' for the current buffer"
@@ -2432,21 +2431,63 @@ maybe: https://github.com/casouri/eldoc-box
          :map eglot-mode-map
          :prefix-map eglot-prefix-map
          :prefix "C-c l"
-         ("a" . #'eglot-code-actions)
-         ("c" . #'eglot-reconnect)
-         ("f f" . #'eglot-format)
-         ("f b" . #'eglot-format-buffer)
-         ("g d" . #'eglot-find-declaration)
-         ("g i" . #'eglot-find-implementation)
-         ("g t" . #'eglot-find-typeDefinition)
-         ("h c" . #'eglot-call-type-hierarchy)
-         ("h t" . #'eglot-show-type-hierarchy)
          ("i" . #'eglot-inlay-hints-mode)
+         ("I" . #'eglot-momentary-inlay-hints)
          ("l" . #'eglot)
-         ("r" . #'eglot-rename)
-         ("s" . #'eglot-shutdown)
-         :map format-prefix-map
-         ("e" . #'eglot-format-buffer))
+         ("r" . #'eglot-rename))
+
+  :bind (:map eglot-prefix-map
+              :prefix-map eglot-action-prefix-map
+              :prefix "a"
+              ("a" . #'eglot-code-actions)
+              ("e" . #'eglot-code-action-extract)
+              ("i" . #'eglot-code-action-inline)
+              ("o" . #'eglot-code-action-organize-imports)
+              ("q" . #'eglot-code-action-quickfix)
+              ("r" . #'eglot-code-action-rewrite))
+
+  :bind (:map eglot-prefix-map
+              :prefix-map eglot-diagnostics-prefix-map
+              :prefix "d"
+              ("b" . #'flymake-show-buffer-diagnostics)
+              ("p" . #'flymake-show-project-diagnostics))
+
+  :bind (:map eglot-prefix-map
+              :prefix-map eglot-format-prefix-map
+              :prefix "f"
+              ("b" . #'eglot-format-buffer)
+              ("r" . #'eglot-format))
+
+  :bind (:map eglot-prefix-map
+              :prefix-map eglot-navigation-prefix-map
+              :prefix "g"
+              ("d" . #'xref-find-definitions)
+              ("D" . #'eglot-find-declaration)
+              ("i" . #'eglot-find-implementation)
+              ("r" . #'xref-find-references)
+              ("s" . #'consult-eglot-symbols)
+              ("t" . #'eglot-find-typeDefinition))
+
+  :bind (:map eglot-prefix-map
+              :prefix-map eglot-hierarchy-prefix-map
+              :prefix "h"
+              ("c" . #'eglot-show-call-hierarchy)
+              ("t" . #'eglot-show-type-hierarchy))
+
+  :bind (:map eglot-prefix-map
+              :prefix-map eglot-server-prefix-map
+              :prefix "s"
+              ("c" . #'eglot-list-connections)
+              ("d" . #'eglot-describe-connection)
+              ("e" . #'eglot-events-buffer)
+              ("E" . #'eglot-stderr-buffer)
+              ("q" . #'eglot-shutdown)
+              ("Q" . #'eglot-shutdown-all)
+              ("r" . #'eglot-reconnect)
+              ("w" . #'eglot-show-workspace-configuration))
+
+  :bind (:map format-prefix-map
+              ("e" . #'eglot-format-buffer))
 
   :custom-face
   (eglot-highlight-symbol-face ((t (:bold nil  :underline (:style dots :position nil)))))
