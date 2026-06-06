@@ -943,7 +943,17 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (use-package bookmark+
   :straight t
 
-  :after bookmark)
+  :after bookmark
+
+  :bind (:map bookmark-prefix-map
+              ("a" . bmkp-annotate-bookmark)
+              ("l" . bmkp-this-file/buffer-bmenu-list)
+              ("n" . bmkp-next-bookmark-this-file/buffer-repeat)
+              ("o" . bmkp-store-org-link)
+              ("p" . bmkp-previous-bookmark-this-file/buffer-repeat)
+              ("t" . bmkp-some-tags-jump)
+              ("T" . bmkp-all-tags-jump)
+              ("x" . bmkp-toggle-temporary-bookmark)))
 #+end_src
 
 ** breadcrumb
@@ -1109,18 +1119,28 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package gumshoe
-  :disabled
   :straight t
 
-  :init
-  ;; Enabing global-gumshoe-mode will initiate tracking
-  (global-gumshoe-mode 1)
-  ;; customize peruse slot display if you like
-  (setf gumshoe-slot-schema '(time buffer position line))
-  ;; personally, I use perspectives
-  ;; (setf gumshoe-slot-schema '(perspective time buffer position line))
-  ;; disable auto-cancel of backtracking
-  (setf gumshoe-auto-cancel-backtracking-p nil))
+  :hook
+  (after-init . global-gumshoe-mode)
+
+  :bind (:map goto-prefix-map
+              ("h" . gumshoe-backtrack)
+              ("M" . gumshoe-drop-marker)))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package consult-gumshoe
+  :straight (consult-gumshoe
+             :type git
+             :host github
+             :repo "Overdr0ne/gumshoe"
+             :files ("extensions/consult-gumshoe/consult-gumshoe.el"))
+
+  :after (consult gumshoe)
+
+  :bind (:map goto-prefix-map
+              ("H" . consult-gumshoe-peruse-in-backlog)))
 #+end_src
 
 ** helpful
