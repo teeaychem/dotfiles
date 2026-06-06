@@ -1,0 +1,108 @@
+#!/bin/sh
+
+# Download and install the latest official fzf binary for this platform.
+#
+# Supported systems:
+#   macOS: amd64, arm64
+#   Linux: amd64, arm64
+#
+# The release archive is verified against the SHA-256 checksums published with
+# the same GitHub release before fzf is installed.
+#
+# Environment:
+#   PREFIX  Installation prefix (default: ~/.local)
+
+set -eu
+
+repository=https://github.com/junegunn/fzf
+prefix="${PREFIX:-$HOME/.local}"
+system=$(uname -s)
+machine=$(uname -m)
+
+case "$system" in
+    Darwin)
+        platform=darwin
+        ;;
+    Linux)
+        platform=linux
+        ;;
+    *)
+        printf 'Unsupported operating system: %s\n' "$system" >&2
+        exit 1
+        ;;
+esac
+
+case "$machine" in
+    x86_64|amd64)
+        architecture=amd64
+        ;;
+    arm64|aarch64)
+        architecture=arm64
+        ;;
+    *)
+        printf 'Unsupported architecture: %s\n' "$machine" >&2
+        exit 1
+        ;;
+esac
+
+latest_url=$(
+    curl -fsSLo /dev/null -w '%{url_effective}\n' "$repository/releases/latest"
+)
+tag=${latest_url##*/}
+
+case "$tag" in
+    v[0-9]*)
+        version=${tag#v}
+        ;;
+    *)
+        printf 'Could not determine the latest fzf version from %s.\n' \
+            "$latest_url" >&2
+        exit 1
+        ;;
+esac
+
+archive="fzf-$version-${platform}_${architecture}.tar.gz"
+checksums="fzf_${version}_checksums.txt"
+release_url="$repository/releases/download/$tag"
+temporary_directory=$(mktemp -d "${TMPDIR:-/tmp}/install-fzf.XXXXXXXX")
+temporary_binary="$prefix/bin/.fzf.$$"
+
+cleanup() {
+    rm -rf "$temporary_directory"
+    rm -f "$temporary_binary"
+}
+trap cleanup EXIT HUP INT TERM
+
+printf 'Downloading fzf %s for %s/%s...\n' \
+    "$version" "$platform" "$architecture"
+curl -fsSL "$release_url/$archive" -o "$temporary_directory/$archive"
+curl -fsSL "$release_url/$checksums" -o "$temporary_directory/$checksums"
+
+expected_checksum=$(
+    awk -v archive="$archive" '$2 == archive { print $1 }' \
+        "$temporary_directory/$checksums"
+)
+
+if [ -z "$expected_checksum" ]; then
+    printf 'No checksum found for %s.\n' "$archive" >&2
+    exit 1
+fi
+
+if command -v sha256sum >/dev/null 2>&1; then
+    actual_checksum=$(sha256sum "$temporary_directory/$archive")
+else
+    actual_checksum=$(shasum -a 256 "$temporary_directory/$archive")
+fi
+actual_checksum=${actual_checksum%% *}
+
+if [ "$actual_checksum" != "$expected_checksum" ]; then
+    printf 'Checksum verification failed for %s.\n' "$archive" >&2
+    exit 1
+fi
+
+tar -xzf "$temporary_directory/$archive" -C "$temporary_directory"
+mkdir -p "$prefix/bin"
+install -m 0755 "$temporary_directory/fzf" "$temporary_binary"
+mv -f "$temporary_binary" "$prefix/bin/fzf"
+
+printf 'Installed fzf %s to %s/bin/fzf.\n' "$version" "$prefix"
