@@ -417,8 +417,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package dired
-  :demand t
-
   :init
   (when (and (eq system-type 'darwin) (executable-find "gls"))
     (setq insert-directory-program (executable-find "gls")))
@@ -440,7 +438,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package editorconfig
-  :demand t
   :delight
   :config
   (editorconfig-mode 1))
@@ -599,7 +596,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package ispell
-  :demand t
   :after exec-path-from-shell
 
   :if (executable-find "hunspell")
@@ -654,7 +650,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package which-key
-  :demand t
   :delight which-key-mode
 
   :init
@@ -823,7 +818,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package apheleia
   :straight t
-  :demand t
 
   :init
   (setq-default apheleia-inhibit t)
@@ -870,7 +864,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 ** bookmark+
 #+begin_src emacs-lisp
 (use-package bookmark+
-  :straight t)
+  :straight t
+
+  :after bookmark)
 #+end_src
 
 ** breadcrumb
@@ -970,6 +966,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package dumb-jump
   :straight t
+
+  :commands dumb-jump-xref-activate
+
   :custom
   (dumb-jump-prefer-searcher 'rg))
 
@@ -1025,6 +1024,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :straight (:url "https://github.com/dakra/ghostel"
              :lisp-dir "lisp"
              :rev :newest)
+
+  :defer t
 
   :custom
   (ghostel-tramp-shell-integration nil))
@@ -1259,27 +1260,22 @@ To highlight indentations
 #+begin_src emacs-lisp
 (use-package undo-fu
   :straight t
-  :demand t
 
   :init
   (setq undo-limit (* 8 1024 1024))
   (setq undo-strong-limit (* 64 1024 1024))
   (setq undo-outer-limit (* 126 1024 1024))
 
-  :config
-  (global-set-key (kbd "C-/") 'undo-fu-only-undo)
-  (global-set-key (kbd "C-?") 'undo-fu-only-redo))
+  :bind (("C-/" . undo-fu-only-undo)
+         ("C-?" . undo-fu-only-redo)))
 #+end_src
 
 #+begin_src emacs-lisp
 (use-package undo-fu-session
   :straight t
-  :demand t
 
-  :config
-  (setq undo-fu-session-incompatible-files '("/COMMIT_EDITMSG\\'" "/git-rebase-todo\\'"))
-
-  :commands undo-fu-session-global-mode
+  :custom
+  (undo-fu-session-incompatible-files '("/COMMIT_EDITMSG\\'" "/git-rebase-todo\\'"))
 
   :hook (after-init . undo-fu-session-global-mode))
 #+end_src
@@ -1287,11 +1283,11 @@ To highlight indentations
 #+begin_src emacs-lisp
 (use-package vundo
   :straight t
-  :demand t
 
-  :config
-  (setq vundo-compact-display t)
-  (global-set-key (kbd "C-x u") 'vundo))
+  :custom
+  (vundo-compact-display t)
+
+  :bind ("C-x u" . vundo))
 #+end_src
 
 ** ws-butler
@@ -1353,6 +1349,8 @@ To highlight indentations
 (use-package emsg-blame
   :straight (emsg-blame :local-repo "emsg-blame" :type git :host github :repo "ISouthRain/emsg-blame" :branch "master")
 
+  :commands (emsg-blame-mode global-emsg-blame-mode)
+
   :custom
   (emsg-blame-background t)
   (emsg-blame-background-color "#5b6078"))
@@ -1386,7 +1384,7 @@ To highlight indentations
 #+begin_src emacs-lisp
 (use-package blamer
   :straight t
-  :defer 20
+
   :bind
   (:map magit-prefix-map
         ("B" . blamer-mode))
@@ -1616,6 +1614,7 @@ Get the relevant package subdirectories from the llvm source
   :config
   (define-derived-mode pdll-mode mlir-mode "PDLL"))
 #+end_src
+
 *** tablegen
 
 #+begin_src emacs-lisp
@@ -1642,6 +1641,7 @@ Get the relevant package subdirectories from the llvm source
   :after exec-path-from-shell
   :mode "\\.td\\'")
 #+end_src
+
 *** llvm
 
 #+begin_src emacs-lisp
@@ -1649,6 +1649,7 @@ Get the relevant package subdirectories from the llvm source
   :straight nil
   :mode "\\.ll\\'")
 #+end_src
+
 *** llvm-mir
 
 #+begin_src emacs-lisp
@@ -1831,7 +1832,10 @@ https://github.com/radian-software/apheleia/issues/278
 (use-package math-preview
   :straight (math-preview :type git :host gitlab :repo "matsievskiysv/math-preview" :branch "master")
 
-  :custom (math-preview-command "~/.npm-packages/bin/math-preview"))
+  :defer t
+
+  :custom
+  (math-preview-command "~/.npm-packages/bin/math-preview"))
 #+end_src
 
 ** toml
@@ -2524,7 +2528,6 @@ https://github.com/renzmann/treesit-auto
 (use-package treesit-auto
   :straight t
   :ensure t
-  :demand t
 
   :custom
   (treesit-auto-install 'prompt)
@@ -2754,7 +2757,8 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 #+begin_src emacs-lisp
 (use-package gptel-agent
   :straight t
-  :defer t
+
+  :commands gptel-agent
 
   :config (gptel-agent-update))         ;Read files from agents directories
 #+end_src
@@ -2764,7 +2768,11 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 #+begin_src emacs-lisp
 (use-package agent-shell
   :straight t
-  :defer t
+
+  :commands (agent-shell
+             agent-shell-new-shell
+             agent-shell-new-temp-shell
+             agent-shell-toggle)
 
   ;; :ensure-system-package
   ;; ((codex-acp . "brew install codex-acp"))
