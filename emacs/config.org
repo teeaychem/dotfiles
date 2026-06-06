@@ -244,6 +244,12 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
          :prefix "C-c f"))
 #+end_src
 
+#+begin_src emacs-lisp
+(use-package emacs
+  :bind (:prefix-map search-prefix-map
+         :prefix "C-c s"))
+#+end_src
+
 
 ** bookmarks
 
@@ -1300,7 +1306,8 @@ To highlight indentations
 (use-package rg
   :straight t
 
-  :bind (("C-c s m" . rg-menu))
+  :bind (:map search-prefix-map
+              ("m" . rg-menu))
 
   :config
   (add-to-list 'rg-custom-type-aliases '("mlir" . "*.mlir *.pdll"))
@@ -2093,7 +2100,6 @@ https://github.com/radian-software/apheleia/issues/278
 
   (bind-keys :prefix-map consult-prefix-map :prefix "C-c c")
   (bind-keys :prefix-map consult-goto-prefix-map :prefix "C-c g")
-  (bind-keys :prefix-map consult-search-prefix-map :prefix "C-c s")
 
   :bind
   (([remap Info-search] . consult-info)
@@ -2120,7 +2126,7 @@ https://github.com/radian-software/apheleia/issues/278
        ("M-s" . consult-history)                 ;; orig. next-matching-history-element
        ("M-r" . consult-history)                 ;; orig. previous-matching-history-element
 
-   :map consult-search-prefix-map
+   :map search-prefix-map
         ("d" . consult-find)                  ;; Alternative: consult-fd
         ("c" . consult-locate)
         ("G" . consult-grep)
@@ -2250,11 +2256,12 @@ https://github.com/Qkessler/consult-project-extra, for project
 (use-package consult-projectile
   :straight (consult-projectile :type git :host gitlab :repo "OlMon/consult-projectile" :branch "master")
   :after (consult projectile)
-  :bind ((:prefix-map consult-projectile-search-prefix-map :prefix "C-c s p")
-         (:map consult-projectile-search-prefix-map
-               ("b" . consult-projectile-switch-to-buffer)
-               ("d" . consult-projectile-find-dir)
-               ("f" . consult-projectile-find-file))))
+  :bind (:map search-prefix-map
+              :prefix-map consult-projectile-search-prefix-map
+              :prefix "p"
+              ("b" . consult-projectile-switch-to-buffer)
+              ("d" . consult-projectile-find-dir)
+              ("f" . consult-projectile-find-file)))
 #+end_src
 
 *** consult-dir
