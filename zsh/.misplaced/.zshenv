@@ -53,6 +53,32 @@ load_env() {
   done < "$env_file"
 }
 
+load_vars() {
+  setopt local_options extended_glob
+
+  local vars_file="$1"
+
+  if [[ ! -f "$vars_file" ]]; then
+    echo "Error: Variables file '$vars_file' does not exist or was not specified." >&2
+    return 1
+  fi
+
+  local line name
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    name="${line##[[:space:]]#}"
+    name="${name%%[[:space:]]#}"
+    [[ "$name" == \#* || -z "$name" ]] && continue
+
+    if [[ ! "$name" =~ '^[A-Za-z_][A-Za-z0-9_]*$' ]]; then
+      echo "Warning: Ignoring malformed line in '$vars_file': $line" >&2
+      continue
+    fi
+
+    (( ${+parameters[$name]} )) || typeset -g "$name="
+  done < "$vars_file"
+}
+
+load_vars "$XDG_CONFIG_HOME/envs/base.vars"
 load_env "$XDG_CONFIG_HOME/envs/base.env"
 load_env "$XDG_CONFIG_HOME/envs/local.env"
 

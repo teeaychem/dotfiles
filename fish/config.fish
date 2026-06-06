@@ -39,10 +39,32 @@ function load_env
     end < $env_file
 end
 
+function load_vars
+    set -l vars_file $argv[1]
+
+    if not test -f "$vars_file"
+        echo "Error: Variables file '$vars_file' does not exist or was not specified." >&2
+        return 1
+    end
+
+    while read -l line
+        set -l name (string trim -- "$line")
+        string match -q -r '^(#|$)' -- "$name"; and continue
+
+        if not string match -q -r '^[A-Za-z_][A-Za-z0-9_]*$' -- "$name"
+            echo "Warning: Ignoring malformed line in '$vars_file': $line" >&2
+            continue
+        end
+
+        set -q $name; or set -g $name ''
+    end < "$vars_file"
+end
+
 set -gx XDG_CONFIG_HOME $HOME/.config/
 
 
 # Usage inside config.fish:
+load_vars "$XDG_CONFIG_HOME/envs/base.vars"
 load_env "$XDG_CONFIG_HOME/envs/base.env"
 load_env "$XDG_CONFIG_HOME/envs/local.env"
 
