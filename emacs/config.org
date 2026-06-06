@@ -19,6 +19,7 @@
 
 https://www.emacswiki.org/emacs/GnusAuthinfo
 
+
 * to investigate
 
 https://github.com/editorconfig/editorconfig-emacs?tab=readme-ov-file https://editorconfig.org
@@ -343,6 +344,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 ** macos
+
 #+begin_src emacs-lisp
 (use-package emacs
   :if (memq system-type '(darwin))
@@ -688,6 +690,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 
 ** flymake
+
 #+begin_src emacs-lisp :result silent
 (use-package flymake
   :straight t
@@ -756,6 +759,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 * theme
 
+
+** catppuccin
+
 #+begin_src emacs-lisp
 (use-package catppuccin-theme
   :disabled
@@ -778,6 +784,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 * external, etc.
 
+
 ** avy
 
 #+begin_src emacs-lisp
@@ -789,6 +796,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 ** COMMENT compile-angel
+
 #+begin_src emacs-lisp
 (use-package compile-angel
   :demand t
@@ -815,6 +823,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 ** apheleia
+
 #+begin_src emacs-lisp
 (use-package apheleia
   :straight t
@@ -862,6 +871,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 ** bookmark+
+
 #+begin_src emacs-lisp
 (use-package bookmark+
   :straight t
@@ -880,6 +890,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 ** browse kill ring
+
 #+begin_src emacs-lisp
 (use-package browse-kill-ring
   :straight t)
@@ -893,6 +904,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 ** COMMENT ctrlf
+
 #+begin_src emacs-lisp
 (use-package ctrlf
   :straight t
@@ -910,6 +922,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 ** dirvish
+
 #+begin_src emacs-lisp
 (use-package emacs
   :config
@@ -1051,6 +1064,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 ** helpful
+
 #+begin_src emacs-lisp
 (use-package helpful
   :straight t
@@ -1110,13 +1124,9 @@ To highlight indentations
 
   :custom
   (indent-bars-no-stipple-char ?│)
-
   (indent-bars-starting-column 0)
-
   (indent-bars-color '(highlight :face-bg default :default "#ffffff"))
-
   (indent-bars-highlight-current-depth '(:face default :color "#ffaa00"))
-
   (indent-bars-color-by-depth
    '(:palette ("#7f5555"   ; Depth 1: Stormy Muted Red
                "#7f6a55"   ; Depth 2: Overcast Ochre/Orange
@@ -1125,7 +1135,6 @@ To highlight indentations
                "#556a7f"   ; Depth 5: Slate Blue / Rainy Sky
                "#6a557f"   ; Depth 6: Muted Indigo / Shadow Purple
                "#7f556a"))) ; Depth 7: Dusty Rose / Fading Violet
-
   (indent-bars-width-frac 0.2)
   (indent-bars-pad-frac 0.1)
   (indent-bars-depth-update-delay 0.1)
@@ -1133,9 +1142,7 @@ To highlight indentations
 
   ;; tree-sit
   (indent-bars-treesit-support t)
-
   (indent-bars-ts-out-of-scope-color '(:face default :color "#808080"))
-
   (indent-bars-treesit-wrap '((python argument_list parameters
 				                              list list_comprehension
 				                              dictionary dictionary_comprehension
@@ -1181,6 +1188,7 @@ To highlight indentations
 #+end_src
 
 ** multiple cursors
+
 #+begin_src emacs-lisp
 (use-package multiple-cursors
   :straight t
@@ -1193,6 +1201,7 @@ To highlight indentations
 #+end_src
 
 ** no-littering
+
 #+begin_src emacs-lisp
 (use-package no-littering
   :straight t
@@ -1213,6 +1222,7 @@ To highlight indentations
 #+end_src
 
 ** projectile
+
 #+begin_src emacs-lisp
 (use-package projectile
   :straight t
@@ -1230,6 +1240,7 @@ To highlight indentations
 #+end_src
 
 ** rainbow delimiters
+
 #+begin_src emacs-lisp
 (use-package rainbow-delimiters
   :straight t
@@ -1257,6 +1268,7 @@ To highlight indentations
 #+end_src
 
 ** undo and redo
+
 #+begin_src emacs-lisp
 (use-package undo-fu
   :straight t
@@ -1291,6 +1303,7 @@ To highlight indentations
 #+end_src
 
 ** ws-butler
+
 #+begin_src emacs-lisp
 (use-package ws-butler
   :straight (ws-butler :type git :host github :repo "lewang/ws-butler" :branch "master")
@@ -1305,6 +1318,7 @@ To highlight indentations
 
 
 * vc
+
 
 ** diff-hl
 
@@ -1343,7 +1357,6 @@ To highlight indentations
 #+end_src
 
 ** emsg
-
 
 #+begin_src emacs-lisp
 (use-package emsg-blame
@@ -1431,6 +1444,7 @@ To highlight indentations
 
 
 * languages
+
 
 ** COMMENT ASP
 
@@ -1719,6 +1733,7 @@ Get the relevant package subdirectories from the llvm source
   :hook
   (python-base-mode . pet-mode))
 #+end_src
+
 *** uv
 
 #+begin_src emacs-lisp
@@ -1798,6 +1813,7 @@ https://github.com/radian-software/apheleia/issues/278
 
 * markup
 
+
 ** json
 
 #+begin_src emacs-lisp
@@ -1828,6 +1844,7 @@ https://github.com/radian-software/apheleia/issues/278
 #+end_src
 
 ** math-preview
+
 #+begin_src emacs-lisp
 (use-package math-preview
   :straight (math-preview :type git :host gitlab :repo "matsievskiysv/math-preview" :branch "master")
@@ -1856,6 +1873,7 @@ https://github.com/radian-software/apheleia/issues/278
 
 
 * org
+
 
 ** org
 
@@ -1898,6 +1916,8 @@ https://github.com/radian-software/apheleia/issues/278
   (org-list-allow-alphabetical t)
 
   (org-log-done 'note)
+
+  (org-cycle-separator-lines 2)
 
   :config
   (org-babel-do-load-languages 'org-babel-load-languages
@@ -1946,6 +1966,7 @@ https://github.com/radian-software/apheleia/issues/278
 
 
 * completion
+
 
 ** emacs
 
@@ -2304,6 +2325,7 @@ https://github.com/Qkessler/consult-project-extra, for project
 
 * eglot
 
+
 ** eglot
 
 #+begin_src emacs-lisp
@@ -2484,6 +2506,7 @@ for rust dev
 #+end_src
 
 ** workspaces
+
 #+begin_src emacs-lisp
 ;; (add-hook 'python-base-mode-hook
 ;;           (lambda ()
@@ -2506,6 +2529,7 @@ for rust dev
 
 
 * tree sitter
+
 
 ** combobulate
 
@@ -2609,6 +2633,7 @@ https://github.com/renzmann/treesit-auto
 
 * debugging
 
+
 ** dap
 
 #+begin_src emacs-lisp
@@ -2708,6 +2733,7 @@ From https://blog.plover.com/prog/revert-all.html
 
 See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 
+
 ** clipetty
 
 #+begin_src emacs-lisp
@@ -2721,6 +2747,7 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 
 
 * llm
+
 
 ** gptel
 
