@@ -942,13 +942,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (prog-mode-hook . breadcrumb-local-mode))
 #+end_src
 
-** browse kill ring
-
-#+begin_src emacs-lisp
-(use-package browse-kill-ring
-  :straight t)
-#+end_src
-
 ** crux
 
 #+begin_src emacs-lisp
@@ -1982,7 +1975,7 @@ https://github.com/radian-software/apheleia/issues/278
   (keymap-unset org-mode-map "<backtab>" 'remove))
 #+end_src
 
-** org-node
+** org-mem
 
 #+begin_src emacs-lisp
 (use-package org-mem
@@ -1998,6 +1991,8 @@ https://github.com/radian-software/apheleia/issues/278
   :config
   (org-mem-updater-mode 1))
 #+end_src
+
+** org-node
 
 #+begin_src emacs-lisp
 (use-package org-node
