@@ -10,6 +10,7 @@ brew "bat"
 brew "bitwise"
 brew "cmake"
 brew "coreutils" # GNU File, Shell, and Text utilities
+brew "difftastic"
 brew "direnv"
 brew "wader/tap/fq"
 brew "fzf"
