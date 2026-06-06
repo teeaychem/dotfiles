@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Apply preferred macOS user defaults.
+
+set -eu
+
+if [ "$(uname -s)" != Darwin ]; then
+    printf '%s\n' 'configure-macos: macOS is required' >&2
+    exit 1
+fi
+
+defaults -currentHost write -g AppleFontSmoothing -int 0
+defaults write com.apple.LaunchServices LSQuarantine -bool false
+defaults write com.apple.finder AppleShowAllFiles -bool true

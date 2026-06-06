@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Configure a static, optimized cvc5 build with Python bindings.
+#
+# Run from the root of the cvc5 source tree. Additional arguments are passed to
+# configure.sh after the standard options.
+
+set -eu
+
+if [ ! -x ./configure.sh ]; then
+    printf '%s\n' "Run ${0##*/} from the root of a cvc5 source tree." >&2
+    exit 1
+fi
+
+exec ./configure.sh \
+    --static \
+    --best \
+    --gpl \
+    --no-cryptominisat \
+    --no-glpk \
+    --python-bindings \
+    --cocoa \
+    "$@"
