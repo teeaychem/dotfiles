@@ -1,0 +1,107 @@
+#!/bin/sh
+
+# Configure, compile, and install a terminal-first Emacs 31+ from source.
+#
+# Run this script from the root of the Emacs source tree. A normal invocation
+# performs an incremental build. Use --bootstrap after switching revisions or
+# when stale generated or compiled files cause build failures. Use --aot to
+# natively compile all bundled Lisp during the build; otherwise only preloaded
+# Lisp is compiled ahead of time and other Lisp is compiled on demand.
+#
+# GUI backends and desktop integration are disabled. TLS, XML, SQLite, dynamic
+# modules, Tree-sitter, native compilation, threads, and file notifications are
+# required so configure fails early when a useful dependency is missing.
+#
+# Environment:
+#   PREFIX  Installation prefix (default: ~/.local)
+#   JOBS    Number of parallel make jobs (default: online CPU count)
+#   CFLAGS  Optional compiler flags (default: Emacs configure defaults)
+#
+# Usage:
+#   build-emacs [--bootstrap] [--aot]
+
+set -eu
+
+usage() {
+    printf 'Usage: %s [--bootstrap] [--aot]\n' "${0##*/}"
+}
+
+make_target=
+native_compilation=yes
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --bootstrap)
+            make_target=bootstrap
+            ;;
+        --aot)
+            native_compilation=aot
+            ;;
+        -h|--help)
+            usage
+            exit
+            ;;
+        *)
+            usage >&2
+            exit 2
+            ;;
+    esac
+    shift
+done
+
+if [ ! -f configure.ac ]; then
+    printf '%s\n' "Run ${0##*/} from the root of an Emacs source tree." >&2
+    exit 1
+fi
+
+emacs_major=$(
+    sed -n 's/^AC_INIT(\[GNU Emacs\], \[\([0-9][0-9]*\).*/\1/p' configure.ac
+)
+
+case "$emacs_major" in
+    ""|*[!0-9]*)
+        printf '%s\n' \
+            "Could not determine the Emacs version from configure.ac." >&2
+        exit 1
+        ;;
+    *)
+        if [ "$emacs_major" -lt 31 ]; then
+            printf 'Emacs 31 or newer is required; found major version %s.\n' \
+                "$emacs_major" >&2
+            exit 1
+        fi
+        ;;
+esac
+
+if [ ! -x ./configure ]; then
+    ./autogen.sh
+fi
+
+prefix="${PREFIX:-$HOME/.local}"
+jobs="${JOBS:-$(getconf _NPROCESSORS_ONLN)}"
+
+# For a hybrid terminal/X build, replace --without-x with:
+#   --with-x --with-x-toolkit=lucid
+./configure \
+    --prefix="$prefix" \
+    --program-transform-name='s/^ctags$/ctags.emacs/' \
+    --without-x \
+    --without-ns \
+    --without-pgtk \
+    --without-dbus \
+    --without-gsettings \
+    --with-sound=no \
+    --without-mailutils \
+    --with-gnutls \
+    --with-xml2 \
+    --with-sqlite3 \
+    --with-modules \
+    --with-tree-sitter \
+    --with-native-compilation="$native_compilation" \
+    --with-threads \
+    --with-file-notification=yes \
+    --without-compress-install \
+    --disable-build-details
+
+make ${make_target:+"$make_target"} -j"$jobs"
+make install

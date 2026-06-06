@@ -19,38 +19,6 @@
 
 https://www.emacswiki.org/emacs/GnusAuthinfo
 
-
-** compilation
-
-Run autogen, if needed.
-
-#+begin_src sh
-./autogen.sh
-./configure
-make -j$(nproc)
-sudo make install
-#+end_src
-
-maybe make bootstrap, if old build artifacts conflict
-
-#+begin_src sh
-CFLAGS='-march=native -O3' \
-./configure \
-    --with-ns=no \
-    --with-x \
-    --with-x-toolkit=yes \
-    --with-native-compilation \
-    --prefix="$HOME/.local/opt/emacs/" \
-    --program-transform-name='s/^ctags$/ctags.emacs/' \
-    --with-imagemagick \
-    --with-native-compilation=aot \
-    --with-tree-sitter \
-    --without-toolkit-scroll-bars \
-    --without-mailutils \
-    --without-compress-install
-#+end_src
-
-
 * to investigate
 
 https://github.com/editorconfig/editorconfig-emacs?tab=readme-ov-file https://editorconfig.org

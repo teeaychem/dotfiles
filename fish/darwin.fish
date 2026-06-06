@@ -4,7 +4,7 @@ end
 
 fish_add_path "$XDG_CONFIG_HOME/scripts/darwin"
 fish_add_path --append "/opt/homebrew/opt/llvm/bin/"
-fish_add_path "$HOME/.local/opt/emacs/bin/"
+fish_add_path "$HOME/.local/bin/"
 fish_add_path "$HOME/.local/opt/elan/bin/"
 fish_add_path "/usr/local/texlive/2026basic/bin/universal-darwin/"
 
