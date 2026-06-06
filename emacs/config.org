@@ -1499,36 +1499,34 @@ To highlight indentations
 (use-package c-ts-mode
   :straight nil
 
-  :init
-  (defvar-keymap c-family-prefix-map
-    :doc "Common C and C++ commands."
-    "f" #'apheleia-format-buffer
-    "t" #'tempel-insert)
-
-  (defvar-keymap c-family-build-prefix-map
-    :doc "C and C++ build commands."
-    "c" #'compile
-    "p" #'project-compile
-    "r" #'recompile)
-  (keymap-set c-family-prefix-map "b" c-family-build-prefix-map)
-
-  (defvar-keymap c-family-file-prefix-map
-    :doc "C and C++ counterpart file commands."
-    "f" #'ff-find-other-file
-    "o" #'ff-find-other-file-other-window)
-  (keymap-set c-family-prefix-map "o" c-family-file-prefix-map)
-
   :mode (("\\.c\\'" . c-ts-mode)
          ("\\.\\(?:H\\|cc\\|hh\\|cpp\\|hpp\\|cxx\\|hxx\\|c\\+\\+\\|h\\+\\+\\|ipp\\|ixx\\|cppm\\)\\'" . c++-ts-mode)
          ("\\.\\(?:cc\\|cpp\\|cxx\\|h\\|hh\\|hpp\\|hxx\\)\\.inc\\'" . c++-ts-mode)
          ("\\.inc\\'" . c++-ts-mode)
          ("\\.def\\'" . c++-ts-mode))
 
-  :bind ((:map c-ts-base-mode-map
-               ("C-c m" . c-family-prefix-map)
-               ("C-c h" . ff-find-other-file-other-window))
-         (:map c++-ts-mode-map
-               ("C-c C-o" . nil)))
+  :bind (:map c-ts-base-mode-map
+              :prefix-map c-family-prefix-map
+              :prefix "C-c m"
+              ("=" . #'apheleia-format-buffer))
+
+  :bind (:map c-family-prefix-map
+              :prefix-map c-family-build-prefix-map
+              :prefix "b"
+              ("c" . #'compile)
+              ("p" . #'project-compile)
+              ("r" . #'recompile))
+
+  :bind (:map c-family-prefix-map
+              :prefix-map c-family-file-prefix-map
+              :prefix "f"
+              ("f" . #'ff-find-other-file)
+              ("o" . #'ff-find-other-file-other-window))
+
+  :bind (:map c-family-prefix-map
+              :prefix-map c-family-template-prefix-map
+              :prefix "t"
+              ("i" . #'tempel-insert))
 
   :custom
   (c-ts-mode-indent-style 'linux))
@@ -2645,12 +2643,13 @@ https://github.com/renzmann/treesit-auto
                      (concat user-emacs-directory "tempel/modes/*.eld")))
   ;; (tempel-trigger-prefix "<") ;; Require trigger prefix before template name when completing.
 
+  :config
+  (tempel-key "." dereference c-family-template-prefix-map)
+  (tempel-key ">" reference c-family-template-prefix-map)
+
   :hook
   ((conf-mode prog-mode text-mode) . tempel-setup-capf)
-  (eglot-managed-mode . tempel-setup-capf)
-  (c-ts-base-mode . (lambda ()
-                      (tempel-key "C-c c ." dereference c-ts-base-mode-map)
-                      (tempel-key "C-c c >" reference   c-ts-base-mode-map))))
+  (eglot-managed-mode . tempel-setup-capf))
 #+end_src
 
 
