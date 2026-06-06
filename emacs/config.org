@@ -1853,13 +1853,45 @@ raco pkg install --auto drracket
 https://robert.kra.hn/posts/rust-emacs-setup/
 
 #+begin_src emacs-lisp
-(use-package rust-mode
-  :straight t
-  :mode "\\.rs\\'"
+(use-package rust-ts-mode
+  :straight nil
+
+  :mode ("\\.rs\\'" . rust-ts-mode)
 
   :init
-  (setq rust-mode-treesitter-derive t)
-  (setq rust-format-on-save nil))
+  (defun my/rust-set-edition ()
+    "Set `rust-edition' from the current crate's Cargo metadata."
+    ;; https://github.com/radian-software/apheleia/issues/278
+    (when-let*
+        ((cratedir
+          (locate-dominating-file default-directory "Cargo.toml"))
+         (manifest-path
+          (expand-file-name "Cargo.toml" cratedir))
+         (env process-environment)
+         (path exec-path))
+      (setq-local rust-edition
+                  (with-temp-buffer
+                    (setq-local process-environment env)
+                    (setq-local exec-path path)
+                    (let ((retcode
+                           (process-file
+                            "cargo" nil (list (current-buffer) nil) nil
+                            "metadata" "--format-version" "1")))
+                      (when (/= retcode 0)
+                        (error "Cargo metadata --format-version 1 returned %s: %s"
+                               retcode (buffer-string)))
+                      (goto-char 0)
+                      (let ((metadata (json-parse-buffer
+                                       :object-type 'alist
+                                       :array-type 'list)))
+                        (cdr (assq 'edition
+                                   (--first
+                                    (string= (cdr (assq 'manifest_path it))
+                                             manifest-path)
+                                    (cdr (assq 'packages metadata)))))))))))
+
+  :hook
+  (rust-ts-mode . my/rust-set-edition))
 #+end_src
 
 
@@ -1867,40 +1899,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 (use-package cargo
   :straight t
   :delight cargo-minor-mode
-  :hook (rust-mode . cargo-minor-mode))
-#+end_src
-
-https://github.com/radian-software/apheleia/issues/278
-
-#+begin_src emacs-lisp
-(add-hook 'rust-mode-hook
-          (lambda ()
-            (when-let*
-                ((cratedir
-                  (locate-dominating-file default-directory
-                                          "Cargo.toml"))
-                 (manifest-path
-                  (expand-file-name "Cargo.toml" cratedir))
-                 (env process-environment)
-                 (path exec-path))
-              (setq-local rust-edition
-                          (with-temp-buffer
-                            (setq-local process-environment env)
-                            (setq-local exec-path path)
-                            (let ((retcode
-                                   (process-file
-                                    rust-cargo-bin nil (list (current-buffer) nil) nil
-                                    "metadata" "--format-version" "1")))
-                              (when (/= retcode 0)
-                                (error "Cargo metadata --format-version 1 returned %s: %s"
-                                       retcode (buffer-string)))
-                              (goto-char 0)
-                              (let ((metadata (json-parse-buffer
-                                               :object-type 'alist
-                                               :array-type 'list)))
-                                (cdr (assq 'edition
-                                           (--first (string= (cdr (assq 'manifest_path it)) manifest-path)
-                                                    (cdr (assq 'packages metadata))))))))))))
+  :hook (rust-ts-mode . cargo-minor-mode))
 #+end_src
 
 
@@ -2283,7 +2282,7 @@ Instances of the macro
   (consult-filter-macro "Lua" '(lua-mode lua-ts-mode) ?l)
   (consult-filter-macro "Org" '(org-mode) ?o)
   (consult-filter-macro "Python" '(python-mode python-ts-mode) ?p)
-  (consult-filter-macro "Rust" '(rust-mode rust-ts-mode) ?r)
+  (consult-filter-macro "Rust" '(rust-ts-mode) ?r)
   (consult-filter-macro "TeX" '(latex-mode LaTeX-mode tex-mode TeX-mode) ?t))
 #+end_src
 
@@ -2484,7 +2483,7 @@ maybe: https://github.com/casouri/eldoc-box
   (add-to-list 'eglot-server-programs '(latex-mode . ("texlab")))
   (add-to-list 'eglot-server-programs '((nix-mode nix-ts-mode) . ("nil")))
   (add-to-list 'eglot-server-programs '((python-mode python-ts-mode) . ("ty" "server")))
-  (add-to-list 'eglot-server-programs '((rust-ts-mode rust-mode) .
+  (add-to-list 'eglot-server-programs '(rust-ts-mode .
                                         ("rust-analyzer"
                                          :initializationOptions (:check (:command "clippy")))))
   (add-to-list 'eglot-server-programs '((toml-ts-mode conf-toml-mode) .
