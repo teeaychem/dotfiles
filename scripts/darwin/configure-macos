@@ -1,14 +1,116 @@
 #!/bin/sh
 
 # Apply preferred macOS user defaults.
+#
+# Usage:
+#   configure-macos [--restart]
+#   configure-macos --suggestions
+#
+# --restart restarts Finder and Dock so their settings take effect immediately.
 
 set -eu
+
+usage() {
+    printf '%s\n' \
+        "Usage: ${0##*/} [--restart]" \
+        "       ${0##*/} --suggestions"
+}
+
+suggestions() {
+    printf '%s\n' \
+        'Suggestions:' \
+        '  - If accessibility defaults fail, grant your terminal Full Disk Access under System Settings > Privacy & Security, then restart the terminal.' \
+        '  - Use --restart to refresh Finder, Dock, and menu-bar settings.' \
+        '  - Some preferences may still require logging out or restarting macOS.' \
+        '  - Use dq PATH to remove quarantine metadata from a trusted item.'
+}
+
+set_default() {
+    if ! error=$(defaults "$@" 2>&1); then
+        printf 'Warning: defaults %s failed: %s\n' "$*" "$error" >&2
+        defaults_failed=true
+    fi
+}
+
+restart=false
+defaults_failed=false
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --restart)
+            restart=true
+            ;;
+        --suggestions)
+            suggestions
+            exit
+            ;;
+        -h | --help)
+            usage
+            exit
+            ;;
+        *)
+            usage >&2
+            exit 2
+            ;;
+    esac
+    shift
+done
 
 if [ "$(uname -s)" != Darwin ]; then
     printf '%s\n' 'configure-macos: macOS is required' >&2
     exit 1
 fi
 
-defaults -currentHost write -g AppleFontSmoothing -int 0
-defaults write com.apple.LaunchServices LSQuarantine -bool false
-defaults write com.apple.finder AppleShowAllFiles -bool true
+# Appearance and locale.
+set_default -currentHost write -g AppleFontSmoothing -int 0
+set_default write -g AppleICUForce24HourTime -bool true
+set_default write -g AppleShowAllExtensions -bool true
+set_default write -g AppleShowScrollBars -string Always
+set_default write com.apple.universalaccess reduceMotion -bool true
+set_default write com.apple.universalaccess reduceTransparency -bool true
+
+# Text input.
+set_default write -g NSAutomaticCapitalizationEnabled -bool false
+set_default write -g NSAutomaticDashSubstitutionEnabled -bool false                    # keep typed hyphens
+set_default write -g NSAutomaticInlinePredictionEnabled -bool false                    # no inline suggestions
+set_default write -g NSAutomaticPeriodSubstitutionEnabled -bool false                  # no double-space periods
+set_default write -g NSAutomaticQuoteSubstitutionEnabled -bool false                   # keep straight quotes
+set_default write -g NSAutomaticSpellingCorrectionEnabled -bool false                  # no silent corrections
+set_default write kCFPreferencesAnyApplication TSMLanguageIndicatorEnabled -bool false # hide the language bubble
+
+# Windows and file dialogs.
+set_default write -g NSAutomaticWindowAnimationsEnabled -bool false # open windows promptly
+set_default write -g NSDocumentSaveNewDocumentsToCloud -bool false  # save locally by default
+set_default write -g NSNavPanelExpandedStateForSaveMode -bool true  # expand save dialogs
+set_default write -g NSNavPanelExpandedStateForSaveMode2 -bool true # same for newer dialogs
+
+# Finder and Dock.
+set_default write com.apple.finder AppleShowAllFiles -bool true       # include hidden files
+set_default write com.apple.finder ShowPathbar -bool true             # show the current path
+set_default write com.apple.finder ShowStatusBar -bool true           # show counts and free space
+set_default write com.apple.finder _FXShowPosixPathInTitle -bool true # put the full path in titles
+set_default write com.apple.finder FXDefaultSearchScope -string SCcf  # search the current folder
+set_default write com.apple.dock autohide -bool true                  # keep the Dock out of the way
+set_default write com.apple.dock show-recents -bool false             # skip recent apps
+
+# Avoid metadata files on removable and network volumes.
+set_default write com.apple.desktopservices DSDontWriteNetworkStores -bool true # no network .DS_Store
+set_default write com.apple.desktopservices DSDontWriteUSBStores -bool true     # no USB .DS_Store
+
+# Restore the system quarantine policy; use dq for explicit exceptions.
+defaults delete com.apple.LaunchServices LSQuarantine 2>/dev/null || true
+
+if [ "$restart" = true ]; then
+    killall Finder 2>/dev/null || true
+    killall Dock 2>/dev/null || true
+    killall SystemUIServer 2>/dev/null || true
+fi
+
+if [ "$defaults_failed" = true ]; then
+    printf '%s\n' \
+        'Applied macOS user defaults with warnings.' \
+        "Run ${0##*/} --suggestions for possible fixes." >&2
+    exit 1
+fi
+
+printf '%s\n' 'Applied macOS user defaults.'
