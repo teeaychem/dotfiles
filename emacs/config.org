@@ -452,6 +452,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package editorconfig
+  :straight nil
   :delight
   :config
   (editorconfig-mode 1))
@@ -471,7 +472,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package eldoc
-  :straight t
+  :straight nil
   :demand t
   :delight eldoc-mode
 
@@ -717,6 +718,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package which-key
+  :straight nil
   :delight which-key-mode
 
   :init
@@ -758,7 +760,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp :result silent
 (use-package flymake
-  :straight t
+  :straight nil
   :init
   (setq python-flymake-command '("ruff" "--quiet" "--stdin-filename=stdin" "-"))
   (setq rust-ts-flymake-command '("cargo" "check" "-"))
@@ -923,7 +925,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (setf (alist-get 'racket-mode apheleia-mode-alist) '(raco-fmt))
 
   (push '(taplo . ("taplo" "format")) apheleia-formatters)
-  (setf (alist-get 'toml-mode apheleia-mode-alist) '(taplo))
+  (setf (alist-get 'toml-ts-mode apheleia-mode-alist) '(taplo))
 
   ;; https://github.com/radian-software/apheleia/issues/278
   (setf (alist-get 'rustfmt apheleia-formatters)
@@ -1326,7 +1328,25 @@ To highlight indentations
   (rg-default-alias-fallback "all"))
 #+end_src
 
-** undo and redo
+** ws-butler
+
+#+begin_src emacs-lisp
+(use-package ws-butler
+  :straight (ws-butler :type git :host github :repo "lewang/ws-butler" :branch "master")
+  :delight ws-butler-mode
+
+  :custom
+  (ws-butler-keep-whitespace-before-point nil)
+
+  :hook
+  (((org-mode prog-mode text-mode) . ws-butler-mode)))
+#+end_src
+
+
+
+* undo and redo
+
+** undo-fu
 
 #+begin_src emacs-lisp
 (use-package undo-fu
@@ -1341,6 +1361,8 @@ To highlight indentations
          ("C-?" . undo-fu-only-redo)))
 #+end_src
 
+** undo-fu-session
+
 #+begin_src emacs-lisp
 (use-package undo-fu-session
   :straight t
@@ -1350,6 +1372,8 @@ To highlight indentations
 
   :hook (after-init . undo-fu-session-global-mode))
 #+end_src
+
+** vundo
 
 #+begin_src emacs-lisp
 (use-package vundo
@@ -1876,8 +1900,8 @@ https://github.com/radian-software/apheleia/issues/278
 ** json
 
 #+begin_src emacs-lisp
-(use-package json-mode
-  :straight t
+(use-package json-ts-mode
+  :straight nil
   :mode ("\\.json\\'" . json-ts-mode))
 #+end_src
 
@@ -1917,17 +1941,17 @@ https://github.com/radian-software/apheleia/issues/278
 ** toml
 
 #+begin_src emacs-lisp
-(use-package toml-mode
-  :straight t
-  :mode "\\.toml\\'")
+(use-package toml-ts-mode
+  :straight nil
+  :mode ("\\.toml\\'" . toml-ts-mode))
 #+end_src
 
 ** yaml
 
 #+begin_src emacs-lisp
-(use-package yaml-mode
-  :straight t
-  :mode "\\.ya?ml\\'")
+(use-package yaml-ts-mode
+  :straight nil
+  :mode ("\\.ya?ml\\'" . yaml-ts-mode))
 #+end_src
 
 
@@ -2408,7 +2432,7 @@ maybe: https://github.com/casouri/eldoc-box
 
 #+begin_src emacs-lisp
 (use-package eglot
-  :straight t
+  :straight nil
   ;; :pin manual
 
   :custom
@@ -2452,7 +2476,7 @@ maybe: https://github.com/casouri/eldoc-box
   (add-to-list 'eglot-server-programs '((rust-ts-mode rust-mode) .
                                         ("rust-analyzer"
                                          :initializationOptions (:check (:command "clippy")))))
-  (add-to-list 'eglot-server-programs '((toml-mode toml-ts-mode conf-toml-mode) .
+  (add-to-list 'eglot-server-programs '((toml-ts-mode conf-toml-mode) .
                                         ("taplo" "lsp" "stdio")))
 
   (add-to-list 'eglot-server-programs `(mlir-mode . my-eglot-strict-mlir))
