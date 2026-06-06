@@ -1275,6 +1275,8 @@ To highlight indentations
 
   :bind (("C-S-." . mc/mark-next-like-this)
          ("C-S-," . mc/mark-previous-like-this)
+         ("C-S-;" . mc/skip-to-next-like-this)
+         ("C-S-:" . mc/unmark-next-like-this)
          ("C-c C-S-." . mc/mark-all-like-this)
          ("C-c C-SPC" . mc/edit-lines)
          ("M-<M-down-mouse-1>" . mc/add-cursor-on-click)))
@@ -1335,6 +1337,7 @@ To highlight indentations
   :straight t
 
   :bind (:map search-prefix-map
+              ("l" . rg-list-searches)
               ("m" . rg-menu))
 
   :config
@@ -1405,19 +1408,6 @@ To highlight indentations
   :bind ("C-x u" . vundo))
 #+end_src
 
-** ws-butler
-
-#+begin_src emacs-lisp
-(use-package ws-butler
-  :straight (ws-butler :type git :host github :repo "lewang/ws-butler" :branch "master")
-  :delight ws-butler-mode
-
-  :custom
-  (ws-butler-keep-whitespace-before-point nil)
-
-  :hook
-  (((org-mode prog-mode text-mode) . ws-butler-mode)))
-#+end_src
 
 
 * vc
@@ -2189,6 +2179,7 @@ https://github.com/radian-software/apheleia/issues/278
     :map goto-prefix-map
         ("b" . consult-bookmark)
         ("e" . consult-compile-error)
+        ("f" . consult-flymake)
         ("g" . consult-goto-line)             ;; orig. goto-line
         ("i" . consult-imenu)
         ("I" . consult-imenu-multi)
