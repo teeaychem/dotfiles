@@ -460,31 +460,82 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package eldoc
   :straight t
+  :demand t
   :delight eldoc-mode
+
+  :preface
+  (defvar my/eldoc-window-side 'bottom
+    "Side on which to display the Eldoc documentation window.")
+
+  (defun my/eldoc-display-buffer (buffer alist)
+    "Display Eldoc BUFFER according to `my/eldoc-window-side'."
+    (or (display-buffer-reuse-window buffer alist)
+        (let ((window-sides-vertical nil))
+          (display-buffer-in-side-window
+           buffer
+           (append `((side . ,my/eldoc-window-side)
+                     (slot . 0))
+                   (if (eq my/eldoc-window-side 'bottom)
+                       '((window-height . 8))
+                     '((window-width . 80)))
+                   alist)))))
+
+  (defun my/eldoc-promote-flymake ()
+    "Give Flymake diagnostics priority when Flymake provides Eldoc."
+    (when (memq #'flymake-eldoc-function eldoc-documentation-functions)
+      (setq-local eldoc-documentation-functions
+                  (cons #'flymake-eldoc-function
+                        (remove #'flymake-eldoc-function
+                                eldoc-documentation-functions)))))
+
+  (defun my/elisp-eldoc-symbol-documentation (callback &rest _)
+    "Report full documentation for the Emacs Lisp symbol at point."
+    (when-let* ((symbol (symbol-at-point))
+                (doc (cond
+                      ((fboundp symbol) (documentation symbol t))
+                      ((boundp symbol)
+                       (documentation-property
+                        symbol 'variable-documentation t)))))
+      (funcall callback doc
+               :thing (symbol-name symbol)
+               :echo 'skip)
+      t))
+
+  (defun my/elisp-eldoc-setup ()
+    "Add full symbol documentation to Emacs Lisp Eldoc."
+    (setq-local eldoc-documentation-strategy
+                #'eldoc-documentation-compose)
+    (add-hook 'eldoc-documentation-functions
+              #'my/elisp-eldoc-symbol-documentation t t))
+
+  (defun my/eldoc-quit-doc-buffer ()
+    "Close the displayed Eldoc documentation window."
+    (interactive)
+    (when-let ((window (get-buffer-window "*eldoc*" t)))
+      (quit-window nil window)))
+
+  (defun my/eldoc-toggle-window-side ()
+    "Toggle the Eldoc window between the bottom and right side."
+    (interactive)
+    (setq my/eldoc-window-side
+          (if (eq my/eldoc-window-side 'bottom) 'right 'bottom))
+    (when-let ((buffer (get-buffer "*eldoc*")))
+      (when-let ((window (get-buffer-window buffer t)))
+        (delete-window window))
+      (display-buffer buffer))
+    (message "Eldoc window: %s" my/eldoc-window-side))
 
   :init
   (add-to-list 'display-buffer-alist
-               '("\\*eldoc*" (display-buffer-at-bottom) (window-height . 8)))
+               '("\\*eldoc\\*"
+                 my/eldoc-display-buffer))
 
   :config
-  ;; Try to ensure flymake errors come before any other eldoc messages
-  (defun eldoc-promote-flymake ()
-    (setq eldoc-documentation-functions
-          (cons #'flymake-eldoc-function
-                (remove #'flymake-eldoc-function eldoc-documentation-functions))))
-
-
-
-  (defun quit-eldoc-buffer (args)
-    (interactive "P")
-    (when (get-buffer "*eldoc*")
-      (progn
-        (quit-restore-window (get-buffer-window "*eldoc*")))))
-
-
   (global-eldoc-mode 1)
 
   :custom
+  (eldoc-idle-delay 0.2)
+  (eldoc-echo-area-display-truncation-message nil)
   (eldoc-echo-area-prefer-doc-buffer t)
   (eldoc-echo-area-use-multiline-p 1)
   (eldoc-documentation-strategy #'eldoc-documentation-compose)
@@ -494,10 +545,12 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
                      ("d" . #'eldoc)
                      ("b" . #'eldoc-doc-buffer)
                      ("t" . #'eldoc-print-current-symbol-info)
-                     ("q" . #'quit-eldoc-buffer))
+                     ("q" . #'my/eldoc-quit-doc-buffer)
+                     ("w" . #'my/eldoc-toggle-window-side))
 
   :hook
-  (eldoc-mode-hook . eldoc-promote-flymake))
+  (emacs-lisp-mode . my/elisp-eldoc-setup)
+  ((flymake-mode eglot-managed-mode) . my/eldoc-promote-flymake))
 #+end_src
 
 ** elec-pair
@@ -1904,6 +1957,7 @@ https://github.com/radian-software/apheleia/issues/278
   (org-src-fontify-natively t)
   (org-src-preserve-indentation t)
   (org-src-tab-acts-natively t)
+  (org-src-window-setup 'current-window)
 
   (org-startup-truncated nil) ;; wrap lines on startup
 
@@ -2462,11 +2516,7 @@ maybe: https://github.com/casouri/eldoc-box
 
   :custom-face
   (eglot-highlight-symbol-face ((t (:bold nil  :underline (:style dots :position nil)))))
-  (eglot-diagnostic-tag-unnecessary-face ((t (:inherit f  :underline (:color "#7cb6cb" :style wave :position nil)))))
-
-  :hook
-  ;; ;; ((…-mode) . eglot-ensure)
-  ((eglot-managed-mode . eldoc-promote-flymake)))
+  (eglot-diagnostic-tag-unnecessary-face ((t (:inherit f  :underline (:color "#7cb6cb" :style wave :position nil))))))
 #+end_src
 
 ** eglot-x
