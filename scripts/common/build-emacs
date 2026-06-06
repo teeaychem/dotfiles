@@ -11,6 +11,8 @@
 # GUI backends and desktop integration are disabled. TLS, XML, SQLite, dynamic
 # modules, Tree-sitter, native compilation, threads, and file notifications are
 # required so configure fails early when a useful dependency is missing.
+# Use --install-deps to install these build dependencies before building.
+# This uses Homebrew on macOS and apt-get on Ubuntu.
 #
 # Environment:
 #   PREFIX  Installation prefix (default: ~/.local)
@@ -18,19 +20,23 @@
 #   CFLAGS  Optional compiler flags (default: Emacs configure defaults)
 #
 # Usage:
-#   build-emacs [--bootstrap] [--aot]
+#   build-emacs [--install-deps] [--bootstrap] [--aot]
 
 set -eu
 
 usage() {
-    printf 'Usage: %s [--bootstrap] [--aot]\n' "${0##*/}"
+    printf 'Usage: %s [--install-deps] [--bootstrap] [--aot]\n' "${0##*/}"
 }
 
+install_deps=false
 make_target=
 native_compilation=yes
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
+        --install-deps|--install-dependencies)
+            install_deps=true
+            ;;
         --bootstrap)
             make_target=bootstrap
             ;;
@@ -48,6 +54,67 @@ while [ "$#" -gt 0 ]; do
     esac
     shift
 done
+
+install_dependencies() {
+    case "$(uname -s)" in
+        Darwin)
+            if ! command -v brew >/dev/null 2>&1; then
+                printf '%s\n' \
+                    "Homebrew is required to install build dependencies." >&2
+                exit 1
+            fi
+
+            brew install \
+                autoconf \
+                automake \
+                gnutls \
+                libgccjit \
+                pkg-config \
+                texinfo \
+                tree-sitter
+            ;;
+        Linux)
+            if [ ! -r /etc/os-release ] ||
+                ! grep -Eq '^ID="?ubuntu"?$' /etc/os-release; then
+                printf '%s\n' \
+                    "Automatic dependency installation supports Ubuntu only." >&2
+                exit 1
+            fi
+
+            sudo apt-get update
+            libgccjit_dev=$(
+                apt-cache search '^libgccjit-[0-9]+-dev$' |
+                    awk '{ print $1 }' |
+                    sort -V |
+                    tail -n 1
+            )
+
+            if [ -z "$libgccjit_dev" ]; then
+                printf '%s\n' \
+                    "No libgccjit development package is available." >&2
+                exit 1
+            fi
+
+            sudo apt-get install -y \
+                autoconf \
+                automake \
+                build-essential \
+                "$libgccjit_dev" \
+                libgnutls28-dev \
+                libncurses-dev \
+                libsqlite3-dev \
+                libtree-sitter-dev \
+                libxml2-dev \
+                pkg-config \
+                texinfo \
+                zlib1g-dev
+            ;;
+        *)
+            printf 'Unsupported operating system: %s\n' "$(uname -s)" >&2
+            exit 1
+            ;;
+    esac
+}
 
 if [ ! -f configure.ac ]; then
     printf '%s\n' "Run ${0##*/} from the root of an Emacs source tree." >&2
@@ -72,6 +139,10 @@ case "$emacs_major" in
         fi
         ;;
 esac
+
+if [ "$install_deps" = true ]; then
+    install_dependencies
+fi
 
 if [ ! -x ./configure ]; then
     ./autogen.sh
