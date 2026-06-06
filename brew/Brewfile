@@ -1,11 +1,9 @@
 # # Taps
 
-# tap "d12frosted/emacs-plus"
 tap "kgarner7/feishin"
 
 # # Brews
 
-# brew "emacs-plus" # alt. cash "emacs-plus-app"
 brew "bat"
 brew "bitwise"
 brew "cmake"
@@ -77,7 +75,6 @@ brew "taplo"
 brew "z3"
 
 # libs
-brew "libgccjit"
 brew "openblas"
 
 # # Casks
