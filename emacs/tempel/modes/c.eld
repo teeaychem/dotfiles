@@ -1,4 +1,4 @@
-c-mode c-ts-base-mode
+c-ts-base-mode
 
 (dereference "->")
 (reference "&")

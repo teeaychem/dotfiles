@@ -1,4 +1,4 @@
-c++-mode c++-ts-mode
+c++-ts-mode
 
 (amain "
 using namespace std;

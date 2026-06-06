@@ -1496,43 +1496,39 @@ To highlight indentations
 ** C/++
 
 #+begin_src emacs-lisp
-(use-package cc-mode
-  :straight nil
-
-  :custom
-  (c-default-style '((c++-mode . "linux")
-                     (c-mode . "linux")
-                     (other . "gnu"))))
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package c++-mode
-  :straight nil
-
-  :mode (("\\.\\(?:C\\|H\\|cc\\|hh\\|cpp\\|hpp\\|cxx\\|hxx\\|c++\\|h++\\|ipp\\|ixx\\|cppm\\)\\'" . c++-mode)
-         ("\\.\\(?:cc\\|cpp\\|cxx\\|h\\|hh\\|hpp\\|hxx\\)\\.inc\\'" . c++-mode)
-         ("\\.inc\\'" . c++-mode)
-         ("\\.def\\'" . c++-mode))
-
-  :bind (:map c++-mode-map
-              ("C-c h" . ff-find-other-file-other-window)
-              ("C-c C-o" . nil))
-
-  :custom
-  (c-doc-comment-style '((c++-mode . doxygen))))
-#+end_src
-
-c-ts-mode is shared by both c and c++
-
-#+begin_src emacs-lisp
 (use-package c-ts-mode
   :straight nil
 
-  :bind ((:map c++-ts-mode-map
-               ("C-c h" . ff-find-other-file-other-window)
-               ("C-c C-o" . nil))
-         (:map c-ts-mode-map
-               ("C-c h" . ff-find-other-file-other-window)))
+  :init
+  (defvar-keymap c-family-prefix-map
+    :doc "Common C and C++ commands."
+    "f" #'apheleia-format-buffer
+    "t" #'tempel-insert)
+
+  (defvar-keymap c-family-build-prefix-map
+    :doc "C and C++ build commands."
+    "c" #'compile
+    "p" #'project-compile
+    "r" #'recompile)
+  (keymap-set c-family-prefix-map "b" c-family-build-prefix-map)
+
+  (defvar-keymap c-family-file-prefix-map
+    :doc "C and C++ counterpart file commands."
+    "f" #'ff-find-other-file
+    "o" #'ff-find-other-file-other-window)
+  (keymap-set c-family-prefix-map "o" c-family-file-prefix-map)
+
+  :mode (("\\.c\\'" . c-ts-mode)
+         ("\\.\\(?:H\\|cc\\|hh\\|cpp\\|hpp\\|cxx\\|hxx\\|c\\+\\+\\|h\\+\\+\\|ipp\\|ixx\\|cppm\\)\\'" . c++-ts-mode)
+         ("\\.\\(?:cc\\|cpp\\|cxx\\|h\\|hh\\|hpp\\|hxx\\)\\.inc\\'" . c++-ts-mode)
+         ("\\.inc\\'" . c++-ts-mode)
+         ("\\.def\\'" . c++-ts-mode))
+
+  :bind ((:map c-ts-base-mode-map
+               ("C-c m" . c-family-prefix-map)
+               ("C-c h" . ff-find-other-file-other-window))
+         (:map c++-ts-mode-map
+               ("C-c C-o" . nil)))
 
   :custom
   (c-ts-mode-indent-style 'linux))
@@ -2214,7 +2210,7 @@ Instances of the macro
 
 #+begin_src emacs-lisp
 (with-eval-after-load 'consult
-  (consult-filter-macro "C/pp" '(c-mode c++-mode c-ts-mode c++-ts-mode cmake-mode cmake-ts-mode) ?c)
+  (consult-filter-macro "C/pp" '(c-ts-mode c++-ts-mode cmake-mode cmake-ts-mode) ?c)
   (consult-filter-macro "Lua" '(lua-mode lua-ts-mode) ?l)
   (consult-filter-macro "Org" '(org-mode) ?o)
   (consult-filter-macro "Python" '(python-mode python-ts-mode) ?p)
@@ -2396,7 +2392,7 @@ maybe: https://github.com/casouri/eldoc-box
   ;; (add-to-list 'eglot-stay-out-of 'flymake)
   (let ((clangd-jobs (or (getenv "CLANGD_JOBS") "4")))
     (add-to-list 'eglot-server-programs
-                 `((c-mode c-ts-mode c++-mode c++-ts-mode) .
+                 `((c-ts-mode c++-ts-mode) .
                    ("clangd"
                     "--query-driver=/**/*"
                     "--background-index"
@@ -2653,8 +2649,8 @@ https://github.com/renzmann/treesit-auto
   ((conf-mode prog-mode text-mode) . tempel-setup-capf)
   (eglot-managed-mode . tempel-setup-capf)
   (c-ts-base-mode . (lambda ()
-                      (tempel-key "C-c c ." dereference c-ts-mode-map)
-                      (tempel-key "C-c c >" reference   c-ts-mode-map))))
+                      (tempel-key "C-c c ." dereference c-ts-base-mode-map)
+                      (tempel-key "C-c c >" reference   c-ts-base-mode-map))))
 #+end_src
 
 
@@ -2722,7 +2718,7 @@ https://github.com/renzmann/treesit-auto
 ;;                             (message command)
 ;;                             (unless (>= version 14.1)
 ;;                               (user-error "Requires gdb version >= 14.1"))))
-;;      modes (c-mode c-ts-mode c++-mode c++-ts-mode)
+;;      modes (c-ts-mode c++-ts-mode)
 ;;      command-cwd dape-command-cwd
 ;;      command "gdb"
 ;;      command-args ("--interpreter=dap")
