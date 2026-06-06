@@ -517,7 +517,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (after-init . recentf-mode)
 
   :custom
-  (recentf-auto-cleanup (if (daemonp) 300 'never))
+  (recentf-auto-cleanup 300) ;; Removes duplicates, excluded paths, and files that no longer exist.
+  (recentf-max-saved-items 200)
   (recentf-exclude `(,(regexp-quote (expand-file-name package-user-dir))
                      ":" ;; tramp
                      ".cache"
