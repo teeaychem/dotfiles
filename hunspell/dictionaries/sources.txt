@@ -1,5 +1,12 @@
-http://wordlist.aspell.net/dicts/
+https://wordlist.aspell.net/dicts/
 
 https://github.com/en-wl/wordlist
 
-en_GB, large
+en_GB and en_US, large
+
+Install or update with:
+
+    install-hunspell-dictionary
+
+The generated dictionary is installed under XDG_DATA_HOME. This directory
+contains only the tracked personal dictionary and source notes.

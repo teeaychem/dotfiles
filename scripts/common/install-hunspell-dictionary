@@ -1,0 +1,102 @@
+#!/bin/sh
+
+# Download and install the latest en_GB-large and en_US-large dictionaries.
+#
+# The upstream files are installed under their conventional en_GB and en_US
+# names. The personal dictionary is left untouched.
+#
+# Environment:
+#   DICPATH  Dictionary directory
+#            (default: ${XDG_DATA_HOME:-~/.local/share}/hunspell)
+
+set -eu
+
+repository=https://github.com/en-wl/wordlist
+destination="${DICPATH:-${XDG_DATA_HOME:-$HOME/.local/share}/hunspell}"
+
+latest_url=$(
+    curl -fsSLo /dev/null -w '%{url_effective}\n' "$repository/releases/latest"
+)
+tag=${latest_url##*/}
+
+case "$tag" in
+    rel-[0-9]*)
+        version=${tag#rel-}
+        ;;
+    *)
+        printf 'Could not determine the latest dictionary release from %s.\n' \
+            "$latest_url" >&2
+        exit 1
+        ;;
+esac
+
+release_url="$repository/releases/download/$tag"
+temporary_directory=$(mktemp -d "${TMPDIR:-/tmp}/install-hunspell.XXXXXXXX")
+
+cleanup() {
+    rm -rf "$temporary_directory"
+    rm -f "$destination"/.*".$$"
+}
+trap cleanup EXIT HUP INT TERM
+
+install_dictionary() {
+    dictionary=$1
+    installed_name=$2
+    archive="hunspell-$dictionary-$version.zip"
+    extraction_directory="$temporary_directory/$dictionary"
+    mkdir "$extraction_directory"
+
+    printf 'Downloading %s %s...\n' "$dictionary" "$version"
+    curl -fsSL "$release_url/$archive" -o "$temporary_directory/$archive"
+    unzip -qt "$temporary_directory/$archive" >/dev/null
+    unzip -q "$temporary_directory/$archive" -d "$extraction_directory"
+
+    affix_file="$extraction_directory/$dictionary.aff"
+    dictionary_file="$extraction_directory/$dictionary.dic"
+    readme_file="$extraction_directory/README_$dictionary.txt"
+
+    for file in "$affix_file" "$dictionary_file" "$readme_file"; do
+        if [ ! -s "$file" ]; then
+            printf 'The release archive is missing %s.\n' "${file##*/}" >&2
+            exit 1
+        fi
+    done
+
+    expected_entries=$(sed -n '1p' "$dictionary_file")
+    actual_entries=$(($(wc -l <"$dictionary_file") - 1))
+
+    case "$expected_entries" in
+        "" | *[!0-9]*)
+            printf 'Invalid dictionary entry count: %s\n' "$expected_entries" >&2
+            exit 1
+            ;;
+    esac
+
+    if [ "$actual_entries" -ne "$expected_entries" ]; then
+        printf '%s contains %s entries; expected %s.\n' \
+            "$dictionary" "$actual_entries" "$expected_entries" >&2
+        exit 1
+    fi
+
+    if command -v hunspell >/dev/null 2>&1; then
+        DICPATH=$extraction_directory hunspell -d "$dictionary" -l </dev/null
+    fi
+
+    temporary_affix="$destination/.$installed_name.aff.$$"
+    temporary_dictionary="$destination/.$installed_name.dic.$$"
+    temporary_readme="$destination/.README_$dictionary.txt.$$"
+
+    install -m 0644 "$affix_file" "$temporary_affix"
+    install -m 0644 "$dictionary_file" "$temporary_dictionary"
+    install -m 0644 "$readme_file" "$temporary_readme"
+
+    mv -f "$temporary_affix" "$destination/$installed_name.aff"
+    mv -f "$temporary_dictionary" "$destination/$installed_name.dic"
+    mv -f "$temporary_readme" "$destination/README_$dictionary.txt"
+}
+
+mkdir -p "$destination"
+install_dictionary en_GB-large en_GB
+install_dictionary en_US-large en_US
+
+printf 'Installed English dictionaries %s in %s.\n' "$version" "$destination"

@@ -606,7 +606,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   :custom
   (ispell-program-name "hunspell")
-  (ispell-personal-dictionary (concat (getenv "DICPATH") "/hunspell_personal"))
+  (ispell-personal-dictionary
+   (expand-file-name "hunspell/dictionaries/hunspell_personal"
+                     (getenv "XDG_CONFIG_HOME")))
   (ispell-dictionary "en_GB")
 
   :hook
