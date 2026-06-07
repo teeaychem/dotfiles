@@ -1097,6 +1097,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
      "DICPATH"
      "REPOS_DIR"
      "XDG_CONFIG_HOME"
+     "CLANGD_JOBS"
      "LLVM_SRC"
      "MLIR_LSP_SERVER_BIN"
      "MLIR_PDLL_LSP_SERVER_BIN"
