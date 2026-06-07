@@ -88,8 +88,7 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
 
   (minibuffer-prompt-properties '(read-only t
                                             cursor-intangible t
-                                            face minibuffer-prompt))
-  )
+                                            face minibuffer-prompt)))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -189,7 +188,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
    ("C-x k" . #'kill-current-buffer)
    ("C-x K" . #'kill-buffer)
 
-   ;; xref
    ("s-." . #'xref-find-definitions)
    ("M-." . #'xref-find-definitions)
    ("M-s-," . #'xref-go-back)
@@ -1099,8 +1097,10 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
      "DICPATH"
      "REPOS_DIR"
      "XDG_CONFIG_HOME"
+     "LLVM_SRC"
      "MLIR_LSP_SERVER_BIN"
      "MLIR_PDLL_LSP_SERVER_BIN"
+     "PDLL_COMPILATION_DATABASE"
      "TABLEGEN_LSP_SERVER_BIN"
      "TABLEGEN_COMPILATION_DATABASE"))
 
@@ -1691,26 +1691,31 @@ Get the relevant package subdirectories from the llvm source
 *** mlir
 
 #+begin_src emacs-lisp
-(defun my-eglot-strict-mlir (&optional _interactive)
-  (let ((shell-path (getenv "MLIR_LSP_SERVER_BIN")))
-    (if (and shell-path
-             (not (string-empty-p shell-path))
-             (file-executable-p shell-path))
-        (list shell-path)
-      (user-error "Eglot aborted: MLIR_LSP_SERVER_BIN is unset, empty, or points to a non-executable path (%s)"
-                  (or shell-path "Unset")))))
-
-(defun my-eglot-strict-pdll (&optional _interactive)
-  (let ((shell-path (getenv "MLIR_PDLL_LSP_SERVER_BIN")))
-    (if (and shell-path (not (string-empty-p shell-path)) (file-executable-p shell-path))
-        (list shell-path)
-      (user-error "Eglot aborted: MLIR_PDLL_LSP_SERVER_BIN is invalid or missing (%s)" (or shell-path "Unset")))))
-
 (use-package mlir-mode
   :straight nil
   :after exec-path-from-shell
   :mode (("\\.mlir\\'" . mlir-mode)
          ("\\.pdll\\'" . pdll-mode))
+
+  :init
+  (defun my-eglot-strict-mlir (&optional _interactive)
+    "Return the MLIR language-server command from the shell environment."
+    (let ((server-path (getenv "MLIR_LSP_SERVER_BIN")))
+      (unless (file-executable-p server-path)
+        (user-error "Eglot aborted: MLIR_LSP_SERVER_BIN is invalid (%s)"
+                    (or server-path "Unset")))
+      (list server-path)))
+
+  (defun my-eglot-strict-pdll (&optional _interactive)
+    "Return the PDLL language-server command from the shell environment."
+    (let ((server-path (getenv "MLIR_PDLL_LSP_SERVER_BIN"))
+          (db-path (getenv "PDLL_COMPILATION_DATABASE")))
+      (unless (and (file-executable-p server-path)
+                   (file-readable-p db-path))
+        (user-error "Eglot aborted: PDLL server or compilation database is invalid (%s, %s)"
+                    (or server-path "Unset")
+                    (or db-path "Unset")))
+      (list server-path (format "--pdll-compilation-database=%s" db-path))))
 
   :config
   (define-derived-mode pdll-mode mlir-mode "PDLL"))
@@ -1719,28 +1724,22 @@ Get the relevant package subdirectories from the llvm source
 *** tablegen
 
 #+begin_src emacs-lisp
-(defun my-eglot-strict-tablegen (&optional _interactive)
-  "Locate tablegen server and database strictly via shell environment variables."
-  (let ((server-path (getenv "TABLEGEN_LSP_SERVER_BIN"))
-        (db-path     (getenv "TABLEGEN_COMPILATION_DATABASE")))
-
-    ;; 1. Validate the LSP Server binary
-    (unless (and server-path (not (string-empty-p server-path)) (file-executable-p server-path))
-      (user-error "Eglot aborted: TABLEGEN_LSP_SERVER_BIN is unset or not executable (%s)"
-                  (or server-path "Unset")))
-
-    ;; 2. Validate the TableGen Compilation Database file
-    (unless (and db-path (not (string-empty-p db-path)) (file-exists-p db-path))
-      (user-error "Eglot aborted: TABLEGEN_COMPILATION_DATABASE file is missing or empty (%s)"
-                  (or db-path "Unset")))
-
-    ;; 3. Return the fully formed command array with the formatted flag
-    (list server-path (format "--tablegen-compilation-database=%s" db-path))))
-
 (use-package tablegen-mode
   :straight nil
   :after exec-path-from-shell
-  :mode "\\.td\\'")
+  :mode "\\.td\\'"
+
+  :init
+  (defun my-eglot-strict-tablegen (&optional _interactive)
+    "Return the TableGen language-server command from the shell environment."
+    (let ((server-path (getenv "TABLEGEN_LSP_SERVER_BIN"))
+          (db-path (getenv "TABLEGEN_COMPILATION_DATABASE")))
+      (unless (and (file-executable-p server-path)
+                   (file-readable-p db-path))
+        (user-error "Eglot aborted: TableGen server or compilation database is invalid (%s, %s)"
+                    (or server-path "Unset")
+                    (or db-path "Unset")))
+      (list server-path (format "--tablegen-compilation-database=%s" db-path)))))
 #+end_src
 
 *** llvm
@@ -2464,9 +2463,9 @@ maybe: https://github.com/casouri/eldoc-box
   (add-to-list 'eglot-server-programs '((toml-ts-mode conf-toml-mode) .
                                         ("taplo" "lsp" "stdio")))
 
-  (add-to-list 'eglot-server-programs `(mlir-mode . my-eglot-strict-mlir))
+  (add-to-list 'eglot-server-programs `((mlir-mode :language-id "mlir") . my-eglot-strict-mlir))
   (add-to-list 'eglot-server-programs `((pdll-mode :language-id "pdll") . my-eglot-strict-pdll))
-  (add-to-list 'eglot-server-programs `(tablegen-mode . my-eglot-strict-tablegen))
+  (add-to-list 'eglot-server-programs `((tablegen-mode :language-id "tablegen") . my-eglot-strict-tablegen))
 
   :bind (("C-c l l" . eglot)
          :map eglot-mode-map
