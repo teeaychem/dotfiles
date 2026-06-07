@@ -1,17 +1,8 @@
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
-path_add "${XDG_CONFIG_HOME}/scripts/darwin"
-
-# llvm
-path_add "/opt/homebrew/opt/llvm/bin/" "append"
-
 # export LDFLAGS="-L/opt/homebrew/opt/llvm/lib -L/opt/homebrew/opt/llvm/lib/c++ -L/opt/homebrew/opt/llvm/lib/unwind -lunwind"
 # export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
 # export CMAKE_PREFIX_PATH="/opt/homebrew/opt/llvm"
-
-path_add "/usr/local/texlive/2026basic/bin/universal-darwin/" "prepend"
-path_add "${HOME}/.local/bin/" "prepend"
-path_add "${HOME}/.local/opt/elan/bin/" "prepend"
 
 export HOMEBREW_BUNDLE_FILE="${XDG_CONFIG_HOME}/brew/Brewfile"
 export HOMEBREW_NO_AUTO_UPDATE

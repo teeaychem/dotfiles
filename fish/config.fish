@@ -68,8 +68,6 @@ load_vars "$XDG_CONFIG_HOME/envs/base.vars"
 load_env "$XDG_CONFIG_HOME/envs/base.env"
 load_env "$XDG_CONFIG_HOME/envs/local.env"
 
-fish_add_path "$XDG_CONFIG_HOME/scripts/common"
-
 switch (uname)
     case Darwin
         source $__fish_config_dir/darwin.fish
@@ -90,13 +88,14 @@ set -gx EDITOR nvim
 
 # npm / node
 set -gx NPM_CONFIG_USERCONFIG "$XDG_CONFIG_HOME/npm/npmrc"
-fish_add_path "./node_modules/.bin"
 
 # OCaml
 set -gx OPAMROOT "$XDG_DATA_HOME/opam"
 
 # This adds: the correct directories to the PATH, auto-completion for the opam binary
 test -r "$OPAMROOT/opam-init/init.fish" && source "$OPAMROOT/opam-init/init.fish" >/dev/null 2>/dev/null; or true
+
+set -gx PATH (string split : ("$XDG_CONFIG_HOME/scripts/common/path"))
 
 # etc
 

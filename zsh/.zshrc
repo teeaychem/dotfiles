@@ -7,12 +7,6 @@ fi
 source ${ZDOTDIR:-$HOME}/.antidote/antidote.zsh
 antidote load
 
-source ${XDG_CONFIG_HOME}/zsh/utils.sh
-
-# fns
-
-path_add "${XDG_CONFIG_HOME}/scripts/common"
-
 # Path configuration, as macOS executes path_helper *after* sourcing zshenv
 # https://apple.stackexchange.com/questions/432226/homebrew-path-set-in-zshenv-is-overridden
 case "$OSTYPE" in
@@ -30,6 +24,8 @@ case "$OSTYPE" in
     echo "No configuration for: $OSTYPE"
     ;;
 esac
+
+export PATH="$("${XDG_CONFIG_HOME}/scripts/common/path")"
 
 # options
 

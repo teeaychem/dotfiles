@@ -1,0 +1,67 @@
+#!/bin/sh
+
+path=${PATH:-}
+
+path_add() {
+    directory=${1%/}
+    position=${2:-append}
+
+    case "$position" in
+        prepend|append) ;;
+        *)
+            printf 'path: invalid position: %s\n' "$position" >&2
+            return 2
+            ;;
+    esac
+
+    [ -d "$directory" ] || return 0
+
+    remaining=$path
+    path=
+
+    while [ -n "$remaining" ]; do
+        case "$remaining" in
+            *:*)
+                entry=${remaining%%:*}
+                remaining=${remaining#*:}
+                ;;
+            *)
+                entry=$remaining
+                remaining=
+                ;;
+        esac
+
+        [ "$entry" = "$directory" ] ||
+            path="${path:+$path:}$entry"
+    done
+
+    case "$position" in
+        prepend)
+            path="$directory${path:+:$path}"
+            ;;
+        append)
+            path="${path:+$path:}$directory"
+            ;;
+    esac
+}
+
+path_add "${XDG_CONFIG_HOME:-$HOME/.config}/scripts/common" prepend
+path_add "$HOME/.local/opt/emacs/bin" prepend
+path_add "$HOME/.cargo/bin" prepend
+path_add "$HOME/.local/bin" prepend
+path_add "$HOME/.local/opt/elan/bin" prepend
+
+case "$(uname -s)" in
+    Darwin)
+        path_add "/opt/homebrew/sbin" prepend
+        path_add "/opt/homebrew/bin" prepend
+        path_add "${XDG_CONFIG_HOME:-$HOME/.config}/scripts/darwin" prepend
+        path_add "/usr/local/texlive/2026basic/bin/universal-darwin" prepend
+        path_add "/opt/homebrew/opt/llvm/bin" append
+        ;;
+    Linux)
+        :
+        ;;
+esac
+
+printf '%s\n' "$path"
