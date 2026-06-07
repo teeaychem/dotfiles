@@ -95,6 +95,22 @@ function load_aliases
     end < "$aliases_file"
 end
 
+function load_history_ignore
+    set -l ignore_file $argv[1]
+
+    if not test -f "$ignore_file"
+        echo "Error: History ignore file '$ignore_file' does not exist or was not specified." >&2
+        return 1
+    end
+
+    set -g history_ignore_patterns
+
+    while read -l line
+        string match -q -r '^\s*(#|$)' -- "$line"; and continue
+        set -a history_ignore_patterns "$line"
+    end < "$ignore_file"
+end
+
 set -gx XDG_CONFIG_HOME $HOME/.config/
 
 
@@ -105,6 +121,7 @@ load_env "$XDG_CONFIG_HOME/shell/env/base.env"
 load_env "$XDG_CONFIG_HOME/shell/env/local.env"
 
 load_aliases "$XDG_CONFIG_HOME/shell/aliases/base.aliases"
+load_history_ignore "$XDG_CONFIG_HOME/shell/history/ignore"
 
 switch (uname)
     case Darwin
@@ -133,24 +150,8 @@ end
 abbr -a !! --position anywhere --function last_history_item
 
 function fish_should_add_to_history
-    # Ignore base commands safely, accounting for symbols like dashes
-    if string match -qr "^(man|which|ls|cd|z|pkgconf|pkg-config)(\s|\$)" -- $argv
-        return 1
-    end
-
-    # Ignore specific cargo subcommands
-    if string match -qr "^cargo\s+(init)(\s|\$)" -- $argv
-        return 1
-    end
-
-    # Ignore specific git subcommands
-    if string match -qr "^git\s+(add|commit|pop|remove|rename|restore|rm|stash|status|submodule)(\s|\$)" -- $argv
-        return 1
-    end
-
-    # Ignore flags (-v, -V, -h, -H, or --help) at the very end of a line
-    if string match -qr "\s+-{1,2}(v|V|h|H|help)\$" -- $argv
-        return 1
+    for pattern in $history_ignore_patterns
+        string match -qr -- "$pattern" "$argv"; and return 1
     end
 
     return 0

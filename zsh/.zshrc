@@ -55,44 +55,25 @@ setopt share_history # hare command history data, append history and read on eac
 
 setopt EXTENDED_HISTORY # record timestamp of command
 
-local -a history_to_ignore=(
-    'clear(| *)'
-    'date(| *)'
-    'df(| *)'
-    'dirs(| *)'
-    'du(| *)'
-    'echo(| *)'
-    'exit(| *)'
-    'fc(| *)'
-    'git (add|commit|log|reset|restore|rm|status)(| *)'
-    'help(| *)'
-    'history(| *)'
-    'htop(| *)'
-    'info(| *)'
-    'ls(| *)'
-    'll(| *)'
-    'man(| *)'
-    'mkdir(| *)'
-    'open(| *)'
-    'pbcopy(| *)'
-    'pbpaste(| *)'
-    'popd(| *)'
-    'ps(| *)'
-    'pushd(| *)'
-    'pwd(| *)'
-    'rm(| *)'
-    'rmdir(| *)'
-    'time(| *)'
-    'top(| *)'
-    'touch(| *)'
-    'which(| *)'
-)
+typeset -ga history_ignore_patterns
+history_ignore_patterns=()
 
-HISTORY_IGNORE="(${(j:|:)history_to_ignore})"
+while IFS= read -r pattern || [[ -n "$pattern" ]]; do
+    [[ "$pattern" =~ '^[[:space:]]*(#|$)' ]] && continue
+    history_ignore_patterns+=("$pattern")
+done < "$XDG_CONFIG_HOME/shell/history/ignore"
 
 function _ignore_history() {
     emulate -L zsh
-    [[ ${1%%$'\n'} != ${~HISTORY_IGNORE} ]]
+
+    local command="${1%%$'\n'}"
+    local pattern
+
+    for pattern in "${history_ignore_patterns[@]}"; do
+        [[ "$command" =~ "$pattern" ]] && return 1
+    done
+
+    return 0
 }
 
 autoload -Uz add-zsh-hook

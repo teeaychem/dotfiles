@@ -1,0 +1,11 @@
+# Common commands
+^(clear|date|df|dirs|du|echo|exit|fc|help|history|htop|info|ll|ls|man|mkdir|open|pbcopy|pbpaste|popd|ps|pushd|pwd|rm|rmdir|time|top|touch|which|cd|z|pkgconf|pkg-config)([[:space:]]|$)
+
+# Cargo subcommands
+^cargo[[:space:]]+init([[:space:]]|$)
+
+# Git subcommands
+^git[[:space:]]+(add|commit|log|pop|remove|rename|reset|restore|rm|stash|status|submodule)([[:space:]]|$)
+
+# Help and version flags
+[[:space:]]+-{1,2}(v|V|h|H|help)$
