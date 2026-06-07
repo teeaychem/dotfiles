@@ -1,5 +1,20 @@
-# Common commands
-^(clear|date|df|dirs|du|echo|exit|fc|help|history|htop|info|ll|ls|man|mkdir|open|pbcopy|pbpaste|popd|ps|pushd|pwd|rm|rmdir|time|top|touch|which|cd|z|pkgconf|pkg-config)([[:space:]]|$)
+# Navigation
+^(cd|dirs|popd|pushd|pwd|z)([[:space:]]|$)
+
+# Filesystem
+^(df|du|ll|ls|mkdir|rm|rmdir|touch)([[:space:]]|$)
+
+# Information
+^(date|help|history|htop|info|man|ps|time|top|which)([[:space:]]|$)
+
+# Shell utilities
+^(clear|echo|exit|fc)([[:space:]]|$)
+
+# macOS
+^(open|pbcopy|pbpaste)([[:space:]]|$)
+
+# Package metadata
+^(pkgconf|pkg-config)([[:space:]]|$)
 
 # Cargo subcommands
 ^cargo[[:space:]]+init([[:space:]]|$)
