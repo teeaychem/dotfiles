@@ -634,8 +634,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package savehist
   :commands (savehist-mode savehist-save)
-  :hook
-  (after-init . savehist-mode)
+
   :custom
   (savehist-file  (concat user-emacs-directory "var/savehist"))
   (savehist-additional-variables
@@ -647,8 +646,10 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
      register-alist                   ; macros
      search-ring regexp-search-ring
      compile-command))
-  (savehist-autosave-interval 600))
+  (savehist-autosave-interval 600)
 
+  :hook
+  (after-init . savehist-mode))
 #+end_src
 
 ** skeleton
@@ -729,8 +730,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (remote-file-name-inhibit-locks t)
   (tramp-copy-size-limit (* 1024 1024))
   (tramp-use-scp-direct-remote-copying t)
-  (tramp-verbose 2)
-)
+  (tramp-verbose 2))
 #+end_src
 
 ** which-key
@@ -781,8 +781,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (use-package flymake
   :straight nil
   :init
-  (setq python-flymake-command '("ruff" "--quiet" "--stdin-filename=stdin" "-"))
-  (setq rust-ts-flymake-command '("cargo" "check" "-"))
+  (setq python-flymake-command '("ruff" "check" "--quiet" "--output-format=concise"
+                                 "--stdin-filename=stdin" "-"))
+  (setq rust-ts-flymake-command '("clippy-driver" "-"))
 
   (defun flymake-next-error-error (&optional n interactive)
     (interactive (list 1 t))
@@ -974,7 +975,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :straight t
 
   :hook
-  (prog-mode-hook . breadcrumb-local-mode))
+  (prog-mode . breadcrumb-local-mode))
 #+end_src
 
 ** crux
@@ -1364,6 +1365,7 @@ To highlight indentations
 
 * undo and redo
 
+
 ** undo-fu
 
 #+begin_src emacs-lisp
@@ -1585,8 +1587,8 @@ To highlight indentations
 
 
 #+begin_src emacs-lisp
-(use-package cmake-mode
-  :straight (:host github :repo "emacsmirror/cmake-mode" :branch "master")
+(use-package cmake-ts-mode
+  :straight nil
   :mode (("CMakeLists\\.txt\\'" . cmake-ts-mode)
          ("\\.cmake\\'" . cmake-ts-mode)))
 #+end_src
@@ -1820,7 +1822,8 @@ Get the relevant package subdirectories from the llvm source
 (use-package uv-mode
   :straight t
   :disabled
-  :hook (python-mode-hook . uv-mode-auto-activate-hook))
+
+  :hook (python-mode . uv-mode-auto-activate-hook))
 #+end_src
 
 ** racket
@@ -1959,7 +1962,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 #+begin_src emacs-lisp
 (use-package org
   :straight nil
-  :mode ("\\.org" . org-mode)
+  :mode ("\\.org\\" . org-mode)
 
   :custom
   (org-directory "~/org")
@@ -2264,7 +2267,7 @@ Instances of the macro
 
 #+begin_src emacs-lisp
 (with-eval-after-load 'consult
-  (consult-filter-macro "C/pp" '(c-ts-mode c++-ts-mode cmake-mode cmake-ts-mode) ?c)
+  (consult-filter-macro "C/pp" '(c-ts-mode c++-ts-mode cmake-ts-mode) ?c)
   (consult-filter-macro "Lua" '(lua-mode lua-ts-mode) ?l)
   (consult-filter-macro "Org" '(org-mode) ?o)
   (consult-filter-macro "Python" '(python-mode python-ts-mode) ?p)
@@ -2360,6 +2363,8 @@ Instances of the macro
 
 ** embark
 
+*** embark
+
 #+begin_src emacs-lisp
 (use-package embark
   :straight t
@@ -2379,6 +2384,8 @@ Instances of the macro
   (setq prefix-help-command #'embark-prefix-help-command))
 #+end_src
 
+*** embark-consult
+
 #+begin_src emacs-lisp
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
@@ -2388,6 +2395,7 @@ Instances of the macro
 
 
 * eglot
+
 
 ** eglot
 
@@ -2432,6 +2440,7 @@ maybe: https://github.com/casouri/eldoc-box
     (add-to-list 'eglot-server-programs
                  `((c-ts-mode c++-ts-mode) .
                    ("clangd"
+                    ;; Project compiler drivers are trusted, including custom toolchains.
                     "--query-driver=/**/*"
                     "--background-index"
                     "--background-index-priority=background"
@@ -2610,7 +2619,6 @@ https://github.com/renzmann/treesit-auto
 #+begin_src emacs-lisp
 (use-package treesit-auto
   :straight t
-  :ensure t
 
   :custom
   (treesit-auto-install 'prompt)
@@ -2796,7 +2804,7 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 #+begin_src emacs-lisp
 (use-package clipetty
   :straight t
-  :ensure t
+
   :bind
   ("M-w" . clipetty-kill-ring-save)
   ("s-c" . clipetty-kill-ring-save))
