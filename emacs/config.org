@@ -2255,9 +2255,11 @@ These buffers can be seen by using space.
                   (apply #'my/consult-mode-buffer-source spec))
                 '(("C/pp" (c-ts-mode c++-ts-mode cmake-ts-mode) (?C . "C/pp"))
                   ("Lua" (lua-mode lua-ts-mode) (?L . "Lua"))
+                  ("MLIR" (mlir-mode pdll-mode) (?M . "MLIR"))
                   ("Org" (org-mode) (?O . "Org"))
                   ("Python" (python-mode python-ts-mode) (?P . "Python"))
                   ("Rust" (rust-ts-mode) (?U . "Rust"))
+                  ("TableGen" (tablegen-mode) (?G . "TableGen"))
                   ("TeX" (latex-mode LaTeX-mode tex-mode TeX-mode) (?T . "TeX")))))
 
   (setq consult-buffer-sources
