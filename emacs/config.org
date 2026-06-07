@@ -2110,7 +2110,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
   :straight t
 
   :init
-  ;; Configure the register formatting.  This improves the register preview for `consult-register', `consult-register-load', `consult-register-store' and the Emacs built-ins.
+  ;; Configure the register formatting. This improves the register preview for `consult-register', etc. and the emacs built-ins.
   (setq register-preview-delay 0.5)
   (setq register-preview-function #'consult-register-format)
 
@@ -2136,7 +2136,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
    ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
    ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
    ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
-   ("C-x p b" . consult-project-buffer)       ;; orig. project-switch-to-buffer
+   ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
    ("M-y" . consult-yank-pop)
    ("M-s e" . consult-isearch-history)
 
@@ -2175,8 +2175,8 @@ https://robert.kra.hn/posts/rust-emacs-setup/
         ("r" . consult-grep-match)
 
     :map consult-prefix-map
-        ("m" . consult-man)
-        ("M" . consult-mode-command)
+        ("M" . consult-man)
+        ("m" . consult-mode-command)
         ("n" . consult-minor-mode-menu)
         ("t" . consult-theme)
         ("r" . consult-register-prefix-map)
@@ -2187,26 +2187,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
         ("x" . consult-register))
 
   :config
-  ;; Optionally configure preview. The default value is 'any, such that any key triggers the preview.
-  ;; (setq consult-preview-key 'any)
-  ;; (setq consult-preview-key "M-.")
-  ;; For some commands and buffer sources it is useful to configure the :preview-key on a per-command basis using the `consult-customize' macro.
-  (consult-customize
-   consult-theme :preview-key '(:debounce 0.2 any)
-   consult-ripgrep
-   consult-git-grep
-   consult-grep
-   consult-bookmark
-   consult-recent-file
-   consult-xref
-   consult-source-bookmark
-   consult-source-buffer
-   consult-source-file-register
-   consult-source-recent-file
-   consult-source-project-recent-file
-
-   :preview-key '(:debounce 0.5 any))
-
+  (setq consult-preview-key '(:debounce 0.1 any))
   (setq consult-narrow-key "<"))
 #+end_src
 
