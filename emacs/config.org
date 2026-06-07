@@ -813,13 +813,18 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package project
-  :straight t
+  :straight nil
 
   :custom
+  (project-mode-line 'non-remote)
   (project-vc-extra-root-markers
    '("INSTALL_RECEIPT.json" ;; brewed libraries, etc.
      ".project"             ;; custom
-     ".dir-locals.el")))
+     ".dir-locals.el"))
+
+  :bind (:map project-prefix-map
+              ("R" . project-remember-projects-under)
+              ("Z" . project-forget-zombie-projects)))
 #+end_src
 
 
@@ -1317,24 +1322,6 @@ To highlight indentations
         kept-new-versions 6
         kept-old-versions 2
         version-control t))
-#+end_src
-
-** projectile
-
-#+begin_src emacs-lisp
-(use-package projectile
-  :straight t
-  :demand t
-
-  :config
-  (projectile-mode 1)
-
-  :custom
-  (projectile-mode-line-function
-   '(lambda () (format " projectile[%s]" (projectile-project-name))))
-
-  :bind-keymap
-  ("C-x p" . projectile-command-map))
 #+end_src
 
 ** rainbow delimiters
@@ -2147,10 +2134,6 @@ https://robert.kra.hn/posts/rust-emacs-setup/
   (setq xref-show-xrefs-function #'consult-xref)
   (setq xref-show-definitions-function #'consult-xref)
 
-  (autoload 'projectile-project-root "projectile")
-  (setq consult-project-function (lambda (_) (projectile-project-root)))
-
-
   (define-prefix-command 'consult-register-prefix-map)
 
   (bind-keys :prefix-map consult-prefix-map :prefix "C-c c")
@@ -2300,23 +2283,6 @@ Instances of the macro
   (consult-filter-macro "Python" '(python-mode python-ts-mode) ?p)
   (consult-filter-macro "Rust" '(rust-ts-mode) ?r)
   (consult-filter-macro "TeX" '(latex-mode LaTeX-mode tex-mode TeX-mode) ?t))
-#+end_src
-
-*** consult-project-extra
-
-https://gitlab.com/OlMon/consult-projectile
-https://github.com/Qkessler/consult-project-extra, for project
-
-#+begin_src emacs-lisp
-(use-package consult-projectile
-  :straight (consult-projectile :type git :host gitlab :repo "OlMon/consult-projectile" :branch "master")
-  :after (consult projectile)
-  :bind (:map search-prefix-map
-              :prefix-map consult-projectile-search-prefix-map
-              :prefix "p"
-              ("b" . consult-projectile-switch-to-buffer)
-              ("d" . consult-projectile-find-dir)
-              ("f" . consult-projectile-find-file)))
 #+end_src
 
 *** consult-dir
@@ -2782,8 +2748,6 @@ https://github.com/renzmann/treesit-auto
   ;; Kill compile buffer on build success
   ;; (add-hook 'dape-compile-hook 'kill-buffer)
 
-  ;; Projectile users
-  ;; (setq dape-cwd-function 'projectile-project-root)
   )
 
 ;; (with-eval-after-load 'dape
