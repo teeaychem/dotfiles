@@ -2210,9 +2210,9 @@ https://robert.kra.hn/posts/rust-emacs-setup/
   (setq consult-narrow-key "<"))
 #+end_src
 
-*** macros
+*** buffer sources
 
-These buffers can be seen by using space
+These buffers can be seen by using space.
 
 #+begin_src emacs-lisp
 (with-eval-after-load 'consult
@@ -2226,53 +2226,42 @@ These buffers can be seen by using space
                    "lsp"
                    "magit"))
     (add-to-list 'recentf-exclude regex)
-    (add-to-list 'consult-buffer-filter regex)))
-#+end_src
+    (add-to-list 'consult-buffer-filter regex))
 
-**** narrowing
+  (defvar my/consult-mode-buffer-sources nil)
 
-Set project to use uppercase key
+  (defun my/consult-mode-buffer-source (name modes narrow)
+    "Return a hidden `consult-buffer' source named NAME for buffers in MODES."
+    (list
+     :hidden t
+     :name name
+     :category 'buffer
+     :narrow narrow
+     :face 'consult-buffer
+     :history 'buffer-name-history
+     :state #'consult--buffer-state
+     :items (lambda ()
+              (consult--buffer-query
+               :mode modes
+               :exclude consult-buffer-filter
+               :as #'buffer-name))))
 
-#+begin_src emacs-lisp
-(with-eval-after-load 'consult
-  (dolist (src consult-buffer-sources)
-    (if (eq src 'consult--source-project-buffer-hidden)
-      (set src (plist-put (symbol-value src) :narrow '(?P . "Project"))))))
-#+end_src
+  ;; Keep repeated evaluation from appending duplicate custom sources.
+  (dolist (source my/consult-mode-buffer-sources)
+    (setq consult-buffer-sources (delq source consult-buffer-sources)))
 
-Macro based off https://github.com/minad/consult#multiple-sources
+  (setq my/consult-mode-buffer-sources
+        (mapcar (lambda (spec)
+                  (apply #'my/consult-mode-buffer-source spec))
+                '(("C/pp" (c-ts-mode c++-ts-mode cmake-ts-mode) (?C . "C/pp"))
+                  ("Lua" (lua-mode lua-ts-mode) (?L . "Lua"))
+                  ("Org" (org-mode) (?O . "Org"))
+                  ("Python" (python-mode python-ts-mode) (?P . "Python"))
+                  ("Rust" (rust-ts-mode) (?U . "Rust"))
+                  ("TeX" (latex-mode LaTeX-mode tex-mode TeX-mode) (?T . "TeX")))))
 
-#+begin_src emacs-lisp
-(with-eval-after-load 'consult
-  (defmacro consult-filter-macro (name mode nrw)
-    `(progn
-       (defvar ,(intern (format "+consult-%s-filter" name))
-         (list
-          :hidden   t
-          :name     ,(format "%s" name)
-          :category 'buffer
-          :narrow   ,nrw
-          :face     'consult-buffer
-          :history  'buffer-name-history
-          :state    #'consult--buffer-state
-          :items    (lambda ()
-                      (consult--buffer-query
-                       :mode ,mode
-                       :exclude (cl-set-difference consult-buffer-filter ,(intern (format "+consult-%s-filter" name)))
-                       :as #'buffer-name))))
-       (add-to-list 'consult-buffer-sources ',(intern (format "+consult-%s-filter" name)) 'append))))
-#+end_src
-
-Instances of the macro
-
-#+begin_src emacs-lisp
-(with-eval-after-load 'consult
-  (consult-filter-macro "C/pp" '(c-ts-mode c++-ts-mode cmake-ts-mode) ?c)
-  (consult-filter-macro "Lua" '(lua-mode lua-ts-mode) ?l)
-  (consult-filter-macro "Org" '(org-mode) ?o)
-  (consult-filter-macro "Python" '(python-mode python-ts-mode) ?p)
-  (consult-filter-macro "Rust" '(rust-ts-mode) ?r)
-  (consult-filter-macro "TeX" '(latex-mode LaTeX-mode tex-mode TeX-mode) ?t))
+  (setq consult-buffer-sources
+        (append consult-buffer-sources my/consult-mode-buffer-sources)))
 #+end_src
 
 *** consult-dir
