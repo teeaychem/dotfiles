@@ -56,7 +56,6 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
   (setq-default indent-tabs-mode nil)
 
   (delete-selection-mode 1) ;; delete selected text by typing
-  (global-auto-revert-mode 1) ; for reloading bib files, etc.
 
   (save-place-mode 1)
   (xterm-mouse-mode 1)
@@ -392,6 +391,22 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 * internal
 
+
+** autorevert
+
+#+begin_src emacs-lisp
+(use-package autorevert
+  :straight nil
+
+  :init
+  (global-auto-revert-mode 1))
+
+(defun my/revert-all-buffers ()
+  "Immediately check all buffers managed by Auto-Revert."
+  (interactive)
+  (let ((auto-revert-stop-on-user-input nil))
+    (auto-revert-buffers)))
+#+end_src
 
 ** dabbrev
 
@@ -2745,31 +2760,9 @@ https://github.com/renzmann/treesit-auto
 #+end_src
 
 
-* fns
-
-From https://blog.plover.com/prog/revert-all.html
-
-#+begin_src emacs-lisp
-(defun revert-all-buffers ()
-  "Refreshes all open buffers from their respective files"
-  (interactive)
-  (let* ((list (buffer-list))
-         (buffer (car list)))
-    (while buffer
-      (when (and (buffer-file-name buffer)
-                 (not (buffer-modified-p buffer)))
-        (set-buffer buffer)
-        (revert-buffer t t t))
-      (setq list (cdr list))
-      (setq buffer (car list))))
-  (message "Refreshed open files"))
-#+end_src
-
-
 * terminal
 
 See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
-
 
 ** clipetty
 
@@ -2784,7 +2777,6 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 
 
 * llm
-
 
 ** gptel
 
@@ -2817,6 +2809,8 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
   (setq-default gptel-log-level 'info)
   (setq-default gptel-cache t))
 #+end_src
+
+** gptel-agent
 
 #+begin_src emacs-lisp
 (use-package gptel-agent
