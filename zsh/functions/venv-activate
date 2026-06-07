@@ -1,0 +1,9 @@
+local venv_root="${1:-.venv}"
+
+if [[ -d "$venv_root" && -f "${venv_root}/bin/activate" ]]; then
+    source "${venv_root}/bin/activate"
+    echo "Activated venv: $venv_root"
+else
+    echo "Unable to activate venv: ${venv_root}" >&2
+    return 1
+fi

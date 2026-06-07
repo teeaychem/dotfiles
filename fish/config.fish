@@ -145,23 +145,6 @@ abbr -a python python3
 abbr -a pyfind 'find . -name "*.py"'
 abbr -a pygrep 'rg -g "*.py" -g "!**/site-packages/"'
 
-function venv-activate
-    # Fallback to .venv if no path argument is provided
-    set -l venv_root $argv[1]
-    test -n "$venv_root"; or set venv_root .venv
-
-    # Strip any trailing slashes
-    set venv_root (string replace -r '/$' '' -- "$venv_root")
-
-    if test -f "$venv_root/bin/activate.fish"
-        source "$venv_root/bin/activate.fish"
-        echo "Activated venv: $venv_root"
-    else
-        echo "Unable to activate venv: $venv_root" >&2
-        return 1
-    end
-end
-
 # fzf
 set -gx FZF_DEFAULT_COMMAND 'fd --type f --hidden --follow --exclude .git'
 

@@ -7,6 +7,9 @@ fi
 source ${ZDOTDIR:-$HOME}/.antidote/antidote.zsh
 antidote load
 
+fpath=("${XDG_CONFIG_HOME}/zsh/functions" $fpath)
+autoload -Uz venv-activate
+
 # Path configuration, as macOS executes path_helper *after* sourcing zshenv
 # https://apple.stackexchange.com/questions/432226/homebrew-path-set-in-zshenv-is-overridden
 case "$OSTYPE" in
@@ -150,18 +153,6 @@ alias python="python3"
 
 alias pyfind='find . -name "*.py"'
 alias pygrep='rg -g "*.py" -g "!**/site-packages/"'
-
-function venv-activate() {
-    local venv_root="${1:-.venv}"
-
-     if [[ -d "$venv_root" && -f "${venv_root}/bin/activate" ]]; then
-        echo "Activated venv: $venv_root"
-        source "${venv_root}/bin/activate"
-    else
-        echo "Unable to activate venv: ${venv_root}"
-        return 1
-    fi
-}
 
 # # rust
 export CARGO_HOME="${HOME}/.cargo"

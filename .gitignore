@@ -27,7 +27,7 @@
 /emacs/var/*
 
 /fish/fish_variables
-/fish/functions
+/fish/functions/_autopair_*.fish
 /fist/conf.d/rustup.fish
 
 hunspell/dictionaries/README*
