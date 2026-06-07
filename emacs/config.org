@@ -59,6 +59,7 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
   (global-auto-revert-mode 1) ; for reloading bib files, etc.
 
   (save-place-mode 1)
+  (xterm-mouse-mode 1)
 
   (setopt package-install-upgrade-built-in t) ;; show updates to built in packages
 
@@ -72,11 +73,9 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
   (tab-always-indent t)
   (custom-buffer-indent 4)
   (tab-width 2)
-  (xterm-mouse-mode 1)
   (translate-upper-case-key-bindings nil)
   (mouse-yank-at-point t)
   (kill-whole-line t)
-  (native-comp-async-report-warnings-errors nil)
   (read-extended-command-predicate #'command-completion-default-include-p)   ;; Hide commands in M-x which do not work in the current mode.
 
   (kill-do-not-save-duplicates t)
@@ -429,7 +428,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :custom
   (desktop-path (list (expand-file-name "var/desktops/" user-emacs-directory)))
   (desktop-auto-save-timeout nil)
-  (desktop-load-locked-desktop nil)
   (desktop-restore-eager 5)
 
   (desktop-save-mode 1)
@@ -447,12 +445,16 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package dired
+  :straight nil
+
   :init
   (when (and (eq system-type 'darwin) (executable-find "gls"))
     (setq insert-directory-program (executable-find "gls")))
 
+  :config
+  (require 'dired-x)
+
   :custom
-  (global-dired-omit-mode 1)
   (dired-kill-when-opening-new-dired-buffer t)
   (dired-recursive-copies 'always)
   (dired-recursive-deletes 'always)
@@ -461,7 +463,10 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
                             "\\|^\\.DS_Store\\'"
                             "\\|^\\.\\(?:svn\\|git\\)\\'"
                             "\\|^__pycache__\\'"
-                            "\\|^flymake_.*")))
+                            "\\|^flymake_.*"))
+
+  :hook
+  (dired-mode . dired-omit-mode))
 #+end_src
 
 ** editorconfig
@@ -916,22 +921,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (use-package apheleia
   :straight t
 
-  :init
-  (setq-default apheleia-inhibit t)
-  (setq-default apheleia-global-mode nil)
-
-  :custom
-  (apheleia-mode-hook nil)
-
   :config
   (setf (alist-get 'python-mode apheleia-mode-alist) '(ruff))
   (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff))
-
-  (setf (alist-get 'clang-format apheleia-formatters) '("clang-format"
-                                                        "-assume-filename"
-                                                        (or (apheleia-formatters-local-buffer-file-name)
-                                                            (apheleia-formatters-mode-extension)
-                                                            ".c")))
 
   (setf (alist-get 'clang-format apheleia-formatters) '("clang-format"
                                                         "-assume-filename"
@@ -1078,7 +1070,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 (setq xref-backend-functions (remq 'etags--xref-backend xref-backend-functions))
 (add-hook 'xref-backend-functions #'dumb-jump-xref-activate t)
-(setq xref-show-definitions-function #'xref-show-definitions-completing-read)
 #+end_src
 
 ** envrc
