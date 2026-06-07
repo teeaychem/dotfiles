@@ -99,12 +99,12 @@ set -gx XDG_CONFIG_HOME $HOME/.config/
 
 
 # Usage inside config.fish:
-load_vars "$XDG_CONFIG_HOME/envs/base.vars"
+load_vars "$XDG_CONFIG_HOME/shell/vars/base.vars"
 
-load_env "$XDG_CONFIG_HOME/envs/base.env"
-load_env "$XDG_CONFIG_HOME/envs/local.env"
+load_env "$XDG_CONFIG_HOME/shell/env/base.env"
+load_env "$XDG_CONFIG_HOME/shell/env/local.env"
 
-load_aliases "$XDG_CONFIG_HOME/aliases/base.aliases"
+load_aliases "$XDG_CONFIG_HOME/shell/aliases/base.aliases"
 
 switch (uname)
     case Darwin
