@@ -22,7 +22,6 @@ https://www.emacswiki.org/emacs/GnusAuthinfo
 
 * to investigate
 
-https://github.com/editorconfig/editorconfig-emacs?tab=readme-ov-file https://editorconfig.org
 https://github.com/pierre-rouleau/pel
 https://whhone.com/emacs-config/
 https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emacs
@@ -120,7 +119,10 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (kept-old-versions 0)      ; don't bother with old versions
   (delete-old-versions t)    ; don't ask about deleting old versions
   (version-control t)        ; number backups
-  (vc-make-backup-files nil))
+  (vc-make-backup-files nil)
+
+  :hook
+  (after-save . executable-make-buffer-file-executable-if-script-p))
 #+end_src
 
 ** locale
@@ -222,6 +224,15 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package emacs
+  :init
+  (defun my/window-toggle-dedicated ()
+    "Toggle whether the selected window is dedicated to its buffer."
+    (interactive)
+    (let* ((window (selected-window))
+           (dedicated (not (window-dedicated-p window))))
+      (set-window-dedicated-p window dedicated)
+      (message "Window %sdedicated" (if dedicated "" "no longer "))))
+
   :bind (:prefix-map window-prefix-map
          :prefix "C-c w")
   :bind (:repeat-map window-prefix-map
@@ -235,6 +246,10 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
         ("S-<right>" . windmove-swap-states-right)
         ("S-<up>"    . windmove-swap-states-up)
         ("S-<down>"  . windmove-swap-states-down)
+        ("C-<left>"  . shrink-window-horizontally)
+        ("C-<right>" . enlarge-window-horizontally)
+        ("C-<up>"    . enlarge-window)
+        ("C-<down>"  . shrink-window)
         ("["         . previous-buffer)
         ("]"         . next-buffer)
         ("0"         . delete-window)
@@ -242,6 +257,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
         ("2"         . split-window-below)
         ("3"         . split-window-right)
         ("="         . balance-windows-area)
+        ("d"         . my/window-toggle-dedicated)
         ("r"         . window-layout-rotate-clockwise)
         ("R"         . window-layout-rotate-anticlockwise)
         ("t"         . window-layout-transpose)
@@ -269,24 +285,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 
-** bookmarks
-
-#+begin_src emacs-lisp
-(use-package emacs
-  :bind (:prefix-map bookmark-prefix-map
-                     :prefix "C-c b")
-  (:map bookmark-prefix-map
-        ("c" . consult-bookmark)
-        ("d" . bookmark-delete)
-        ("e" . edit-bookmarks)
-        ("j" . bookmark-jump)
-        ("s" . bookmark-set-no-overwrite)
-        ("S" . bookmark-set)))
-  #+end_src
-
-
 * visual
-
 
 ** display
 
@@ -407,6 +406,21 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (let ((auto-revert-stop-on-user-input nil))
     (auto-revert-buffers)))
 #+end_src
+
+** bookmarks
+
+#+begin_src emacs-lisp
+(use-package emacs
+  :bind (:prefix-map bookmark-prefix-map
+                     :prefix "C-c b")
+  (:map bookmark-prefix-map
+        ("c" . consult-bookmark)
+        ("d" . bookmark-delete)
+        ("e" . edit-bookmarks)
+        ("j" . bookmark-jump)
+        ("s" . bookmark-set-no-overwrite)
+        ("S" . bookmark-set)))
+  #+end_src
 
 ** dabbrev
 
@@ -1776,7 +1790,6 @@ Get the relevant package subdirectories from the llvm source
   :mode "\\.mir\\'")
 #+end_src
 
-
 ** COMMENT OCaml
 
 #+begin_src emacs-lisp
@@ -2015,7 +2028,10 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 
   (org-log-done 'note)
 
+  (org-blank-before-new-entry '((heading . t)
+                                (plain-list-item . nil)))
   (org-cycle-separator-lines 2)
+  (org-insert-heading-respect-content t)
 
   :config
   (org-babel-do-load-languages 'org-babel-load-languages
@@ -2777,6 +2793,7 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 
 
 * llm
+
 
 ** gptel
 
