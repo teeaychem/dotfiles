@@ -231,11 +231,27 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :bind (:repeat-map window-prefix-map
         :exit
         :continue
-        ("<left>"  . windmove-left)
-        ("<right>" . windmove-right)
-        ("<up>  "  . windmove-up)
-        ("<down>"  . windmove-down)
-        ("l"       . #'display-line-numbers-mode)))
+        ("<left>"    . windmove-left)
+        ("<right>"   . windmove-right)
+        ("<up>"      . windmove-up)
+        ("<down>"    . windmove-down)
+        ("S-<left>"  . windmove-swap-states-left)
+        ("S-<right>" . windmove-swap-states-right)
+        ("S-<up>"    . windmove-swap-states-up)
+        ("S-<down>"  . windmove-swap-states-down)
+        ("["         . previous-buffer)
+        ("]"         . next-buffer)
+        ("0"         . delete-window)
+        ("1"         . delete-other-windows)
+        ("2"         . split-window-below)
+        ("3"         . split-window-right)
+        ("="         . balance-windows-area)
+        ("r"         . window-layout-rotate-clockwise)
+        ("R"         . window-layout-rotate-anticlockwise)
+        ("t"         . window-layout-transpose)
+        ("u"         . winner-undo)
+        ("U"         . winner-redo)
+        ("l"         . display-line-numbers-mode)))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -2419,7 +2435,6 @@ https://github.com/Qkessler/consult-project-extra, for project
 
 
 * eglot
-
 
 ** eglot
 
