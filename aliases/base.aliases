@@ -1,0 +1,15 @@
+# File search
+fdd="fd --type d"
+fdf="fd --type f"
+fda="fd --no-ignore --hidden"
+fde="fd --type f --extension"
+
+# General tools
+grep="grep --color=auto"
+ll="ls -lh"
+
+# Python
+py="python3"
+python="python3"
+pyfind='find . -name "*.py"'
+pygrep='rg -g "*.py" -g "!**/site-packages/"'

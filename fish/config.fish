@@ -60,13 +60,51 @@ function load_vars
     end < "$vars_file"
 end
 
+function load_aliases
+    set -l aliases_file $argv[1]
+
+    if not test -f "$aliases_file"
+        echo "Error: Aliases file '$aliases_file' does not exist or was not specified." >&2
+        return 1
+    end
+
+    while read -l line
+        string match -q -r '^\s*(#|$)' -- "$line"; and continue
+
+        if not string match -q '*=*' -- "$line"
+            echo "Warning: Ignoring malformed line in '$aliases_file': $line" >&2
+            continue
+        end
+
+        set -l parts (string split -m 1 '=' -- "$line")
+        set -l name (string trim -- "$parts[1]")
+        set -l expansion (string trim -- "$parts[2]")
+        set -l first (string sub -s 1 -l 1 -- "$expansion")
+        set -l last (string sub -s -1 -l 1 -- "$expansion")
+
+        if test "$first" = "$last"; and contains -- "$first" "'" '"'
+            set expansion (string sub -s 2 -l (math (string length -- "$expansion") - 2) -- "$expansion")
+        end
+
+        if not string match -q -r '^[A-Za-z0-9_.-]+$' -- "$name"
+            echo "Warning: Ignoring invalid alias name in '$aliases_file': $name" >&2
+            continue
+        end
+
+        abbr --add "$name" -- "$expansion"
+    end < "$aliases_file"
+end
+
 set -gx XDG_CONFIG_HOME $HOME/.config/
 
 
 # Usage inside config.fish:
 load_vars "$XDG_CONFIG_HOME/envs/base.vars"
+
 load_env "$XDG_CONFIG_HOME/envs/base.env"
 load_env "$XDG_CONFIG_HOME/envs/local.env"
+
+load_aliases "$XDG_CONFIG_HOME/aliases/base.aliases"
 
 switch (uname)
     case Darwin
@@ -117,20 +155,6 @@ function fish_should_add_to_history
 
     return 0
 end
-
-# tools
-abbr -a fdd "fd --type d"
-abbr -a fdf "fd --type f"
-abbr -a fda "fd --no-ignore --hidden"
-abbr -a fde "fd --type f --extension"
-
-abbr -a grep "grep --color=auto"
-abbr -a ll "ls -lh"
-
-abbr -a py python3
-abbr -a python python3
-abbr -a pyfind 'find . -name "*.py"'
-abbr -a pygrep 'rg -g "*.py" -g "!**/site-packages/"'
 
 # fzf
 if status is-interactive; and command -q fzf

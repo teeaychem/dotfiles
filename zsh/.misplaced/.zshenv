@@ -82,6 +82,12 @@ load_vars "$XDG_CONFIG_HOME/envs/base.vars"
 load_env "$XDG_CONFIG_HOME/envs/base.env"
 load_env "$XDG_CONFIG_HOME/envs/local.env"
 
+case "$OSTYPE" in
+  darwin*)
+    load_env "$XDG_CONFIG_HOME/envs/darwin.env"
+    ;;
+esac
+
 mkdir -p \
     "$XDG_CONFIG_HOME" \
     "$XDG_CACHE_HOME" \

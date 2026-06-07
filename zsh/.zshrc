@@ -8,7 +8,7 @@ source ${ZDOTDIR:-$HOME}/.antidote/antidote.zsh
 antidote load
 
 fpath=("${XDG_CONFIG_HOME}/zsh/functions" $fpath)
-autoload -Uz venv-activate
+autoload -Uz load_aliases venv-activate
 
 # Path configuration, as macOS executes path_helper *after* sourcing zshenv
 # https://apple.stackexchange.com/questions/432226/homebrew-path-set-in-zshenv-is-overridden
@@ -29,6 +29,7 @@ case "$OSTYPE" in
 esac
 
 export PATH="$("${XDG_CONFIG_HOME}/scripts/common/path")"
+load_aliases "$XDG_CONFIG_HOME/aliases/base.aliases"
 
 # options
 
@@ -124,27 +125,6 @@ setopt COMPLETE_IN_WORD # complete from both ends of a word
 setopt PATH_DIRS        # perform path search even on command names with slashes
 setopt NO_FLOW_CONTROL  # disable start/stop characters in shell editor
 setopt NO_MENU_COMPLETE # do not autoselect the first completion entry
-
-# Tools
-
-alias fdd="fd --type d"             # Find directories only
-alias fdf="fd --type f"             # Find files only
-alias fda="fd --no-ignore --hidden" # Find everything (ignores .gitignore)
-alias fde="fd --type f --extension" # Find files by extension (e.g., fde py)
-
-# # grep
-alias grep='grep --color=auto'
-
-# # ls
-alias ll="ls -lh"
-
-# # python
-
-alias py="python3"
-alias python="python3"
-
-alias pyfind='find . -name "*.py"'
-alias pygrep='rg -g "*.py" -g "!**/site-packages/"'
 
 # # rust
 export CARGO_HOME="${HOME}/.cargo"

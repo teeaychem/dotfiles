@@ -1,0 +1,35 @@
+setopt local_options extended_glob
+
+local aliases_file="$1"
+
+if [[ ! -f "$aliases_file" ]]; then
+  echo "Error: Aliases file '$aliases_file' does not exist or was not specified." >&2
+  return 1
+fi
+
+local line name expansion
+while IFS= read -r line || [[ -n "$line" ]]; do
+  [[ "$line" =~ '^[[:space:]]*(#|$)' ]] && continue
+
+  if [[ "$line" != *=* ]]; then
+    echo "Warning: Ignoring malformed line in '$aliases_file': $line" >&2
+    continue
+  fi
+
+  name="${line%%=*}"
+  name="${name##[[:space:]]#}"
+  name="${name%%[[:space:]]#}"
+  expansion="${line#*=}"
+
+  if [[ "$expansion[1]" == "$expansion[-1]" &&
+        ("$expansion[1]" == \" || "$expansion[1]" == \') ]]; then
+    expansion="${expansion[2,-2]}"
+  fi
+
+  if [[ ! "$name" =~ '^[A-Za-z0-9_.-]+$' ]]; then
+    echo "Warning: Ignoring invalid alias name in '$aliases_file': $name" >&2
+    continue
+  fi
+
+  alias "$name=$expansion"
+done < "$aliases_file"

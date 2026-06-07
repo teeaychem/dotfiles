@@ -1,5 +1,3 @@
-load_env "$XDG_CONFIG_HOME/envs/darwin.env"
-
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # export LDFLAGS="-L/opt/homebrew/opt/llvm/lib -L/opt/homebrew/opt/llvm/lib/c++ -L/opt/homebrew/opt/llvm/lib/unwind -lunwind"
