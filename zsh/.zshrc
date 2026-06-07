@@ -56,41 +56,47 @@ setopt share_history # hare command history data, append history and read on eac
 setopt EXTENDED_HISTORY # record timestamp of command
 
 local -a history_to_ignore=(
-    'clear'
-    'date'
-    'df'
-    'dirs'
-    'du'
-    'echo'
+    'clear(| *)'
+    'date(| *)'
+    'df(| *)'
+    'dirs(| *)'
+    'du(| *)'
     'echo(| *)'
-    'exit'
-    'fc'
+    'exit(| *)'
+    'fc(| *)'
     'git (add|commit|log|reset|restore|rm|status)(| *)'
-    'help'
-    'history'
-    'htop'
-    'info'
-    'll'
-    'll'
+    'help(| *)'
+    'history(| *)'
+    'htop(| *)'
+    'info(| *)'
     'ls(| *)'
+    'll(| *)'
     'man(| *)'
-    'mkdir'
-    'open'
-    'pbcopy'
-    'pbpaste'
-    'popd'
+    'mkdir(| *)'
+    'open(| *)'
+    'pbcopy(| *)'
+    'pbpaste(| *)'
+    'popd(| *)'
     'ps(| *)'
-    'pushd'
-    'pwd'
+    'pushd(| *)'
+    'pwd(| *)'
     'rm(| *)'
-    'rmdir'
-    'time'
-    'top'
+    'rmdir(| *)'
+    'time(| *)'
+    'top(| *)'
     'touch(| *)'
     'which(| *)'
 )
 
-HISTORY_IGNORE="${(j:|:)history_to_ignore}"
+HISTORY_IGNORE="(${(j:|:)history_to_ignore})"
+
+function _ignore_history() {
+    emulate -L zsh
+    [[ ${1%%$'\n'} != ${~HISTORY_IGNORE} ]]
+}
+
+autoload -Uz add-zsh-hook
+add-zsh-hook zshaddhistory _ignore_history
 
 # # # corrections
 # setopt CORRECT
