@@ -32,8 +32,6 @@ export PATH="$("${XDG_CONFIG_HOME}/scripts/common/path")"
 
 # options
 
-EDITOR=nvim
-
 # # misc
 
 unsetopt CLOBBER
@@ -129,9 +127,6 @@ setopt NO_MENU_COMPLETE # do not autoselect the first completion entry
 
 # Tools
 
-# #
-export FD_OPTIONS="--hidden --follow"
-
 alias fdd="fd --type d"             # Find directories only
 alias fdf="fd --type f"             # Find files only
 alias fda="fd --no-ignore --hidden" # Find everything (ignores .gitignore)
@@ -142,9 +137,6 @@ alias grep='grep --color=auto'
 
 # # ls
 alias ll="ls -lh"
-
-# # man
-export MANPAGER="nvim +Man!"
 
 # # python
 
@@ -165,7 +157,6 @@ if [[ -d $CARGO_HOME ]]; then
 fi
 
 # # OCaml
-export OPAMROOT="${XDG_DATA_HOME}/opam"
 [[ -r "$OPAMROOT/opam-init/init.zsh" ]] && source "$OPAMROOT/opam-init/init.zsh" >/dev/null 2>/dev/null
 
 # extensions

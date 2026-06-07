@@ -80,18 +80,7 @@ end
 # hammerspoon
 # defaults write org.hammerspoon.Hammerspoon MJConfigFile "~/.config/hammerspoon/init.lua"
 
-# man
-set -x MANPAGER "nvim +Man!"
-
-# editor
-set -gx EDITOR nvim
-
-# npm / node
-set -gx NPM_CONFIG_USERCONFIG "$XDG_CONFIG_HOME/npm/npmrc"
-
 # OCaml
-set -gx OPAMROOT "$XDG_DATA_HOME/opam"
-
 # This adds: the correct directories to the PATH, auto-completion for the opam binary
 test -r "$OPAMROOT/opam-init/init.fish" && source "$OPAMROOT/opam-init/init.fish" >/dev/null 2>/dev/null; or true
 
@@ -130,8 +119,6 @@ function fish_should_add_to_history
 end
 
 # tools
-set -gx FD_OPTIONS "--hidden --follow"
-
 abbr -a fdd "fd --type d"
 abbr -a fdf "fd --type f"
 abbr -a fda "fd --no-ignore --hidden"
@@ -146,8 +133,6 @@ abbr -a pyfind 'find . -name "*.py"'
 abbr -a pygrep 'rg -g "*.py" -g "!**/site-packages/"'
 
 # fzf
-set -gx FZF_DEFAULT_COMMAND 'fd --type f --hidden --follow --exclude .git'
-
 if status is-interactive; and command -q fzf
     fzf --fish | source
 
@@ -173,8 +158,4 @@ end
 
 if status is-interactive; and command -q zoxide
     zoxide init fish | source
-end
-
-if status is-interactive; and command -q direnv
-    direnv hook fish | source
 end
