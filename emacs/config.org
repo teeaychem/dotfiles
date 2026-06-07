@@ -2149,7 +2149,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
    ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
    ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
    ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
-   ;; ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
+   ("C-x p b" . consult-project-buffer)       ;; orig. project-switch-to-buffer
    ("M-y" . consult-yank-pop)
    ("M-s e" . consult-isearch-history)
 
@@ -2164,7 +2164,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
        ("M-r" . consult-history)                 ;; orig. previous-matching-history-element
 
    :map search-prefix-map
-        ("d" . consult-find)                  ;; Alternative: consult-fd
+        ("d" . consult-fd) ;; Alternative: consult-find
         ("c" . consult-locate)
         ("G" . consult-grep)
         ("g" . consult-git-grep)
@@ -2175,6 +2175,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
         ("u" . consult-focus-lines)
 
     :map goto-prefix-map
+        ("a" . consult-org-agenda)
         ("b" . consult-bookmark)
         ("e" . consult-compile-error)
         ("f" . consult-flymake)
@@ -2184,9 +2185,13 @@ https://robert.kra.hn/posts/rust-emacs-setup/
         ("k" . consult-global-mark)
         ("m" . consult-mark)
         ("o" . consult-outline)               ;; Alternative: consult-org-heading
+        ("r" . consult-grep-match)
 
     :map consult-prefix-map
+        ("m" . consult-man)
         ("M" . consult-mode-command)
+        ("n" . consult-minor-mode-menu)
+        ("t" . consult-theme)
         ("r" . consult-register-prefix-map)
 
     :map consult-register-prefix-map
@@ -2195,8 +2200,6 @@ https://robert.kra.hn/posts/rust-emacs-setup/
         ("x" . consult-register))
 
   :config
-  (setq consult-peek-key '(:debounce 0.5 any))
-
   ;; Optionally configure preview. The default value is 'any, such that any key triggers the preview.
   ;; (setq consult-preview-key 'any)
   ;; (setq consult-preview-key "M-.")
