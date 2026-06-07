@@ -1759,13 +1759,6 @@ Get the relevant package subdirectories from the llvm source
   :mode "\\.mir\\'")
 #+end_src
 
-** nix
-
-#+begin_src emacs-lisp
-(use-package nix-ts-mode
-  :straight t
-  :mode "\\.nix\\'")
-#+end_src
 
 ** COMMENT OCaml
 
