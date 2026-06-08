@@ -5,7 +5,10 @@ GNU Stow deploys these packages into `$HOME`:
 - `common`: configuration shared by all systems
 - `scripts`: shared commands installed in `~/.local/bin`
 - `darwin`: macOS configuration and commands
-- `linux`: Linux configuration, when present
+- `linux`: Linux configuration
+
+Each package contains `.stow-local-ignore` so Git preserves it even when the
+package otherwise becomes empty.
 
 ## Install
 

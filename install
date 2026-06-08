@@ -9,9 +9,7 @@ case "$(uname -s)" in
         packages="$packages darwin"
         ;;
     Linux)
-        if [ -d "$repo_dir/linux" ]; then
-            packages="$packages linux"
-        fi
+        packages="$packages linux"
         ;;
     *)
         printf 'Unsupported operating system: %s\n' "$(uname -s)" >&2
