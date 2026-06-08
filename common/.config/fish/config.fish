@@ -125,9 +125,9 @@ load_history_ignore "$XDG_CONFIG_HOME/shell/history/ignore"
 
 switch (uname)
     case Darwin
-        source $__fish_config_dir/darwin.fish
+        test -f $__fish_config_dir/darwin.fish; and source $__fish_config_dir/darwin.fish
     case Linux
-        source $__fish_config_dir/linux.fish
+        test -f $__fish_config_dir/linux.fish; and source $__fish_config_dir/linux.fish
     case '*'
         echo "No configuration for: "(uname)
 end
@@ -139,7 +139,7 @@ end
 # This adds: the correct directories to the PATH, auto-completion for the opam binary
 test -r "$OPAMROOT/opam-init/init.fish" && source "$OPAMROOT/opam-init/init.fish" >/dev/null 2>/dev/null; or true
 
-set -gx PATH (string split : ("$XDG_CONFIG_HOME/scripts/common/path"))
+set -gx PATH (string split : ("$HOME/.local/bin/dotfiles-path"))
 
 # etc
 

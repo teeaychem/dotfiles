@@ -1,0 +1,79 @@
+#!/bin/sh
+set -eu
+
+resolve_repo() {
+    script=$0
+
+    while [ -L "$script" ]; do
+        target=$(readlink "$script")
+        case "$target" in
+            /*) script=$target ;;
+            *) script=$(dirname "$script")/$target ;;
+        esac
+    done
+
+    CDPATH= cd -- "$(dirname "$script")/../../.." && pwd -P
+}
+
+resolve_link() {
+    link=$1
+    target=$(readlink "$link") || return 1
+
+    case "$target" in
+        /*) resolved=$target ;;
+        *) resolved=$(dirname "$link")/$target ;;
+    esac
+
+    directory=$(dirname "$resolved")
+    basename=$(basename "$resolved")
+    [ -d "$directory" ] || return 1
+
+    printf '%s/%s\n' "$(CDPATH= cd -- "$directory" && pwd -P)" "$basename"
+}
+
+repo_dir=${DOTFILES_DIR:-$(resolve_repo)}
+config_home=${XDG_CONFIG_HOME:-"$HOME/.config"}
+ignore_file="$repo_dir/config.ignore"
+
+if ! command -v rsync >/dev/null 2>&1; then
+    printf '%s\n' 'dotfiles-config-audit requires rsync.' >&2
+    exit 1
+fi
+
+"$repo_dir/scripts/.local/bin/dotfiles-config-ignore" "$ignore_file"
+
+temporary_directory=$(mktemp -d "${TMPDIR:-/tmp}/config-audit.XXXXXXXX")
+listing="$temporary_directory/listing"
+trap 'rm -rf "$temporary_directory"' EXIT HUP INT TERM
+
+rsync \
+    --archive \
+    --dry-run \
+    --exclude-from="$ignore_file" \
+    --out-format='%n' \
+    "$config_home/" \
+    "$temporary_directory/empty/" > "$listing"
+
+count=0
+
+while IFS= read -r relative_path; do
+    case "$relative_path" in
+        '' | */) continue ;;
+    esac
+
+    path="$config_home/$relative_path"
+
+    if [ -L "$path" ]; then
+        resolved=$(resolve_link "$path" || :)
+        case "$resolved" in
+            "$repo_dir"/*) continue ;;
+        esac
+        printf '%s -> %s\n' "$relative_path" "$(readlink "$path")"
+    else
+        printf '%s\n' "$relative_path"
+    fi
+
+    count=$((count + 1))
+done < "$listing"
+
+printf '\n%d potential Stow candidate(s).\n' "$count"

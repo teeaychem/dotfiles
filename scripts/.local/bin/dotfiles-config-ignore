@@ -1,0 +1,43 @@
+#!/bin/sh
+set -eu
+
+resolve_repo() {
+    script=$0
+
+    while [ -L "$script" ]; do
+        target=$(readlink "$script")
+        case "$target" in
+            /*) script=$target ;;
+            *) script=$(dirname "$script")/$target ;;
+        esac
+    done
+
+    CDPATH= cd -- "$(dirname "$script")/../../.." && pwd -P
+}
+
+repo_dir=${DOTFILES_DIR:-$(resolve_repo)}
+source_file="$repo_dir/.gitignore"
+output_file=${1:-"$repo_dir/config.ignore"}
+
+if grep -Eq '^[[:space:]]*!' "$source_file"; then
+    printf '%s\n' \
+        "$source_file contains negated patterns, which rsync excludes cannot represent." >&2
+    exit 1
+fi
+
+temporary_file=$(mktemp "${TMPDIR:-/tmp}/config-ignore.XXXXXXXX")
+trap 'rm -f "$temporary_file"' EXIT HUP INT TERM
+
+{
+    printf '%s\n' \
+        '# Generated from .gitignore by dotfiles-config-ignore.' \
+        '# Used by dotfiles-config-audit; edit .gitignore, then regenerate.'
+    cat "$source_file"
+} > "$temporary_file"
+
+if [ -f "$output_file" ] && cmp -s "$temporary_file" "$output_file"; then
+    exit 0
+fi
+
+mv "$temporary_file" "$output_file"
+trap - EXIT HUP INT TERM

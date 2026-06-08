@@ -28,7 +28,7 @@ case "$OSTYPE" in
     ;;
 esac
 
-export PATH="$("${XDG_CONFIG_HOME}/scripts/common/path")"
+export PATH="$("$HOME/.local/bin/dotfiles-path")"
 load_aliases "$XDG_CONFIG_HOME/shell/aliases/base.aliases"
 
 # options
