@@ -9,12 +9,10 @@
 /emacs/**.elc
 /emacs/.emacs.desktop
 /emacs/.org-id-locations
-/emacs/config.el*
-/emacs/config-darwin.el
+/emacs/config*.el*
 /emacs/custom.el
 /emacs/eln-cache/**
 /emacs/elpa/*
-/emacs/etc/*
 /emacs/etc/*
 /emacs/org-persist/*
 /emacs/places*
@@ -56,4 +54,5 @@ hunspell/dictionaries/README*
 /zsh/.zsh_sessions/*
 
 /.agent-shell/
+
 /htop/htop_history
