@@ -85,13 +85,13 @@ set_default write -g NSNavPanelExpandedStateForSaveMode -bool true  # expand sav
 set_default write -g NSNavPanelExpandedStateForSaveMode2 -bool true # same for newer dialogs
 
 # Finder and Dock.
-set_default write com.apple.finder AppleShowAllFiles -bool true       # include hidden files
-set_default write com.apple.finder ShowPathbar -bool true             # show the current path
-set_default write com.apple.finder ShowStatusBar -bool true           # show counts and free space
-set_default write com.apple.finder _FXShowPosixPathInTitle -bool true # put the full path in titles
-set_default write com.apple.finder FXDefaultSearchScope -string SCcf  # search the current folder
-set_default write com.apple.dock autohide -bool true                  # keep the Dock out of the way
-set_default write com.apple.dock show-recents -bool false             # skip recent apps
+set_default write com.apple.finder AppleShowAllFiles -bool true        # include hidden files
+set_default write com.apple.finder ShowPathbar -bool true              # show the current path
+set_default write com.apple.finder ShowStatusBar -bool true            # show counts and free space
+set_default write com.apple.finder _FXShowPosixPathInTitle -bool false # put the full path in titles
+set_default write com.apple.finder FXDefaultSearchScope -string SCcf   # search the current folder
+set_default write com.apple.dock autohide -bool true                   # keep the Dock out of the way
+set_default write com.apple.dock show-recents -bool false              # skip recent apps
 
 # Avoid metadata files on removable and network volumes.
 set_default write com.apple.desktopservices DSDontWriteNetworkStores -bool true # no network .DS_Store
