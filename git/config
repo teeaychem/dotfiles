@@ -48,5 +48,7 @@
   submodulesummary = true
 
 [user]
-	email = "bsparkes@alumni.stanford.edu"
-	name = "teeaychem"
+	useConfigOnly = true
+
+[include]
+	path = config.local

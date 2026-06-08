@@ -28,6 +28,8 @@
 /fish/functions/_autopair_*.fish
 /fist/conf.d/rustup.fish
 
+/git/config.local
+
 hunspell/dictionaries/README*
 /hunspell/dictionaries/en_GB.*
 
