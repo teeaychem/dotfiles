@@ -62,10 +62,10 @@
 ;; Load the tangle, regenerating it when config.org is newer.
 (org-babel-load-file (expand-file-name "config.org" user-emacs-directory))
 
-;; start emacs in server mode for communcation between skim, etc.
-
-(require 'server)
-(setq server-host (system-name))
-(unless (server-running-p) (server-start))
+;; Daemon mode starts its server after loading init.el.
+(unless (daemonp)
+  (require 'server)
+  (unless (server-running-p)
+    (server-start)))
 
 ;;; init.el ends here

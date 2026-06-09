@@ -288,6 +288,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 * visual
 
+
 ** display
 
 #+begin_src emacs-lisp

@@ -4,7 +4,7 @@ set -eu
 
 usage() {
     printf '%s\n' \
-        'usage: ec [--host HOST] [FILE ...]' \
+        'usage: emc [--host HOST] [--] [FILE ...]' \
         '' \
         'Open files in a terminal Emacs client, starting a daemon if necessary.' \
         '' \
@@ -13,8 +13,12 @@ usage() {
 }
 
 die() {
-    printf 'ec: %s\n' "$*" >&2
+    printf 'emc: %s\n' "$*" >&2
     exit 2
+}
+
+require_command() {
+    command -v "$1" >/dev/null 2>&1 || die "command not found: $1"
 }
 
 shell_quote() {
@@ -29,6 +33,10 @@ while [ "$#" -gt 0 ]; do
             [ "$#" -ge 2 ] || die "$1 requires a value"
             host=$2
             shift
+            ;;
+        --host=*)
+            host=${1#*=}
+            [ -n "$host" ] || die "--host requires a value"
             ;;
         -h | --help)
             usage
@@ -49,13 +57,25 @@ while [ "$#" -gt 0 ]; do
     shift
 done
 
+if [ ! -t 0 ] || [ ! -t 1 ]; then
+    die "an interactive terminal is required"
+fi
+
 # An empty alternate editor makes emacsclient start a daemon if needed.
 if [ -n "$host" ]; then
-    remote_command="cd $(shell_quote "$PWD") && emacsclient --tty --alternate-editor='' --"
+    case "$host" in
+        -*) die "invalid host: $host" ;;
+    esac
+
+    require_command ssh
+
+    remote_error=$(shell_quote "emc: remote directory not found: $PWD")
+    remote_command="cd $(shell_quote "$PWD") || { printf '%s\n' $remote_error >&2; exit 2; }; exec emacsclient --tty --alternate-editor='' --"
     for argument; do
         remote_command="$remote_command $(shell_quote "$argument")"
     done
-    exec ssh -t "$host" "$remote_command"
+    exec ssh -t -- "$host" "$remote_command"
 fi
 
+require_command emacsclient
 exec emacsclient --tty --alternate-editor= -- "$@"
