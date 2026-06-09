@@ -447,6 +447,35 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
                   (apply orig-fun args)))))
 #+end_src
 
+** dired
+
+#+begin_src emacs-lisp
+(use-package dired
+  :straight nil
+
+  :init
+  (when (and (eq system-type 'darwin) (executable-find "gls"))
+    (setq insert-directory-program (executable-find "gls")))
+
+  :config
+  (require 'dired-x)
+
+  :custom
+  (dired-kill-when-opening-new-dired-buffer t)
+  (dired-recursive-copies 'always)
+  (dired-recursive-deletes 'always)
+  (dired-omit-files (concat "\\`[.]\\'"
+                            "\\|\\.\\(?:elc\\|a\\|o\\|pyc\\|pyo\\|swp\\|class\\)\\'"
+                            "\\|^\\.DS_Store\\'"
+                            "\\|^\\.stow-local-ignore\\'"
+                            "\\|^\\.\\(?:svn\\|git\\)\\'"
+                            "\\|^__pycache__\\'"
+                            "\\|^flymake_.*"))
+
+  :hook
+  (dired-mode . dired-omit-mode))
+#+end_src
+
 ** desktop
 
 #+begin_src emacs-lisp
@@ -467,34 +496,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
                      ("r" . desktop-read)
                      ("s" . desktop-save)
                      ("v" . desktop-revert)))
-#+end_src
-
-** dired
-
-#+begin_src emacs-lisp
-(use-package dired
-  :straight nil
-
-  :init
-  (when (and (eq system-type 'darwin) (executable-find "gls"))
-    (setq insert-directory-program (executable-find "gls")))
-
-  :config
-  (require 'dired-x)
-
-  :custom
-  (dired-kill-when-opening-new-dired-buffer t)
-  (dired-recursive-copies 'always)
-  (dired-recursive-deletes 'always)
-  (dired-omit-files (concat "\\`[.]\\'"
-                            "\\|\\.\\(?:elc|a\\|o\\|pyc\\|pyo\\|swp\\|class\\)\\'"
-                            "\\|^\\.DS_Store\\'"
-                            "\\|^\\.\\(?:svn\\|git\\)\\'"
-                            "\\|^__pycache__\\'"
-                            "\\|^flymake_.*"))
-
-  :hook
-  (dired-mode . dired-omit-mode))
 #+end_src
 
 ** editorconfig
@@ -2092,7 +2093,8 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 #+begin_src emacs-lisp
 (use-package emacs
   :init
-  (add-to-list 'completion-ignored-extensions ".DS_Store"))
+  (add-to-list 'completion-ignored-extensions ".DS_Store")
+  (add-to-list 'completion-ignored-extensions ".stow-local-ignore"))
 #+end_src
 
 ** cape
