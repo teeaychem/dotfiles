@@ -136,246 +136,24 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 
-* binds
+* system
+
+
+** darwin
 
 #+begin_src emacs-lisp
 (use-package emacs
-  :init
-  (defun forward-delete-word (arg) (interactive "p")
-         (delete-region (point) (progn (forward-word arg) (point))))
-
-  (defun backward-delete-word (arg) (interactive "p")
-         (delete-region (point) (progn (backward-word arg) (point))))
-
-  (defun forward-delete-line (arg) (interactive "p")
-         (delete-region (point) (progn (end-of-line) (point))))
-
-  (defun backward-delete-word (arg) (interactive "p")
-         (delete-region (point) (progn (backward-word arg) (point))))
-
-  ;; https://protesilaos.com/codelog/2024-11-28-basic-emacs-configuration/
-  (defun prot/keyboard-quit-dwim ()
-    "Do-What-I-Mean behaviour for a general `keyboard-quit'."
-    (interactive)
-    (cond
-     ;; When the region is active, disable it.
-     ((region-active-p) (keyboard-quit))
-     ;; When the Completions buffer is selected, close it.
-     ((derived-mode-p 'completion-list-mode) (delete-completion-window))
-     ;; When a minibuffer is open, but not focused, close the minibuffer.
-     ((> (minibuffer-depth) 0) (abort-recursive-edit))
-     ;;In every other case use the regular `keyboard-quit'.
-     (t (keyboard-quit))))
-
-  :config
-  (keymap-global-unset "<mouse-2>")
-  (keymap-global-unset "<mouse-3>")
-  (keymap-global-unset "C-<wheel-down>")
-  (keymap-global-unset "C-<wheel-up>")
-
-  (keymap-global-unset "C-_")
-  (keymap-global-unset "C-z")
-  (keymap-global-unset "M-z")
-  (keymap-global-unset "s-:")
-
-
-  :bind
-  (("<mouse-3>" . #'context-menu-open)
-   ("C-<tab>" . #'completion-at-point)
-   ("<backtab>" . #'completion-at-point)
-   ("C-<backspace>" . #'backward-delete-word)
-   ("C-g" . #'prot/keyboard-quit-dwim)
-   ("C-k" . #'forward-delete-line)
-
-   ("C-x k" . #'kill-current-buffer)
-   ("C-x K" . #'kill-buffer)
-
-   ("s-." . #'xref-find-definitions)
-   ("M-." . #'xref-find-definitions)
-   ("M-s-," . #'xref-go-back)
-   ("M-s-." . #'xref-go-forward)
-
-   ("M-DEL" . #'backward-delete-word)
-
-   ("M-c" . #'capitalize-dwim)
-   ("M-l" . #'downcase-dwim)
-   ("M-u" . #'upcase-dwim)
-
-   ("s-:" . #'eval-expression)
-
-   ("C-x C-r" . #'execute-extended-command)
-   ("s-x" . #'execute-extended-command)
-
-
-   ("RET" . newline)))
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package emacs
-  :config
-  (keymap-global-unset "s-w")
-  (keymap-global-unset "s-q")
-
-  :bind
-  ("s-c" . #'kill-ring-save)
-  ("s-v" . #'yank)
-  ("s-s" . #'save-buffer)
-  ("s-u" . #'revert-buffer))
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package emacs
-  :init
-  (defun my/window-toggle-dedicated ()
-    "Toggle whether the selected window is dedicated to its buffer."
-    (interactive)
-    (let* ((window (selected-window))
-           (dedicated (not (window-dedicated-p window))))
-      (set-window-dedicated-p window dedicated)
-      (message "Window %sdedicated" (if dedicated "" "no longer "))))
-
-  :bind (:prefix-map window-prefix-map
-         :prefix "C-c w")
-  :bind (:repeat-map window-prefix-map
-        :exit
-        :continue
-        ("<left>"    . windmove-left)
-        ("<right>"   . windmove-right)
-        ("<up>"      . windmove-up)
-        ("<down>"    . windmove-down)
-        ("S-<left>"  . windmove-swap-states-left)
-        ("S-<right>" . windmove-swap-states-right)
-        ("S-<up>"    . windmove-swap-states-up)
-        ("S-<down>"  . windmove-swap-states-down)
-        ("C-<left>"  . shrink-window-horizontally)
-        ("C-<right>" . enlarge-window-horizontally)
-        ("C-<up>"    . enlarge-window)
-        ("C-<down>"  . shrink-window)
-        ("["         . previous-buffer)
-        ("]"         . next-buffer)
-        ("0"         . delete-window)
-        ("1"         . delete-other-windows)
-        ("2"         . split-window-below)
-        ("3"         . split-window-right)
-        ("="         . balance-windows-area)
-        ("d"         . my/window-toggle-dedicated)
-        ("r"         . window-layout-rotate-clockwise)
-        ("R"         . window-layout-rotate-anticlockwise)
-        ("t"         . window-layout-transpose)
-        ("u"         . winner-undo)
-        ("U"         . winner-redo)
-        ("l"         . display-line-numbers-mode)))
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package emacs
-  :bind (:prefix-map format-prefix-map
-         :prefix "C-c f"))
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package emacs
-  :bind (:prefix-map search-prefix-map
-         :prefix "C-c s"))
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package emacs
-  :bind (:prefix-map goto-prefix-map
-         :prefix "C-c g"))
-#+end_src
-
-
-* visual
-
-
-** display
-
-#+begin_src emacs-lisp
-(use-package emacs
-
-  :init
-  (setq-default fill-column 1024)
-  (setq-default indicate-empty-lines t)
-  (tool-bar-mode -1)
-
-  (set-frame-parameter nil 'internal-border-width 2)
-
-  (auto-fill-mode 1) ;; wrap lines automatically
-  (column-number-mode 1)
-  (line-number-mode 1)
-  (global-visual-line-mode 1)
-  (global-visual-wrap-prefix-mode 1)
-
-  (tooltip-mode -1)
-  ;; (scroll-bar-mode -1)
-  ;; (horizontal-scroll-bar-mode -1)
-
-  :config
-  (context-menu-mode 1)
-  (setq context-menu-functions (delete 'context-menu-undo context-menu-functions))
-
-  :custom
-  (comint-scroll-to-bottom-on-output t)
-  (cursor-in-non-selected-windows t)
-  (help-window-select t)
-  (mouse-wheel-follow-mouse t)
-  (fast-but-imprecise-scrolling t)
-  (redisplay-skip-fontification-on-input t)
-  ;; (jit-lock-defer-time 0.1) ;; defer fontification while input is pending
-  (right-margin-width 1)
-  (scroll-conservatively 101)
-  (scroll-preserve-screen-position t)
-  (split-height-threshold 0) ;; When split is automatic, always split windows vertically
-  (split-width-threshold nil)
-  (truncate-string-ellipsis "…")
-  (uniquify-buffer-name-style 'forward) ; unique buffer names
-  (use-dialog-box nil)
-  (use-short-answers t)
-  (warning-minimum-level :error))
-#+end_src
-
-#+begin_src emacs-lisp
- (defun visible-bell-invert ()
-   (invert-face 'mode-line)
-   (run-with-timer 0.2 nil 'invert-face 'mode-line))
-
-(setq visible-bell t)
-(setq ring-bell-function #'visible-bell-invert)
-#+end_src
-
-** font
-
-#+begin_src emacs-lisp
-(use-package emacs
-  :init
-  (setq-default line-spacing nil)
-
-  :config
-  (global-font-lock-mode 1)
-  (global-hi-lock-mode 1)
-
-  :custom
-  (treesit-font-lock-level 4))
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package emacs
-  :if (memq system-type '(darwin))
-  :init
-  (set-face-attribute 'default nil
-                      :family "M PLUS 1 Code"; "Maple Mono NF" "JuliaMono"
-                      :height 150))
-#+end_src
-
-** macos
-
-#+begin_src emacs-lisp
-(use-package emacs
-  :if (memq system-type '(darwin))
+  :if (eq system-type 'darwin)
 
   :init
   (menu-bar-mode 1)
+  (set-face-attribute 'default nil
+                      :family "M PLUS 1 Code" ; "Maple Mono NF" "JuliaMono"
+                      :height 150)
+
+  :config
+  (keymap-global-unset "s-w")
+  (keymap-global-unset "s-q")
 
   :custom
   (ns-command-modifier 'super)
@@ -392,6 +170,293 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 * internal
 
+
+** emacs
+
+#+begin_src emacs-lisp
+(use-package emacs
+  :preface
+  (defun my/visible-bell-invert ()
+    "Briefly invert the mode line to provide a visible bell."
+    (invert-face 'mode-line)
+    (run-with-timer 0.2 nil #'invert-face 'mode-line))
+
+  :init
+  (setq-default fill-column 1024)
+  (setq-default indicate-empty-lines t)
+  (setq-default line-spacing nil)
+
+  (tool-bar-mode -1)
+  ;; (scroll-bar-mode -1)
+  ;; (horizontal-scroll-bar-mode -1)
+
+  (set-frame-parameter nil 'internal-border-width 2)
+
+  :bind (:prefix-map format-prefix-map
+         :prefix "C-c f")
+  :bind (:prefix-map search-prefix-map
+         :prefix "C-c s")
+  :bind (:prefix-map goto-prefix-map
+         :prefix "C-c g")
+
+  :custom
+  (cursor-in-non-selected-windows t)
+  (fast-but-imprecise-scrolling t)
+  (redisplay-skip-fontification-on-input t)
+  ;; (jit-lock-defer-time 0.1) ; Defer fontification while input is pending.
+  (right-margin-width 1)
+  (scroll-conservatively 101)
+  (scroll-preserve-screen-position t)
+  (truncate-string-ellipsis "…")
+  (use-dialog-box nil)
+  (use-short-answers t)
+  (visible-bell t)
+  (ring-bell-function #'my/visible-bell-invert)
+  (warning-minimum-level :error))
+#+end_src
+
+** comint
+
+#+begin_src emacs-lisp
+(use-package comint
+  :straight nil
+
+  :custom
+  (comint-scroll-to-bottom-on-output t))
+#+end_src
+
+** font-lock
+
+#+begin_src emacs-lisp
+(use-package font-lock
+  :straight nil
+
+  :init
+  (global-font-lock-mode 1))
+
+(use-package hi-lock
+  :straight nil
+
+  :init
+  (global-hi-lock-mode 1))
+
+(use-package treesit
+  :straight nil
+
+  :custom
+  (treesit-font-lock-level 4))
+#+end_src
+
+** files
+
+#+begin_src emacs-lisp
+(use-package files
+  :straight nil
+
+  :bind
+  (("s-s" . #'save-buffer)
+   ("s-u" . #'revert-buffer)))
+#+end_src
+
+** help
+
+#+begin_src emacs-lisp
+(use-package help
+  :straight nil
+
+  :custom
+  (help-window-select t))
+#+end_src
+
+** mouse
+
+#+begin_src emacs-lisp
+(use-package mouse
+  :straight nil
+
+  :init
+  (context-menu-mode 1)
+
+  :config
+  (keymap-global-unset "<mouse-2>")
+  (keymap-global-unset "C-<wheel-down>")
+  (keymap-global-unset "C-<wheel-up>")
+
+  (setq context-menu-functions
+        (delete 'context-menu-undo context-menu-functions))
+
+  :bind
+  ("<mouse-3>" . #'context-menu-open)
+
+  :custom
+  (mouse-wheel-follow-mouse t))
+#+end_src
+
+** minibuffer
+
+#+begin_src emacs-lisp
+(use-package minibuffer
+  :straight nil
+
+  :bind
+  (("C-<tab>" . #'completion-at-point)
+   ("<backtab>" . #'completion-at-point)))
+#+end_src
+
+** simple
+
+#+begin_src emacs-lisp
+(use-package simple
+  :straight nil
+
+  :preface
+  (defun my/backward-delete-word (arg)
+    "Delete ARG words backward without adding them to the kill ring."
+    (interactive "p")
+    (delete-region (point) (progn (backward-word arg) (point))))
+
+  (defun my/forward-delete-line ()
+    "Delete from point to the end of the line without killing it."
+    (interactive)
+    (delete-region (point) (line-end-position)))
+
+  ;; https://protesilaos.com/codelog/2024-11-28-basic-emacs-configuration/
+  (defun my/keyboard-quit-dwim ()
+    "Quit the current context or deactivate the active region."
+    (interactive)
+    (cond
+     ((region-active-p)
+      (keyboard-quit))
+     ((derived-mode-p 'completion-list-mode)
+      (delete-completion-window))
+     ((> (minibuffer-depth) 0)
+      (abort-recursive-edit))
+     (t
+      (keyboard-quit))))
+
+  :init
+  (auto-fill-mode 1) ; Wrap lines automatically.
+  (column-number-mode 1)
+  (line-number-mode 1)
+  (global-visual-line-mode 1)
+
+  :config
+  (keymap-global-unset "C-_")
+  (keymap-global-unset "C-z")
+  (keymap-global-unset "M-z")
+
+  :bind
+  (("C-<backspace>" . #'my/backward-delete-word)
+   ("M-DEL" . #'my/backward-delete-word)
+   ("C-g" . #'my/keyboard-quit-dwim)
+   ("C-k" . #'my/forward-delete-line)
+   ("C-x k" . #'kill-current-buffer)
+   ("C-x K" . #'kill-buffer)
+   ("M-c" . #'capitalize-dwim)
+   ("M-l" . #'downcase-dwim)
+   ("M-u" . #'upcase-dwim)
+   ("s-:" . #'eval-expression)
+   ("C-x C-r" . #'execute-extended-command)
+   ("s-x" . #'execute-extended-command)
+   ("s-c" . #'kill-ring-save)
+   ("s-v" . #'yank)
+   ("RET" . #'newline)))
+#+end_src
+
+** tooltip
+
+#+begin_src emacs-lisp
+(use-package tooltip
+  :straight nil
+
+  :init
+  (tooltip-mode -1))
+#+end_src
+
+** uniquify
+
+#+begin_src emacs-lisp
+(use-package uniquify
+  :straight nil
+
+  :custom
+  (uniquify-buffer-name-style 'forward))
+#+end_src
+
+** visual-wrap
+
+#+begin_src emacs-lisp
+(use-package visual-wrap
+  :straight nil
+
+  :init
+  (global-visual-wrap-prefix-mode 1))
+#+end_src
+
+** window
+
+#+begin_src emacs-lisp
+(use-package window
+  :straight nil
+
+  :preface
+  (defun my/window-toggle-dedicated ()
+    "Toggle whether the selected window is dedicated to its buffer."
+    (interactive)
+    (let* ((window (selected-window))
+           (dedicated (not (window-dedicated-p window))))
+      (set-window-dedicated-p window dedicated)
+      (message "Window %sdedicated" (if dedicated "" "no longer "))))
+
+  :bind (:prefix-map my/window-prefix-map
+         :prefix "C-c w")
+  :bind (:repeat-map my/window-prefix-map
+         :exit
+         :continue
+         ("<left>"    . windmove-left)
+         ("<right>"   . windmove-right)
+         ("<up>"      . windmove-up)
+         ("<down>"    . windmove-down)
+         ("S-<left>"  . windmove-swap-states-left)
+         ("S-<right>" . windmove-swap-states-right)
+         ("S-<up>"    . windmove-swap-states-up)
+         ("S-<down>"  . windmove-swap-states-down)
+         ("C-<left>"  . shrink-window-horizontally)
+         ("C-<right>" . enlarge-window-horizontally)
+         ("C-<up>"    . enlarge-window)
+         ("C-<down>"  . shrink-window)
+         ("["         . previous-buffer)
+         ("]"         . next-buffer)
+         ("0"         . delete-window)
+         ("1"         . delete-other-windows)
+         ("2"         . split-window-below)
+         ("3"         . split-window-right)
+         ("="         . balance-windows-area)
+         ("d"         . my/window-toggle-dedicated)
+         ("r"         . window-layout-rotate-clockwise)
+         ("R"         . window-layout-rotate-anticlockwise)
+         ("t"         . window-layout-transpose)
+         ("u"         . winner-undo)
+         ("U"         . winner-redo)
+         ("l"         . display-line-numbers-mode))
+
+  :custom
+  (split-height-threshold 0) ; Prefer side-by-side automatic splits.
+  (split-width-threshold nil))
+#+end_src
+
+** xref
+
+#+begin_src emacs-lisp
+(use-package xref
+  :straight nil
+
+  :bind
+  (("s-." . #'xref-find-definitions)
+   ("M-." . #'xref-find-definitions)
+   ("M-s-," . #'xref-go-back)
+   ("M-s-." . #'xref-go-forward)))
+#+end_src
 
 ** autorevert
 
