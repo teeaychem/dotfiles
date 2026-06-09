@@ -61,6 +61,7 @@ brew "python"
 brew "ruff"
 brew "ty"
 brew "uv"
+brew "yapf"
 
 # rust
 brew "rust-analyzer"
