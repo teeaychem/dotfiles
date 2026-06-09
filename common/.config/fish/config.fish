@@ -139,7 +139,14 @@ end
 # This adds: the correct directories to the PATH, auto-completion for the opam binary
 test -r "$OPAMROOT/opam-init/init.fish" && source "$OPAMROOT/opam-init/init.fish" >/dev/null 2>/dev/null; or true
 
-set -gx PATH (string split : ("$HOME/.local/bin/dotfiles-path"))
+load_paths "$XDG_CONFIG_HOME/shell/path/base.paths"
+switch (uname)
+    case Darwin
+        load_paths "$XDG_CONFIG_HOME/shell/path/darwin.paths"
+    case Linux
+        load_paths "$XDG_CONFIG_HOME/shell/path/linux.paths"
+end
+load_paths "$XDG_CONFIG_HOME/shell/path/local.paths"
 
 # etc
 

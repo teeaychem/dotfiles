@@ -1,0 +1,84 @@
+#!/bin/sh
+
+paths_file=${1:-}
+
+trim() {
+    trimmed=$1
+
+    while :; do
+        case "$trimmed" in
+            [[:space:]]*) trimmed=${trimmed#?} ;;
+            *) break ;;
+        esac
+    done
+
+    while :; do
+        case "$trimmed" in
+            *[[:space:]]) trimmed=${trimmed%?} ;;
+            *) break ;;
+        esac
+    done
+}
+
+if [ ! -f "$paths_file" ]; then
+    case "${paths_file##*/}" in
+        local*) ;;
+        *)
+            printf "Error: Paths file '%s' does not exist or was not specified.\n" \
+                "$paths_file" >&2
+            ;;
+    esac
+    exit 1
+fi
+
+while IFS= read -r line || [ -n "$line" ]; do
+    trim "$line"
+    line=$trimmed
+
+    case "$line" in
+        ''|\#*) continue ;;
+    esac
+
+    operation=${line%"${line#?}"}
+    expression=${line#?}
+    trim "$expression"
+    expression=$trimmed
+
+    case "$operation:$expression" in
+        +:?*|-:?*) ;;
+        *)
+            printf "Warning: Ignoring malformed line in '%s': %s\n" \
+                "$paths_file" "$line" >&2
+            continue
+            ;;
+    esac
+
+    set --
+    if ! eval "set -- $expression"; then
+        printf "Warning: Unable to evaluate path expression in '%s': %s\n" \
+            "$paths_file" "$line" >&2
+        continue
+    fi
+
+    if [ "$#" -ne 1 ] || [ -z "$1" ]; then
+        printf "Warning: Path expression must expand to one nonempty path in '%s': %s\n" \
+            "$paths_file" "$line" >&2
+        continue
+    fi
+
+    directory=$1
+    while [ "$directory" != / ] && [ "${directory%/}" != "$directory" ]; do
+        directory=${directory%/}
+    done
+
+    case "$directory" in
+        *:*)
+            printf "Warning: Path contains a colon in '%s': %s\n" \
+                "$paths_file" "$line" >&2
+            continue
+            ;;
+    esac
+
+    [ "$operation" = - ] || [ -d "$directory" ] || continue
+    printf '%s\t%s\n' "$operation" "$directory"
+done < "$paths_file"

@@ -111,7 +111,6 @@ export LLVM_SRC="${HOME}/repos/llvm"
 
 # # npm / node
 # export NPM_CONFIG_USERCONFIG="${XDG_CONFIG_HOME}/npm/npmrc"
-# path_add "${HOME}/.npm-packages/bin" prepend
 
 # # OCaml
 # export OPAMROOT="${XDG_DATA_HOME}/opam"

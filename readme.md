@@ -37,6 +37,7 @@ Files such as the following should remain machine-local:
 ~/.config/git/config.local
 ~/.config/ghostty/config.local
 ~/.config/shell/env/local.env
+~/.config/shell/path/local.paths
 ~/.config/navidrome.toml
 ```
 
@@ -80,12 +81,34 @@ It can include current machine-local files whose long-term placement remains
 undecided. Update `.gitignore` and regenerate after deciding a path should
 remain local or is generated state.
 
-## PATH helper
+## PATH configuration
 
-`path_add` prints an updated `PATH`, removing duplicate entries and ignoring
-directories that do not exist. It appends by default:
+Shared PATH configuration is stored in:
+
+```text
+~/.config/shell/path/base.paths
+~/.config/shell/path/darwin.paths
+~/.config/shell/path/linux.paths
+~/.config/shell/path/local.paths
+```
+
+The files load from lowest to highest priority: base, platform, then local.
+Within each file, later additions have higher priority.
+
+Each non-comment line starts with an operation followed by a trusted shell
+expression:
 
 ```sh
-export PATH="$(path_add --prepend "$HOME/.local/bin")" # zsh
-set -gx PATH (string split : (path_add --append "$HOME/bin")) # fish
++ "$HOME/.local/bin"
+- "$XDG_CONFIG_HOME/scripts/common"
 ```
+
+`+` removes existing copies and prepends the directory if it exists. `-`
+removes all copies whether or not the directory exists. Blank lines and
+full-line comments are ignored.
+
+The expression is evaluated by a shared POSIX shell parser and must produce
+exactly one nonempty path. These files are trusted configuration: evaluation
+may perform shell expansion and command substitution. Keep expressions valid
+POSIX shell syntax, quote paths that can contain spaces, and use exported
+environment variables such as `$HOME`.
