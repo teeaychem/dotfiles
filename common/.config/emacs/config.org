@@ -951,8 +951,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :straight t
 
   :config
-  (setf (alist-get 'python-mode apheleia-mode-alist) '(ruff))
-  (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff))
+  (setf (alist-get 'python-mode apheleia-mode-alist) '(yapf ruff-isort))
+  (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(yapf ruff-isort))
 
   (setf (alist-get 'clang-format apheleia-formatters) '("clang-format"
                                                         "-assume-filename"
