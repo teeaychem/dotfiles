@@ -2867,50 +2867,6 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 #+end_src
 
 
-* workspaces (maybe)
-
-#+begin_src emacs-lisp
-;; Core Registration Function
-(defun my/register-workspaces (workspaces-alist &optional subfolder)
-  "Register an ALIST of (name . path) workspaces.
-Prioritizes a .dir-locals.el inside the project path.
-Falls back to a file in USER-EMACS-DIRECTORY under SUBFOLDER."
-  (let* ((folder (or subfolder "workspace-configs"))
-         (config-dir (expand-file-name folder user-emacs-directory)))
-    (pcase-dolist (`(,name . ,target-path) workspaces-alist)
-      (when (and target-path (file-directory-p target-path))
-        (let* ((class-name (intern (concat name "-locals")))
-               (local-file (expand-file-name ".dir-locals.el" target-path))
-               (fallback-file (expand-file-name (concat name ".el") config-dir))
-               (target-file (if (file-exists-p local-file) local-file fallback-file)))
-
-          (when (string= target-file fallback-file)
-            (make-directory config-dir t)
-            (unless (file-exists-p fallback-file)
-              (write-region "((nil . ()))" nil fallback-file)))
-
-          (dir-locals-set-class-variables class-name target-file)
-          (dir-locals-set-directory-class target-path class-name))))))
-#+end_src
-
-#+begin_src emacs-lisp
-(let ((workspaces-el (expand-file-name "workspaces.el" (concat user-emacs-directory "var/"))))
-  (unless (file-exists-p workspaces-el)
-    (make-directory (file-name-directory workspaces-el) t)
-    (with-temp-file workspaces-el
-      (insert "(")
-      (insert ";;(\"project-alpha\" . \"/home/user/workspaces/project-alpha/\")\n")
-      (insert ")")))
-
-  (let ((my-personal-workspaces (with-temp-buffer
-                                  (insert-file-contents workspaces-el)
-                                  (goto-char (point-min))
-                                  (read (current-buffer)))))
-
-    (my/register-workspaces my-personal-workspaces)))
-#+end_src
-
-
 * COMMENT profiling-end
 
 #+begin_src emacs-lisp
