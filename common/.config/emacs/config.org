@@ -1702,11 +1702,11 @@ To highlight indentations
 ** lua
 
 #+begin_src emacs-lisp
-(use-package lua-mode
-  :straight t
+(use-package lua-ts-mode
+  :straight nil
 
   :custom
-  (lua-indent-level 2))
+  (lua-ts-indent-offset 2))
 #+end_src
 
 ** llvm
