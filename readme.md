@@ -79,3 +79,13 @@ The result is a review list, not an instruction to move every reported file.
 It can include current machine-local files whose long-term placement remains
 undecided. Update `.gitignore` and regenerate after deciding a path should
 remain local or is generated state.
+
+## PATH helper
+
+`path_add` prints an updated `PATH`, removing duplicate entries and ignoring
+directories that do not exist. It appends by default:
+
+```sh
+export PATH="$(path_add --prepend "$HOME/.local/bin")" # zsh
+set -gx PATH (string split : (path_add --append "$HOME/bin")) # fish
+```
