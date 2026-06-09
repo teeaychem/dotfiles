@@ -56,6 +56,7 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
 
   (delete-selection-mode 1) ;; delete selected text by typing
 
+  (mouse-wheel-mode 1)
   (save-place-mode 1)
   (xterm-mouse-mode 1)
 
