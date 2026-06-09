@@ -1094,10 +1094,12 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :commands dumb-jump-xref-activate
 
   :custom
-  (dumb-jump-prefer-searcher 'rg))
+  (dumb-jump-prefer-searcher 'rg)
 
-(setq xref-backend-functions (remq 'etags--xref-backend xref-backend-functions))
-(add-hook 'xref-backend-functions #'dumb-jump-xref-activate t)
+  :init
+  (with-eval-after-load 'xref
+    (remove-hook 'xref-backend-functions #'etags--xref-backend)
+    (add-hook 'xref-backend-functions #'dumb-jump-xref-activate t)))
 #+end_src
 
 ** envrc
