@@ -1174,7 +1174,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package envrc
-  :disabled
   :straight t
 
   :custom
