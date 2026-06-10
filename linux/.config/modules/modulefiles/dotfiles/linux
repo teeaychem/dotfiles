@@ -1,0 +1,3 @@
+#%Module
+
+module-whatis {loads the Linux dotfiles environment}

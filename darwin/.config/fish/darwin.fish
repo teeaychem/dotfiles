@@ -1,5 +1,3 @@
-load_env "$XDG_CONFIG_HOME/shell/env/darwin.env"
-
 if test -x /opt/homebrew/bin/brew
     /opt/homebrew/bin/brew shellenv fish | source
 end

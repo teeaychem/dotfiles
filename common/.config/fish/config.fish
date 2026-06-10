@@ -1,44 +1,6 @@
 # https://wiki.archlinux.org/title/XDG_Base_Directory
 # https://specifications.freedesktop.org/basedir-spec/latest/
 
-function load_env
-    set -l env_file $argv
-
-    # Catches both an empty argument and a missing file path
-    if not test -f "$env_file"
-        if not string match -q 'local*' (path basename "$env_file")
-            echo "Error: Environment file '$env_file' does not exist or was not specified." >&2
-        end
-        return 1
-    end
-
-    while read -l line
-        # Skip lines that are empty or start with '#'
-        string match -q -r '^\s*(#|$)' $line; and continue
-
-        # Split into key and value around the first '=' sign
-        set -l kv (string split -m 1 '=' $line)
-        set -l key $kv[1]
-
-        # 1. Trim surrounding single or double quotes
-        set -l clean_val (string trim -c '"\'' $kv[2])
-
-        # 2. Expand embedded variables (e.g. $HOME) without evaluating commands
-        set -l expanded_val $clean_val
-        for variable_ref in (string match -ra '\$[A-Za-z_][A-Za-z0-9_]*' -- "$clean_val")
-            set -l variable_name (string sub -s 2 -- $variable_ref)
-            if set -q $variable_name
-                set expanded_val (string replace -a -- "$variable_ref" "$$variable_name" "$expanded_val")
-            else
-                echo "Warning: Environment variable '$variable_name' referenced by '$key' is not set." >&2
-            end
-        end
-
-        # 3. Export the key and the fully expanded value globally
-        set -gx $key $expanded_val
-    end < $env_file
-end
-
 function load_vars
     set -l vars_file $argv[1]
 
@@ -111,13 +73,14 @@ function load_history_ignore
     end < "$ignore_file"
 end
 
-set -gx XDG_CONFIG_HOME $HOME/.config/
+set -gx XDG_CONFIG_HOME $HOME/.config
+set -gx XDG_STATE_HOME $HOME/.local/state
+set -gx XDG_DATA_HOME $HOME/.local/share
+set -gx XDG_CACHE_HOME $HOME/.cache
 
 
 # Usage inside config.fish:
 load_vars "$XDG_CONFIG_HOME/shell/vars/base.vars"
-
-load_env "$XDG_CONFIG_HOME/shell/env/base.env"
 
 load_aliases "$XDG_CONFIG_HOME/shell/aliases/base.aliases"
 load_history_ignore "$XDG_CONFIG_HOME/shell/history/ignore"
@@ -142,7 +105,19 @@ switch (uname)
         test -r /usr/share/modules/init/fish_completion; and source /usr/share/modules/init/fish_completion
 end
 
-load_env "$XDG_CONFIG_HOME/shell/env/local.env"
+if type -q module
+    module use "$XDG_CONFIG_HOME/modules/modulefiles"
+    module load dotfiles/base
+
+    switch (uname)
+        case Darwin
+            module load dotfiles/darwin
+        case Linux
+            module load dotfiles/linux
+    end
+
+    module is-avail dotfiles/local >/dev/null 2>&1; and module load dotfiles/local
+end
 
 # hammerspoon
 # defaults write org.hammerspoon.Hammerspoon MJConfigFile "~/.config/hammerspoon/init.lua"
@@ -150,15 +125,6 @@ load_env "$XDG_CONFIG_HOME/shell/env/local.env"
 # OCaml
 # This adds: the correct directories to the PATH, auto-completion for the opam binary
 test -r "$OPAMROOT/opam-init/init.fish" && source "$OPAMROOT/opam-init/init.fish" >/dev/null 2>/dev/null; or true
-
-load_paths "$XDG_CONFIG_HOME/shell/path/base.paths"
-switch (uname)
-    case Darwin
-        load_paths "$XDG_CONFIG_HOME/shell/path/darwin.paths"
-    case Linux
-        load_paths "$XDG_CONFIG_HOME/shell/path/linux.paths"
-end
-load_paths "$XDG_CONFIG_HOME/shell/path/local.paths"
 
 # etc
 

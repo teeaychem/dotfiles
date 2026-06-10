@@ -1,57 +1,7 @@
 export XDG_CONFIG_HOME="${HOME}/.config"
-
-_expand_env_value() {
-  local key="$1"
-  local value="$2"
-  local remaining="$value"
-  local variable_ref variable_name
-
-  while [[ "$remaining" =~ '\$[A-Za-z_][A-Za-z0-9_]*' ]]; do
-    variable_ref="$MATCH"
-    variable_name="${variable_ref#\$}"
-
-    if (( ${+parameters[$variable_name]} )); then
-      value="${value//${variable_ref}/${(P)variable_name}}"
-    else
-      echo "Warning: Environment variable '$variable_name' referenced by '$key' is not set." >&2
-    fi
-
-    remaining="${remaining#*${variable_ref}}"
-  done
-
-  REPLY="$value"
-}
-
-load_env() {
-  local env_file="$1"
-
-  if [[ ! -f "$env_file" ]]; then
-    if [[ "${env_file:t}" != local* ]]; then
-      echo "Error: Environment file '$env_file' does not exist or was not specified." >&2
-    fi
-    return 1
-  fi
-
-  local line key value
-  while IFS= read -r line || [[ -n "$line" ]]; do
-    [[ "$line" =~ '^[[:space:]]*(#|$)' ]] && continue
-
-    if [[ "$line" != *=* ]]; then
-      echo "Warning: Ignoring malformed line in '$env_file': $line" >&2
-      continue
-    fi
-
-    key="${line%%=*}"
-    value="${line#*=}"
-
-    if [[ "$value" == \"*\" || "$value" == \'*\' ]]; then
-      value="${value[2,-2]}"
-    fi
-
-    _expand_env_value "$key" "$value"
-    export "$key=$REPLY"
-  done < "$env_file"
-}
+export XDG_STATE_HOME="${HOME}/.local/state"
+export XDG_DATA_HOME="${HOME}/.local/share"
+export XDG_CACHE_HOME="${HOME}/.cache"
 
 load_vars() {
   setopt local_options extended_glob
@@ -79,15 +29,6 @@ load_vars() {
 }
 
 load_vars "$XDG_CONFIG_HOME/shell/vars/base.vars"
-load_env "$XDG_CONFIG_HOME/shell/env/base.env"
-
-case "$OSTYPE" in
-  darwin*)
-    load_env "$XDG_CONFIG_HOME/shell/env/darwin.env"
-    ;;
-esac
-
-load_env "$XDG_CONFIG_HOME/shell/env/local.env"
 
 mkdir -p \
     "$XDG_CONFIG_HOME" \
@@ -102,9 +43,6 @@ mkdir -p ${ZDOTDIR}
 export HISTFILE="$ZDOTDIR/.zhistory" # History filepath
 export HISTSIZE=10000                # Maximum events for internal history
 export SAVEHIST=10000                # Maximum events in history file
-
-export REPOS_DIR="${HOME}/repos"
-export LLVM_SRC="${HOME}/repos/llvm"
 
 # Languages, etc.
 

@@ -1,9 +1,0 @@
-# Later additions have higher priority.
-
-- "$XDG_CONFIG_HOME/scripts/common"
-
-+ "$HOME/.local/opt/emacs/bin"
-+ "$HOME/.cargo/bin"
-+ "$HOME/.npm-packages/bin"
-+ "$HOME/.local/bin"
-+ "$ELAN_HOME/bin"

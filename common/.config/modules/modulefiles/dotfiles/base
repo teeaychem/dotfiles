@@ -1,0 +1,46 @@
+#%Module
+
+module-whatis {loads the shared dotfiles environment}
+
+setenv XDG_DESKTOP_DIR "$env(HOME)/Desktop"
+setenv XDG_DOWNLOAD_DIR "$env(HOME)/Downloads"
+setenv XDG_TEMPLATES_DIR "$env(HOME)/Templates"
+setenv XDG_PUBLICSHARE_DIR "$env(HOME)/Public"
+setenv XDG_DOCUMENTS_DIR "$env(HOME)/Documents"
+setenv XDG_MUSIC_DIR "$env(HOME)/Music"
+setenv XDG_PICTURES_DIR "$env(HOME)/Pictures"
+setenv XDG_VIDEOS_DIR "$env(HOME)/Videos"
+
+setenv EDITOR nvim
+setenv MANPAGER {nvim +Man!}
+setenv FD_OPTIONS {--hidden --follow}
+setenv FZF_DEFAULT_COMMAND {fd --type f --hidden --follow --exclude .git}
+
+setenv NPM_CONFIG_USERCONFIG "$env(XDG_CONFIG_HOME)/npm/npmrc"
+setenv OPAMROOT "$env(XDG_DATA_HOME)/opam"
+
+setenv PYTHONPYCACHEPREFIX "$env(XDG_CACHE_HOME)/python_cache"
+setenv PYTHON_HISTORY "$env(XDG_CACHE_HOME)/python/history"
+setenv IPYTHONDIR "$env(XDG_CACHE_HOME)/ipython"
+setenv MPLCONFIGDIR "$env(XDG_CACHE_HOME)/matplotlib"
+
+setenv DOCKER_CONFIG "$env(XDG_CONFIG_HOME)/docker"
+setenv DICTIONARY en_GB
+setenv DICPATH "$env(XDG_DATA_HOME)/hunspell"
+setenv LESSHISTFILE "$env(XDG_STATE_HOME)/less/history"
+setenv KERAS_HOME "$env(XDG_DATA_HOME)/keras"
+setenv ELAN_HOME "$env(HOME)/.local/opt/elan"
+
+setenv REPOS_DIR "$env(HOME)/repos"
+setenv LLVM_SRC "$env(HOME)/repos/llvm"
+
+foreach directory [list \
+    "$env(HOME)/.cargo/bin" \
+    "$env(HOME)/.npm-packages/bin" \
+    "$env(HOME)/.local/bin" \
+    "$env(ELAN_HOME)/bin" \
+] {
+    if {[file isdirectory $directory]} {
+        prepend-path PATH $directory
+    }
+}

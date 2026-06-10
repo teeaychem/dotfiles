@@ -1,9 +1,0 @@
-# Later additions have higher priority.
-
-- "$XDG_CONFIG_HOME/scripts/darwin"
-
-+ "/opt/homebrew/sbin"
-+ "/opt/homebrew/bin"
-+ "/usr/local/texlive/2026basic/bin/universal-darwin"
-
-# + "/opt/homebrew/opt/llvm/bin"

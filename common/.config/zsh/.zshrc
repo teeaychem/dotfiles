@@ -8,7 +8,7 @@ source ${ZDOTDIR:-$HOME}/.antidote/antidote.zsh
 antidote load
 
 fpath=("${XDG_CONFIG_HOME}/zsh/functions" $fpath)
-autoload -Uz load_aliases load_paths venv-activate
+autoload -Uz load_aliases venv-activate
 
 # Path configuration, as macOS executes path_helper *after* sourcing zshenv
 # https://apple.stackexchange.com/questions/432226/homebrew-path-set-in-zshenv-is-overridden
@@ -38,6 +38,20 @@ case "$OSTYPE" in
             source /usr/share/modules/init/zsh
         ;;
 esac
+
+if (( $+functions[module] )); then
+    module use "$XDG_CONFIG_HOME/modules/modulefiles"
+    module load dotfiles/base
+
+    case "$OSTYPE" in
+        darwin*) module load dotfiles/darwin ;;
+        linux*) module load dotfiles/linux ;;
+    esac
+
+    if module is-avail dotfiles/local >/dev/null 2>&1; then
+        module load dotfiles/local
+    fi
+fi
 
 load_aliases "$XDG_CONFIG_HOME/shell/aliases/base.aliases"
 
@@ -135,13 +149,6 @@ fi
 
 # # OCaml
 [[ -r "$OPAMROOT/opam-init/init.zsh" ]] && source "$OPAMROOT/opam-init/init.zsh" >/dev/null 2>/dev/null
-
-load_paths "$XDG_CONFIG_HOME/shell/path/base.paths"
-case "$OSTYPE" in
-    darwin*) load_paths "$XDG_CONFIG_HOME/shell/path/darwin.paths" ;;
-    linux*) load_paths "$XDG_CONFIG_HOME/shell/path/linux.paths" ;;
-esac
-load_paths "$XDG_CONFIG_HOME/shell/path/local.paths"
 
 # extensions
 

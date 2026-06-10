@@ -46,8 +46,7 @@ Files such as the following should remain machine-local:
 ```text
 ~/.config/git/config.local
 ~/.config/ghostty/config.local
-~/.config/shell/env/local.env
-~/.config/shell/path/local.paths
+~/.config/modules/modulefiles/dotfiles/local
 ~/.config/navidrome.toml
 ```
 
@@ -91,34 +90,36 @@ It can include current machine-local files whose long-term placement remains
 undecided. Update `.gitignore` and regenerate after deciding a path should
 remain local or is generated state.
 
-## PATH configuration
+## Environment configuration
 
-Shared PATH configuration is stored in:
+Environment Modules provides shared, platform, and machine-local environment
+configuration:
 
 ```text
-~/.config/shell/path/base.paths
-~/.config/shell/path/darwin.paths
-~/.config/shell/path/linux.paths
-~/.config/shell/path/local.paths
+~/.config/modules/modulefiles/dotfiles/base
+~/.config/modules/modulefiles/dotfiles/darwin
+~/.config/modules/modulefiles/dotfiles/linux
+~/.config/modules/modulefiles/dotfiles/local
 ```
 
-The files load from lowest to highest priority: base, platform, then local.
-Within each file, later additions have higher priority.
+Shell startup loads `dotfiles/base`, the current platform module, then the
+optional untracked `dotfiles/local` module. This gives machine-local values the
+highest priority.
 
-Each non-comment line starts with an operation followed by a trusted shell
-expression:
+Use `setenv` for baseline scalar values and the path commands for path-like
+variables:
 
-```sh
-+ "$HOME/.local/bin"
-- "$XDG_CONFIG_HOME/scripts/common"
+```tcl
+#%Module
+
+setenv EDITOR nvim
+prepend-path PATH /opt/llvm/bin
 ```
 
-`+` removes existing copies and prepends the directory if it exists. `-`
-removes all copies whether or not the directory exists. Blank lines and
-full-line comments are ignored.
+Use `pushenv` in temporary or overriding modules when unloading should restore
+the previous value.
 
-The expression is evaluated by a shared POSIX shell parser and must produce
-exactly one nonempty path. These files are trusted configuration: evaluation
-may perform shell expansion and command substitution. Keep expressions valid
-POSIX shell syntax, quote paths that can contain spaces, and use exported
-environment variables such as `$HOME`.
+`XDG_CONFIG_HOME`, `XDG_STATE_HOME`, `XDG_DATA_HOME`, and `XDG_CACHE_HOME`
+remain shell bootstrap variables because they are needed before Modules is
+initialized. Known unexported variable names used for completion remain in
+`~/.config/shell/vars/base.vars`.
