@@ -1,0 +1,12 @@
+#!/usr/bin/env zsh
+
+if (( $+commands[fdfind] )); then
+    exec fdfind "$@"
+fi
+
+for candidate in ${(f)"$(whence -pa fd)"}; do
+    [[ ${candidate:A} == ${0:A} ]] || exec "$candidate" "$@"
+done
+
+print -u2 'fd: neither fdfind nor another fd executable is available'
+exit 127

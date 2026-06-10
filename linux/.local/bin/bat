@@ -1,0 +1,12 @@
+#!/usr/bin/env zsh
+
+if (( $+commands[batcat] )); then
+    exec batcat "$@"
+fi
+
+for candidate in ${(f)"$(whence -pa bat)"}; do
+    [[ ${candidate:A} == ${0:A} ]] || exec "$candidate" "$@"
+done
+
+print -u2 'bat: neither batcat nor another bat executable is available'
+exit 127

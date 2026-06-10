@@ -1,3 +1,23 @@
-# Environment management
+# Shells and environment management
 direnv
 environment-modules
+fish
+zsh
+
+# Shared command-line tools
+bat
+curl
+fd-find
+hunspell
+ripgrep
+shfmt
+tmux
+tree
+zoxide
+
+# Git configuration
+git
+git-delta
+git-lfs
+
+# fzf is installed with ~/.local/bin/install-fzf.
