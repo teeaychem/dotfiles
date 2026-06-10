@@ -29,6 +29,16 @@ Preview changes without creating links:
 The installer uses `--no-folding`, allowing machine-local files to coexist
 with links managed by Stow.
 
+On Ubuntu, install the environment-management packages with:
+
+```sh
+./linux/.local/bin/install-ubuntu-packages ubuntu-packages
+```
+
+After applying the dotfiles, the command is available as
+`install-ubuntu-packages PACKAGE_FILE`. The environment-management packages
+are listed separately in `ubuntu-packages`.
+
 ## Machine-local files
 
 Files such as the following should remain machine-local:
