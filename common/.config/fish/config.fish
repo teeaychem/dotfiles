@@ -131,6 +131,17 @@ switch (uname)
         echo "No configuration for: "(uname)
 end
 
+switch (uname)
+    case Darwin
+        if test -r "$HOMEBREW_PREFIX/opt/modules/init/fish"
+            source "$HOMEBREW_PREFIX/opt/modules/init/fish"
+            test -r "$HOMEBREW_PREFIX/opt/modules/init/fish_completion"; and source "$HOMEBREW_PREFIX/opt/modules/init/fish_completion"
+        end
+    case Linux
+        test -r /usr/share/modules/init/fish; and source /usr/share/modules/init/fish
+        test -r /usr/share/modules/init/fish_completion; and source /usr/share/modules/init/fish_completion
+end
+
 load_env "$XDG_CONFIG_HOME/shell/env/local.env"
 
 # hammerspoon

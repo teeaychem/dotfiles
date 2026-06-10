@@ -28,6 +28,17 @@ case "$OSTYPE" in
     ;;
 esac
 
+case "$OSTYPE" in
+    darwin*)
+        [[ -r "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/modules/init/zsh" ]] &&
+            source "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/modules/init/zsh"
+        ;;
+    linux*)
+        [[ -r /usr/share/modules/init/zsh ]] &&
+            source /usr/share/modules/init/zsh
+        ;;
+esac
+
 load_aliases "$XDG_CONFIG_HOME/shell/aliases/base.aliases"
 
 # options
