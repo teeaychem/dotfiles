@@ -118,7 +118,6 @@ set -gx XDG_CONFIG_HOME $HOME/.config/
 load_vars "$XDG_CONFIG_HOME/shell/vars/base.vars"
 
 load_env "$XDG_CONFIG_HOME/shell/env/base.env"
-load_env "$XDG_CONFIG_HOME/shell/env/local.env"
 
 load_aliases "$XDG_CONFIG_HOME/shell/aliases/base.aliases"
 load_history_ignore "$XDG_CONFIG_HOME/shell/history/ignore"
@@ -131,6 +130,8 @@ switch (uname)
     case '*'
         echo "No configuration for: "(uname)
 end
+
+load_env "$XDG_CONFIG_HOME/shell/env/local.env"
 
 # hammerspoon
 # defaults write org.hammerspoon.Hammerspoon MJConfigFile "~/.config/hammerspoon/init.lua"

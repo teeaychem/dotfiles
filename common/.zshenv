@@ -80,13 +80,14 @@ load_vars() {
 
 load_vars "$XDG_CONFIG_HOME/shell/vars/base.vars"
 load_env "$XDG_CONFIG_HOME/shell/env/base.env"
-load_env "$XDG_CONFIG_HOME/shell/env/local.env"
 
 case "$OSTYPE" in
   darwin*)
     load_env "$XDG_CONFIG_HOME/shell/env/darwin.env"
     ;;
 esac
+
+load_env "$XDG_CONFIG_HOME/shell/env/local.env"
 
 mkdir -p \
     "$XDG_CONFIG_HOME" \
