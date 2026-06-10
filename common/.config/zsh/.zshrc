@@ -10,8 +10,6 @@ antidote load
 fpath=("${XDG_CONFIG_HOME}/zsh/functions" $fpath)
 autoload -Uz load_aliases venv-activate
 
-# Path configuration, as macOS executes path_helper *after* sourcing zshenv
-# https://apple.stackexchange.com/questions/432226/homebrew-path-set-in-zshenv-is-overridden
 case "$OSTYPE" in
     darwin*)
     if [[ -f ${XDG_CONFIG_HOME}/zsh/darwin.sh ]]; then
@@ -28,29 +26,13 @@ case "$OSTYPE" in
     ;;
 esac
 
-case "$OSTYPE" in
-    darwin*)
-        [[ -r "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/modules/init/zsh" ]] &&
-            source "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/modules/init/zsh"
-        ;;
-    linux*)
-        [[ -r /usr/share/modules/init/zsh ]] &&
-            source /usr/share/modules/init/zsh
-        ;;
-esac
-
-if (( $+functions[module] )); then
-    module use "$XDG_CONFIG_HOME/modules/modulefiles"
-    module load dotfiles/base
-
-    case "$OSTYPE" in
-        darwin*) module load dotfiles/darwin ;;
-        linux*) module load dotfiles/linux ;;
-    esac
-
-    if module is-avail dotfiles/local >/dev/null 2>&1; then
-        module load dotfiles/local
-    fi
+# macOS login shells run path_helper after .zshenv, moving system paths ahead
+# of the paths added by the dotfiles modules. brew shellenv may then adjust
+# PATH again when the platform configuration above is sourced. Reloading the
+# modules here restores their intended precedence for interactive shells.
+# Non-interactive login shells (zsh -lc) keep path_helper's system-first order.
+if [[ "$OSTYPE" == darwin* ]] && (( $+functions[module] )); then
+    module reload
 fi
 
 load_aliases "$XDG_CONFIG_HOME/shell/aliases/base.aliases"

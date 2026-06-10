@@ -58,6 +58,31 @@ export SAVEHIST=10000                # Maximum events in history file
 
 typeset -gU path fpath # ensure path arrays do not contain duplicates.
 
+case "$OSTYPE" in
+    darwin*)
+        [[ -r "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/modules/init/zsh" ]] &&
+            source "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/modules/init/zsh"
+        ;;
+    linux*)
+        [[ -r /usr/share/modules/init/zsh ]] &&
+            source /usr/share/modules/init/zsh
+        ;;
+esac
+
+if (( $+functions[module] )); then
+    module use "$XDG_CONFIG_HOME/modules/modulefiles"
+    module load dotfiles/base
+
+    case "$OSTYPE" in
+        darwin*) module load dotfiles/darwin ;;
+        linux*) module load dotfiles/linux ;;
+    esac
+
+    if module is-avail dotfiles/local >/dev/null 2>&1; then
+        module load dotfiles/local
+    fi
+fi
+
 # # gpg
 
 # https://www.gnupg.org/(it)/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html
