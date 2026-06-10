@@ -165,6 +165,10 @@ if [[ -o interactive ]] && (( $+commands[zoxide] )); then
     eval "$(zoxide init zsh)"
 fi
 
+if [[ -o interactive ]] && (( $+commands[direnv] )); then
+    eval "$(direnv hook zsh)"
+fi
+
 
 # closing
 autoload -Uz compinit
