@@ -33,6 +33,21 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
 (setq debug-on-error nil)
 #+end_src
 
+** straight built-ins
+
+Some libraries bundled with Emacs are also released independently.
+Packages may depend on release names, and straight may install a copy after emacs has already loaded the bundled.
+
+Prefer every package reported by Emacs as built in, an external version must be explicitly removed.
+This block must therefore precede all third-party packages.
+
+#+begin_src emacs-lisp
+(require 'finder-inf)
+
+(dolist (package (mapcar #'car package--builtins))
+  (add-to-list 'straight-built-in-pseudo-packages package))
+#+end_src
+
 
 * general
 
@@ -811,6 +826,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package tramp
+  :straight nil
+
   :config
   (connection-local-set-profile-variables
    'remote-direct-async-process '((tramp-direct-async-process . t)))
