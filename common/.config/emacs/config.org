@@ -449,6 +449,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
          ("2"         . split-window-below)
          ("3"         . split-window-right)
          ("="         . balance-windows-area)
+         ("c"         . compare-windows)
          ("d"         . my/window-toggle-dedicated)
          ("r"         . window-layout-rotate-clockwise)
          ("R"         . window-layout-rotate-anticlockwise)
