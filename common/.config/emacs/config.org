@@ -937,6 +937,13 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   :custom
   (project-mode-line 'non-remote)
+  (project-switch-commands
+   '((project-find-file "Find file" ?f)
+     (consult-ripgrep "Ripgrep" ?g)
+     (consult-project-buffer "Buffer" ?b)
+     (project-dired "Dired" ?d)
+     (project-compile "Compile" ?c)
+     (project-eshell "Eshell" ?e)))
   (project-vc-extra-root-markers
    '("INSTALL_RECEIPT.json" ;; brewed libraries, etc.
      ".project"             ;; custom
@@ -2486,21 +2493,6 @@ These buffers can be seen by using space.
 
 
 ** eglot
-
-#+begin_src emacs-lisp
-(defun set-project-override ()
-  "Set `project-current-directory-override' for the current buffer"
-  (interactive)
-  (setq-local project-current-directory-override (project-prompt-project-dir)))
-#+end_src
-
-set-project-override is not particularly useful as it's (only) buffer local.
-Instead, a .dir.locals in the root with the following seems to work ok.
-
-#+begin_src emacs-lisp :tangle no
-((nil . ((project-current-directory-override . "<project_root>"))))
-#+end_src
-
 
 maybe: https://github.com/casouri/eldoc-box
 
