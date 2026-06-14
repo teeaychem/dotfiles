@@ -352,7 +352,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
       (keyboard-quit))))
 
   :init
-  (auto-fill-mode 1) ; Wrap lines automatically.
   (column-number-mode 1)
   (line-number-mode 1)
   (global-visual-line-mode 1)
