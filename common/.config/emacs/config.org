@@ -590,7 +590,18 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (use-package editorconfig
   :straight nil
   :delight
+
+  :init
+  (defun my/editorconfig-display-fill-column-indicator (props)
+    "Show a fill-column indicator when PROPS set max_line_length."
+    (if (and (editorconfig-string-integer-p (gethash 'max_line_length props))
+             (> fill-column 0))
+        (display-fill-column-indicator-mode 1)
+      (display-fill-column-indicator-mode -1)))
+
   :config
+  (add-hook 'editorconfig-after-apply-functions
+            #'my/editorconfig-display-fill-column-indicator)
   (editorconfig-mode 1))
 #+end_src
 
