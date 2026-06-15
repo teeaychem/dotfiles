@@ -15,6 +15,12 @@ tmux
 tree
 zoxide
 
+# Debugging
+gdb
+lldb
+python3
+python3-venv
+
 # Git configuration
 git
 git-delta

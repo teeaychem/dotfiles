@@ -39,6 +39,19 @@ After applying the dotfiles, the command is available as
 `install-ubuntu-packages PACKAGE_FILE`. The environment-management packages
 are listed separately in `ubuntu-packages`.
 
+## Debugging
+
+The Homebrew and Ubuntu package lists install GDB and LLVM's LLDB adapter.
+`~/.local/bin/lldb-dap` resolves Homebrew's keg-only LLVM installation and
+Ubuntu's versioned adapter names.
+
+Pet runs debugpy with the Python interpreter selected for the current project,
+so debugpy must also be present in that environment. For uv projects:
+
+```sh
+uv add --dev debugpy
+```
+
 ## Machine-local files
 
 Files such as the following should remain machine-local:

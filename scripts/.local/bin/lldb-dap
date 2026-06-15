@@ -1,0 +1,25 @@
+#!/usr/bin/env zsh
+
+# Homebrew keeps LLVM keg-only, so its adapter is not normally on PATH.
+if (( $+commands[brew] )); then
+    llvm_prefix=$(brew --prefix llvm 2>/dev/null)
+    if [[ -x $llvm_prefix/bin/lldb-dap ]]; then
+        exec "$llvm_prefix/bin/lldb-dap" "$@"
+    fi
+fi
+
+for candidate in ${(f)"$(whence -pa lldb-dap)"}; do
+    [[ ${candidate:A} == ${0:A} ]] || exec "$candidate" "$@"
+done
+
+# Ubuntu installs versioned adapter names. LLVM renamed lldb-vscode in 18.
+for name in ${(On)${(k)commands[(I)lldb-dap-*]}}; do
+    exec "$commands[$name]" "$@"
+done
+
+for name in ${(On)${(k)commands[(I)lldb-vscode-*]}}; do
+    exec "$commands[$name]" "$@"
+done
+
+print -u2 'lldb-dap: no LLDB debug adapter is available'
+exit 127
