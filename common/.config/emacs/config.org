@@ -250,13 +250,17 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   :init
   (global-font-lock-mode 1))
+#+end_src
 
+#+begin_src emacs-lisp
 (use-package hi-lock
   :straight nil
 
   :init
   (global-hi-lock-mode 1))
+#+end_src
 
+#+begin_src emacs-lisp
 (use-package treesit
   :straight nil
 
@@ -995,7 +999,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (catppuccin-flavor 'mocha)
   (catppuccin-highlight-matches t)
   (catppuccin-italic-variables t))
+#+end_src
 
+#+begin_src emacs-lisp
 (use-package batppuccin
   :straight (batppuccin :type git :host github :repo "bbatsov/batppuccin-emacs"))
 (load-theme 'batppuccin-mocha t)
@@ -1775,8 +1781,7 @@ To highlight indentations
   (LaTeX-mode . LaTeX-math-mode)
   (LaTeX-mode . reftex-mode)
   (LaTeX-mode . TeX-source-correlate-mode)
-  (LaTeX-mode . flyspell-mode)
-)
+  (LaTeX-mode . flyspell-mode))
 #+end_src
 
 - use Skim as default pdf viewer
@@ -2470,6 +2475,7 @@ These buffers can be seen by using space.
 #+begin_src emacs-lisp
 (use-package embark
   :straight t
+
   :bind (("C-c a" . embark-act)       ;; pick some comfortable binding
          ("C-;" . embark-dwim)        ;; good alternative: M-.
          ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
@@ -2489,7 +2495,6 @@ These buffers can be seen by using space.
 *** embark-consult
 
 #+begin_src emacs-lisp
-;; Consult users will also want the embark-consult package.
 (use-package embark-consult
   :straight t
   :after (embark consult))
@@ -2633,8 +2638,7 @@ for rust dev
 (use-package eglot-x
   :disabled
   :if (memq system-type '(darwin))
-  :vc (eglot-x :url "https://github.com/nemethf/eglot-x"
-               :rev :newest)
+  :vc (eglot-x :url "https://github.com/nemethf/eglot-x" :rev :newest)
   :after eglot
 
   :config
@@ -2657,6 +2661,7 @@ for rust dev
 #+begin_src emacs-lisp
 (use-package consult-eglot
   :straight t
+
   :commands consult-eglot-symbols)
 #+end_src
 
