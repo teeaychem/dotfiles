@@ -1227,6 +1227,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
      "DICPATH"
      "REPOS_DIR"
      "XDG_CONFIG_HOME"
+     "OPENAI_API_KEY"
+     "CODEX_API_KEY"
      "CLANGD_JOBS"
      "LLVM_SRC"
      "MLIR_LSP_SERVER_BIN"
@@ -2937,14 +2939,10 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
   ;; ((codex-acp . "brew install codex-acp"))
 
   :config
-  (let ((local-env (substitute-env-vars "${XDG_CONFIG_HOME}/local.env")))
-    (setq agent-shell-openai-codex-environment
-          (if (file-exists-p local-env)
-              (agent-shell-make-environment-variables
-               :load-env local-env
-               :inherit-env t)
-            (agent-shell-make-environment-variables
-             :inherit-env t)))))
+  ;; Shell startup loads the dotfiles modules; `exec-path-from-shell'
+  ;; imports their agent credentials for GUI Emacs sessions.
+  (setq agent-shell-openai-codex-environment
+        (agent-shell-make-environment-variables :inherit-env t)))
 #+end_src
 
 
