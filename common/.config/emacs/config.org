@@ -54,8 +54,8 @@ This block must therefore precede all third-party packages.
 #+begin_src emacs-lisp
 ;; Optimization from doom-start.el
 (setq auto-mode-case-fold nil)
-(setq-default bidi-display-reordering 'left-to-right
-              bidi-paragraph-direction 'left-to-right)
+(setq-default bidi-display-reordering 'left-to-right)
+(setq-default bidi-paragraph-direction 'left-to-right)
 (setq bidi-inhibit-bpa t)
 (setq idle-update-delay 1.0)
 #+end_src
@@ -90,19 +90,18 @@ This block must therefore precede all third-party packages.
   (translate-upper-case-key-bindings nil)
   (mouse-yank-at-point t)
   (kill-whole-line t)
-  (read-extended-command-predicate #'command-completion-default-include-p)   ;; Hide commands in M-x which do not work in the current mode.
+  (read-extended-command-predicate #'command-completion-default-include-p) ;; Hide commands in M-x which do not work in the current mode.
 
   (kill-do-not-save-duplicates t)
   (save-interprogram-paste-before-kill t)
 
   (window-combination-resize t)
 
-
   (auto-save-interval 200)
 
   (minibuffer-prompt-properties '(read-only t
-                                            cursor-intangible t
-                                            face minibuffer-prompt)))
+                                  cursor-intangible t
+                                  face minibuffer-prompt)))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -112,7 +111,6 @@ This block must therefore precede all third-party packages.
 
   :init
   (global-subword-mode 1))
-
 #+end_src
 
 
@@ -346,14 +344,10 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
     "Quit the current context or deactivate the active region."
     (interactive)
     (cond
-     ((region-active-p)
-      (keyboard-quit))
-     ((derived-mode-p 'completion-list-mode)
-      (delete-completion-window))
-     ((> (minibuffer-depth) 0)
-      (abort-recursive-edit))
-     (t
-      (keyboard-quit))))
+     ((region-active-p)                      (keyboard-quit))
+     ((derived-mode-p 'completion-list-mode) (delete-completion-window))
+     ((> (minibuffer-depth) 0)               (abort-recursive-edit))
+     (t                                      (keyboard-quit))))
 
   :init
   (column-number-mode 1)
