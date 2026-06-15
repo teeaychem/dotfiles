@@ -2792,8 +2792,7 @@ https://github.com/renzmann/treesit-auto
 
 #+begin_src emacs-lisp
 (use-package dape
-  ;; Keep Dape ordered after Pet: Pet supplies buffer-local Python
-  ;; interpreter, project-root, and `dape-command' settings.
+  ;; Keep Dape ordered after Pet: Pet supplies buffer-local Python interpreter, project-root, and `dape-command' settings.
   :after (eglot pet)
   :straight t
 
@@ -2831,34 +2830,7 @@ https://github.com/renzmann/treesit-auto
 
   ;; Kill compile buffer on build success
   ;; (add-hook 'dape-compile-hook 'kill-buffer)
-
   )
-
-;; (with-eval-after-load 'dape
-;;   (add-to-list 'dape-configs
-;;                `(gdb
-;;                  ensure (lambda (config)
-;;                           (dape-ensure-command config)
-;;                           (let* ((default-directory
-;;                                   (or (dape-config-get config 'command-cwd) default-directory))
-;;                                  (command (dape-config-get config 'command))
-;;                                  (output (shell-command-to-string (format "%s --version" command)))
-
-;;                                  (version (save-match-data
-;;                                             (when (string-match "GNU gdb \\(?:(.*) \\)?\\([0-9.]+\\)" output)
-;;                                               (string-to-number (match-string 1 output))))))
-;;                             (message command)
-;;                             (unless (>= version 14.1)
-;;                               (user-error "Requires gdb version >= 14.1"))))
-;;      modes (c-ts-mode c++-ts-mode)
-;;      command-cwd dape-command-cwd
-;;      command "gdb"
-;;      command-args ("--interpreter=dap")
-;;      :command-cwd nil
-;;      :request "launch"
-;;      :program "a.out"
-;;      :args []
-;;      :stopAtBeginningOfMainSubprogram nil)))
 #+end_src
 
 
