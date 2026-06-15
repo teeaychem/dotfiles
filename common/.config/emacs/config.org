@@ -644,13 +644,10 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   "Prefer Flymake diagnostics over other Eldoc sources while Flymake is active."
   (if (bound-and-true-p flymake-mode)
       (progn
-        (remove-hook 'eldoc-documentation-functions
-                     #'flymake-eldoc-function t)
-        (add-hook 'eldoc-documentation-functions
-                  #'flymake-eldoc-function -90 t)
+        (remove-hook 'eldoc-documentation-functions #'flymake-eldoc-function t)
+        (add-hook 'eldoc-documentation-functions #'flymake-eldoc-function -90 t)
         (setq-local eldoc-echo-area-prefer-doc-buffer nil)
-        (setq-local eldoc-documentation-strategy
-                    #'eldoc-documentation-enthusiast))
+        (setq-local eldoc-documentation-strategy #'eldoc-documentation-enthusiast))
     (kill-local-variable 'eldoc-echo-area-prefer-doc-buffer)
     (kill-local-variable 'eldoc-documentation-strategy)))
 
@@ -659,12 +656,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
     (when-let* ((symbol (symbol-at-point))
                 (doc (cond
                       ((fboundp symbol) (documentation symbol t))
-                      ((boundp symbol)
-                       (documentation-property
-                        symbol 'variable-documentation t)))))
-      (funcall callback doc
-               :thing (symbol-name symbol)
-               :echo 'skip)
+                      ((boundp symbol) (documentation-property symbol 'variable-documentation t)))))
+      (funcall callback doc :thing (symbol-name symbol) :echo 'skip)
       t))
 
   (defun my/elisp-eldoc-setup ()
