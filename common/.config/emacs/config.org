@@ -640,13 +640,19 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
                      '((window-width . 80)))
                    alist)))))
 
-  (defun my/eldoc-promote-flymake ()
-    "Give Flymake diagnostics priority when Flymake provides Eldoc."
-    (when (memq #'flymake-eldoc-function eldoc-documentation-functions)
-      (setq-local eldoc-documentation-functions
-                  (cons #'flymake-eldoc-function
-                        (remove #'flymake-eldoc-function
-                                eldoc-documentation-functions)))))
+(defun my/eldoc-prefer-flymake ()
+  "Prefer Flymake diagnostics over other Eldoc sources while Flymake is active."
+  (if (bound-and-true-p flymake-mode)
+      (progn
+        (remove-hook 'eldoc-documentation-functions
+                     #'flymake-eldoc-function t)
+        (add-hook 'eldoc-documentation-functions
+                  #'flymake-eldoc-function -90 t)
+        (setq-local eldoc-echo-area-prefer-doc-buffer nil)
+        (setq-local eldoc-documentation-strategy
+                    #'eldoc-documentation-enthusiast))
+    (kill-local-variable 'eldoc-echo-area-prefer-doc-buffer)
+    (kill-local-variable 'eldoc-documentation-strategy)))
 
   (defun my/elisp-eldoc-symbol-documentation (callback &rest _)
     "Report full documentation for the Emacs Lisp symbol at point."
@@ -710,7 +716,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   :hook
   (emacs-lisp-mode . my/elisp-eldoc-setup)
-  ((flymake-mode eglot-managed-mode) . my/eldoc-promote-flymake))
+  ((flymake-mode eglot-managed-mode) . my/eldoc-prefer-flymake))
 #+end_src
 
 ** elec-pair
