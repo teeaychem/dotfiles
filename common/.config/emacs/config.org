@@ -565,12 +565,17 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (use-package desktop
   :straight nil
 
+  :init
+  (let ((desktop-dir (expand-file-name "var/desktops/" user-emacs-directory)))
+    (make-directory desktop-dir t)
+    (setq desktop-path (list desktop-dir)))
+  (desktop-save-mode 1)
+
   :custom
-  (desktop-path (list (expand-file-name "var/desktops/" user-emacs-directory)))
+  (desktop-save t)
   (desktop-auto-save-timeout nil)
   (desktop-restore-eager 5)
 
-  (desktop-save-mode 1)
   (desktop-load-locked-desktop t)
 
   :bind (:prefix-map desktop-prefix-map
