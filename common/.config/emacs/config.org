@@ -640,17 +640,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
                      '((window-width . 80)))
                    alist)))))
 
-(defun my/eldoc-prefer-flymake ()
-  "Prefer Flymake diagnostics over other Eldoc sources while Flymake is active."
-  (if (bound-and-true-p flymake-mode)
-      (progn
-        (remove-hook 'eldoc-documentation-functions #'flymake-eldoc-function t)
-        (add-hook 'eldoc-documentation-functions #'flymake-eldoc-function -90 t)
-        (setq-local eldoc-echo-area-prefer-doc-buffer nil)
-        (setq-local eldoc-documentation-strategy #'eldoc-documentation-enthusiast))
-    (kill-local-variable 'eldoc-echo-area-prefer-doc-buffer)
-    (kill-local-variable 'eldoc-documentation-strategy)))
-
   (defun my/elisp-eldoc-symbol-documentation (callback &rest _)
     "Report full documentation for the Emacs Lisp symbol at point."
     (when-let* ((symbol (symbol-at-point))
@@ -708,8 +697,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
                      ("w" . #'my/eldoc-toggle-window-side))
 
   :hook
-  (emacs-lisp-mode . my/elisp-eldoc-setup)
-  ((flymake-mode eglot-managed-mode) . my/eldoc-prefer-flymake))
+  (emacs-lisp-mode . my/elisp-eldoc-setup))
 #+end_src
 
 ** elec-pair
@@ -922,6 +910,23 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
     (interactive (list 1 t))
     (flymake-goto-prev-error n '(error) interactive))
 
+  (defun my/flymake-diagnostics-at-point ()
+    "Show Flymake diagnostics at point in the echo area."
+    (when-let* ((diags (flymake-diagnostics (point))))
+      (message "%s"
+               (mapconcat (lambda (diag)
+                            (flymake-diagnostic-text diag
+                             (or (alist-get :eldoc-echo flymake-diagnostic-format-alist)
+                                 (alist-get t flymake-diagnostic-format-alist)
+                                 '(origin code oneliner))))
+                          diags "\n"))))
+
+  (defun my/flymake-diagnostics-at-point-setup ()
+    "Show Flymake diagnostics at point while Flymake is active."
+    (if flymake-mode
+        (add-hook 'post-command-hook  #'my/flymake-diagnostics-at-point nil t)
+      (remove-hook 'post-command-hook #'my/flymake-diagnostics-at-point t)))
+
   :config
   (setq flymake-diagnostic-format-alist
         '((t . (origin code message))))
@@ -939,7 +944,10 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :custom
   (flymake-margin-indicator-position 'right-margin)
   (flymake-fringe-indicator-position 'right-fringe)
-  (flymake-wrap-around t))
+  (flymake-wrap-around t)
+
+  :hook
+  (flymake-mode . my/flymake-diagnostics-at-point-setup))
 #+end_src
 
 ** project
