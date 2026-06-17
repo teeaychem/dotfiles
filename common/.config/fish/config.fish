@@ -162,6 +162,8 @@ if status is-interactive
 
     bind ctrl-h backward-kill-word
     bind shift-tab accept-autosuggestion
+    bind ctrl-left backward-word
+    bind ctrl-right forward-word
     bind alt-b backward-word
     bind alt-f forward-word
 end
