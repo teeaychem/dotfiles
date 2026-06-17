@@ -1,0 +1,33 @@
+#!/bin/sh
+set -eu
+
+script=$0
+
+case $script in
+    */*) ;;
+    *)
+        old_ifs=$IFS
+        IFS=:
+        for dir in $PATH; do
+            test -n "$dir" || dir=.
+            if test -f "$dir/$script"; then
+                script=$dir/$script
+                break
+            fi
+        done
+        IFS=$old_ifs
+        ;;
+esac
+
+while test -L "$script"; do
+    link=$(readlink "$script")
+    case $link in
+        /*) script=$link ;;
+        *) script=$(dirname -- "$script")/$link ;;
+    esac
+done
+
+script_dir=$(CDPATH= cd -- "$(dirname -- "$script")" && pwd -P)
+repo_dir=$(CDPATH= cd -- "$script_dir/../../.." && pwd -P)
+
+exec "$repo_dir/install" "$@"

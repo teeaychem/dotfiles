@@ -28,10 +28,16 @@ cd ~/dotfiles
 ./install
 ```
 
+After the first install, the wrapper command is available from any directory:
+
+```sh
+dotfiles-install
+```
+
 Preview changes without creating links:
 
 ```sh
-./install --simulate --verbose
+dotfiles-install --simulate --verbose
 ```
 
 The installer uses `--no-folding`, allowing machine-local files to coexist
@@ -88,7 +94,7 @@ files are added, removed, or moved:
 ```sh
 cd ~/dotfiles
 git pull
-./install
+dotfiles-install
 ```
 
 ## Audit
