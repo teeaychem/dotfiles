@@ -28,10 +28,10 @@ git clone ssh://git@codeberg.org/teeaychem/dot.git ~/dotfiles
 cd ~/dotfiles
 ```
 
-On macOS, use the Homebrew bundle:
+On macOS, use the core Homebrew bundle:
 
 ```sh
-brew bundle --file darwin/.config/brew/Brewfile
+brew bundle --file darwin/.config/brew/Brewfile.core
 ```
 
 On Ubuntu, use the package list and installer:
@@ -67,6 +67,9 @@ After applying the dotfiles, the command is available as
 These package lists include Environment Modules (`modules` on Homebrew,
 `environment-modules` on Ubuntu), which Fish uses to load the shared, platform,
 and machine-local environment modulefiles.
+
+For a fuller macOS workstation install, use `darwin/.config/brew/Brewfile`,
+which includes both the core and optional bundles.
 
 ## Debugging
 
