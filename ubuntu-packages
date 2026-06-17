@@ -2,6 +2,7 @@
 direnv
 environment-modules
 fish
+stow
 zsh
 
 # Shared command-line tools

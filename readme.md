@@ -20,11 +20,29 @@ fish_plugins_sync
 
 ## Install
 
-Install Git and GNU Stow, then clone and apply the configuration:
+Clone the repository, install the platform package set, then apply the
+configuration:
 
 ```sh
 git clone ssh://git@codeberg.org/teeaychem/dot.git ~/dotfiles
 cd ~/dotfiles
+```
+
+On macOS, use the Homebrew bundle:
+
+```sh
+brew bundle --file darwin/.config/brew/Brewfile
+```
+
+On Ubuntu, use the package list and installer:
+
+```sh
+./linux/.local/bin/install-ubuntu-packages ubuntu-packages
+```
+
+Then apply the Stow links:
+
+```sh
 ./install
 ```
 
@@ -43,15 +61,12 @@ dotfiles-install --simulate --verbose
 The installer uses `--no-folding`, allowing machine-local files to coexist
 with links managed by Stow.
 
-On Ubuntu, install the environment-management packages with:
-
-```sh
-./linux/.local/bin/install-ubuntu-packages ubuntu-packages
-```
-
 After applying the dotfiles, the command is available as
-`install-ubuntu-packages PACKAGE_FILE`. The environment-management packages
-are listed separately in `ubuntu-packages`.
+`install-ubuntu-packages PACKAGE_FILE`.
+
+These package lists include Environment Modules (`modules` on Homebrew,
+`environment-modules` on Ubuntu), which Fish uses to load the shared, platform,
+and machine-local environment modulefiles.
 
 ## Debugging
 
@@ -74,16 +89,6 @@ Files such as the following should remain machine-local:
 ~/.config/git/config.local
 ~/.config/ghostty/config.local
 ~/.config/modules/modulefiles/dotfiles/local
-~/.config/navidrome.toml
-```
-
-The shared Git configuration requires `config.local` to define the user
-identity:
-
-```ini
-[user]
-	name = Your Name
-	email = you@example.com
 ```
 
 ## Update

@@ -10,6 +10,7 @@ brew "cmake"
 brew "coreutils" # GNU File, Shell, and Text utilities
 brew "difftastic"
 brew "direnv"
+brew "fish"
 brew "modules"
 brew "wader/tap/fq"
 brew "fzf"
@@ -28,6 +29,7 @@ brew "qemu"
 brew "ranger"
 brew "ripgrep"
 # brew "starship" # / pure
+brew "stow"
 brew "tmux"
 brew "zoxide"
 
