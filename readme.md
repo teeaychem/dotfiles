@@ -10,6 +10,14 @@ GNU Stow deploys these packages into `$HOME`:
 Each package contains `.stow-local-ignore` so Git preserves it even when the
 package otherwise becomes empty.
 
+## Utils
+
+### Fish
+
+``` sh
+fish_plugins_sync
+```
+
 ## Install
 
 Install Git and GNU Stow, then clone and apply the configuration:
