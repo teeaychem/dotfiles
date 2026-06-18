@@ -8,6 +8,7 @@ zsh
 # Shared command-line tools
 bat
 curl
+dasel
 fd-find
 hunspell
 neovim

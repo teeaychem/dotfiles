@@ -1,4 +1,5 @@
 brew "bat"
+brew "dasel"
 brew "direnv"
 brew "fd"
 brew "fish"
