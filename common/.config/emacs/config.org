@@ -1871,8 +1871,46 @@ https://github.com/llvm/llvm-project.git
 Get the relevant package subdirectories from the llvm source
 
 #+begin_src emacs-lisp
+(defvar my/llvm-source-root (getenv "LLVM_SRC")
+  "LLVM source root for this buffer or project.")
+
+(defvar-local my/mlir-lsp-server-bin (getenv "MLIR_LSP_SERVER_BIN")
+  "MLIR language server executable for this buffer or project.")
+
+(defvar-local my/mlir-pdll-lsp-server-bin (getenv "MLIR_PDLL_LSP_SERVER_BIN")
+  "PDLL language server executable for this buffer or project.")
+
+(defvar-local my/pdll-compilation-database (getenv "PDLL_COMPILATION_DATABASE")
+  "PDLL compilation database for this buffer or project.")
+
+(defvar-local my/tablegen-lsp-server-bin (getenv "TABLEGEN_LSP_SERVER_BIN")
+  "TableGen language server executable for this buffer or project.")
+
+(defvar-local my/tablegen-compilation-database (getenv "TABLEGEN_COMPILATION_DATABASE")
+  "TableGen compilation database for this buffer or project.")
+
+(dolist (variable '(my/llvm-source-root
+                    my/mlir-lsp-server-bin
+                    my/mlir-pdll-lsp-server-bin
+                    my/pdll-compilation-database
+                    my/tablegen-lsp-server-bin
+                    my/tablegen-compilation-database))
+  (put variable 'safe-local-variable #'stringp))
+
+(defun my/llvm-file-executable-p (path)
+  "Return non-nil when PATH names an executable file."
+  (and (stringp path)
+       (not (string= path ""))
+       (file-executable-p path)))
+
+(defun my/llvm-file-readable-p (path)
+  "Return non-nil when PATH names a readable file."
+  (and (stringp path)
+       (not (string= path ""))
+       (file-readable-p path)))
+
 (with-eval-after-load 'exec-path-from-shell
-  (let ((llvm-root (getenv "LLVM_SRC")))
+  (let ((llvm-root my/llvm-source-root))
     (when (and llvm-root (file-directory-p llvm-root))
       (add-to-list 'load-path (expand-file-name "llvm/utils/emacs" llvm-root))
       (add-to-list 'load-path (expand-file-name "mlir/utils/emacs" llvm-root)))))
@@ -1889,20 +1927,20 @@ Get the relevant package subdirectories from the llvm source
 
   :init
   (defun my-eglot-strict-mlir (&optional _interactive)
-    "Return the MLIR language-server command from the shell environment."
-    (let ((server-path (getenv "MLIR_LSP_SERVER_BIN")))
-      (unless (file-executable-p server-path)
-        (user-error "Eglot aborted: MLIR_LSP_SERVER_BIN is invalid (%s)"
+    "Return the MLIR language-server command for the current buffer."
+    (let ((server-path my/mlir-lsp-server-bin))
+      (unless (my/llvm-file-executable-p server-path)
+        (user-error "Eglot aborted: my/mlir-lsp-server-bin or MLIR_LSP_SERVER_BIN is invalid (%s)"
                     (or server-path "Unset")))
       (list server-path)))
 
   (defun my-eglot-strict-pdll (&optional _interactive)
-    "Return the PDLL language-server command from the shell environment."
-    (let ((server-path (getenv "MLIR_PDLL_LSP_SERVER_BIN"))
-          (db-path (getenv "PDLL_COMPILATION_DATABASE")))
-      (unless (and (file-executable-p server-path)
-                   (file-readable-p db-path))
-        (user-error "Eglot aborted: PDLL server or compilation database is invalid (%s, %s)"
+    "Return the PDLL language-server command for the current buffer."
+    (let ((server-path my/mlir-pdll-lsp-server-bin)
+          (db-path my/pdll-compilation-database))
+      (unless (and (my/llvm-file-executable-p server-path)
+                   (my/llvm-file-readable-p db-path))
+        (user-error "Eglot aborted: PDLL server or compilation database setting is invalid (%s, %s)"
                     (or server-path "Unset")
                     (or db-path "Unset")))
       (list server-path (format "--pdll-compilation-database=%s" db-path))))
@@ -1921,12 +1959,12 @@ Get the relevant package subdirectories from the llvm source
 
   :init
   (defun my-eglot-strict-tablegen (&optional _interactive)
-    "Return the TableGen language-server command from the shell environment."
-    (let ((server-path (getenv "TABLEGEN_LSP_SERVER_BIN"))
-          (db-path (getenv "TABLEGEN_COMPILATION_DATABASE")))
-      (unless (and (file-executable-p server-path)
-                   (file-readable-p db-path))
-        (user-error "Eglot aborted: TableGen server or compilation database is invalid (%s, %s)"
+    "Return the TableGen language-server command for the current buffer."
+    (let ((server-path my/tablegen-lsp-server-bin)
+          (db-path my/tablegen-compilation-database))
+      (unless (and (my/llvm-file-executable-p server-path)
+                   (my/llvm-file-readable-p db-path))
+        (user-error "Eglot aborted: TableGen server or compilation database setting is invalid (%s, %s)"
                     (or server-path "Unset")
                     (or db-path "Unset")))
       (list server-path (format "--tablegen-compilation-database=%s" db-path)))))

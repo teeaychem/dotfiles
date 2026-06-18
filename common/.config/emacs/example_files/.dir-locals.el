@@ -1,5 +1,12 @@
 
-((python-base-mode
+((nil
+  . ((my/llvm-source-root . "/path/to/llvm-project")
+     (my/mlir-lsp-server-bin . "/path/to/build/bin/mlir-lsp-server")
+     (my/mlir-pdll-lsp-server-bin . "/path/to/build/bin/mlir-pdll-lsp-server")
+     (my/pdll-compilation-database . "/path/to/build/tools/mlir/tools/pdll/pdll_compile_commands.yml")
+     (my/tablegen-lsp-server-bin . "/path/to/build/bin/tblgen-lsp-server")
+     (my/tablegen-compilation-database . "/path/to/build/tablegen_compile_commands.yml")))
+ (python-base-mode
   . ((eglot-workspace-configuration ;; https://github.com/python-lsp/python-lsp-server/blob/develop/CONFIGURATION.md
       . (:pylsp (:plugins (:jedi (:environment "./.venv/")
                            :jedi_completion (:include_params t
