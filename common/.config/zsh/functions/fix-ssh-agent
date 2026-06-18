@@ -1,0 +1,64 @@
+emulate -L zsh
+
+local stable_sock="${SSH_AUTH_SOCK_STABLE:-$HOME/.ssh/ssh_auth_sock}"
+local source_sock candidate
+
+function _fix_ssh_agent_socket_usable {
+    local sock="$1"
+
+    [[ -S "$sock" ]] || return 1
+
+    if (( $+commands[ssh-add] )); then
+        SSH_AUTH_SOCK="$sock" ssh-add -l >/dev/null 2>&1
+        case $? in
+            0|1) return 0 ;;
+            *) return 1 ;;
+        esac
+    fi
+
+    return 0
+}
+
+{
+    if [[ -n "${SSH_AUTH_SOCK:-}" && "$SSH_AUTH_SOCK" != "$stable_sock" ]] &&
+        _fix_ssh_agent_socket_usable "$SSH_AUTH_SOCK"; then
+        source_sock="$SSH_AUTH_SOCK"
+    fi
+
+    if [[ -z "$source_sock" ]]; then
+        for candidate in /tmp/ssh-*/agent.*(Nom); do
+            [[ "$candidate" == "$stable_sock" ]] && continue
+
+            if _fix_ssh_agent_socket_usable "$candidate"; then
+                source_sock="$candidate"
+                break
+            fi
+        done
+    fi
+
+    if [[ -z "$source_sock" && -n "${SSH_AUTH_SOCK:-}" ]] &&
+        _fix_ssh_agent_socket_usable "$SSH_AUTH_SOCK"; then
+        source_sock="$SSH_AUTH_SOCK"
+    fi
+
+    if [[ -z "$source_sock" ]]; then
+        echo "Unable to find a usable SSH agent socket" >&2
+        return 1
+    fi
+
+    mkdir -p "${stable_sock:h}" || return 1
+
+    if [[ "$source_sock" != "$stable_sock" ]]; then
+        ln -snf "$source_sock" "$stable_sock" || return 1
+    fi
+
+    export SSH_AUTH_SOCK="$stable_sock"
+
+    if [[ -n "$TMUX" ]] && (( $+commands[tmux] )); then
+        tmux setenv -g SSH_AUTH_SOCK "$SSH_AUTH_SOCK"
+    fi
+
+    echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK"
+} always {
+    unfunction _fix_ssh_agent_socket_usable 2>/dev/null || true
+}

@@ -8,7 +8,7 @@ source ${ZDOTDIR:-$HOME}/.antidote/antidote.zsh
 antidote load
 
 fpath=("${XDG_CONFIG_HOME}/zsh/functions" $fpath)
-autoload -Uz load_aliases venv-activate
+autoload -Uz fix-ssh-agent load_aliases venv-activate
 
 case "$OSTYPE" in
     darwin*)
