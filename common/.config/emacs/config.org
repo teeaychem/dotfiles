@@ -280,6 +280,10 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (use-package files
   :straight nil
 
+  :init
+  (add-to-list 'completion-ignored-extensions ".DS_Store")
+  (add-to-list 'completion-ignored-extensions ".stow-local-ignore")
+
   :bind
   (("s-s" . #'save-buffer)
    ("s-u" . #'revert-buffer)))
@@ -503,7 +507,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 ** bookmarks
 
 #+begin_src emacs-lisp
-(use-package emacs
+(use-package bookmark
+  :straight nil
+
   :bind (:prefix-map bookmark-prefix-map
                      :prefix "C-c b")
   (:map bookmark-prefix-map
@@ -551,6 +557,10 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   :config
   (require 'dired-x)
+  (setq dired-listing-switches
+        "-l --almost-all --human-readable --group-directories-first --no-group")
+  ;; useful when you want to close the window of `dirvish-side'  when opening a file
+  (put 'dired-find-alternate-file 'disabled nil)
 
   :custom
   (dired-kill-when-opening-new-dired-buffer t)
@@ -830,7 +840,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 ** isearch
 
 #+begin_src emacs-lisp
-(use-package emacs
+(use-package isearch
+  :straight nil
+
   :config
   (setq isearch-lazy-count t)
   (setq isearch-repeat-on-direction-change t)
@@ -1150,7 +1162,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :straight t)
 #+end_src
 
-** diminish
+** delight
 
 #+begin_src emacs-lisp
 (use-package delight
@@ -1158,15 +1170,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 ** dirvish
-
-#+begin_src emacs-lisp
-(use-package emacs
-  :config
-  (setq dired-listing-switches
-        "-l --almost-all --human-readable --group-directories-first --no-group")
-  ;; useful when you want to close the window of `dirvish-side'  when opening a file
-  (put 'dired-find-alternate-file 'disabled nil))
-#+end_src
 
 #+begin_src emacs-lisp
 (use-package dirvish
@@ -2273,16 +2276,6 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 
 
 * completion
-
-
-** emacs
-
-#+begin_src emacs-lisp
-(use-package emacs
-  :init
-  (add-to-list 'completion-ignored-extensions ".DS_Store")
-  (add-to-list 'completion-ignored-extensions ".stow-local-ignore"))
-#+end_src
 
 ** cape
 
