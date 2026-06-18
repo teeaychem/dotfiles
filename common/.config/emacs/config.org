@@ -833,9 +833,15 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (use-package emacs
   :config
   (setq isearch-lazy-count t)
+  (setq isearch-repeat-on-direction-change t)
   (setq lazy-count-prefix-format "(%s/%s) ")
   (setq lazy-count-suffix-format nil)
-  (setq search-whitespace-regexp ".*?"))
+  (setq search-whitespace-regexp ".*?")
+
+  :bind (:map isearch-mode-map
+              ("C-o" . isearch-occur)
+              ("M-%" . isearch-query-replace)
+              ("C-M-%" . isearch-query-replace-regexp)))
 #+end_src
 
 ** tramp
@@ -1142,17 +1148,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package crux
   :straight t)
-#+end_src
-
-** COMMENT ctrlf
-
-#+begin_src emacs-lisp
-(use-package ctrlf
-  :straight t
-  :disabled
-
-  :init
-  (ctrlf-mode 1))
 #+end_src
 
 ** diminish
