@@ -2301,6 +2301,20 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 (use-package cape
   :straight t
 
+  :init
+  ;; Add to the global default value of `completion-at-point-functions' which is used by `completion-at-point'.
+  ;; The order of the functions matters, the first function returning a result wins.
+  ;; Note that the list of buffer-local completion functions takes precedence over the global list.
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-elisp-block)
+  ;;(add-to-list 'completion-at-point-functions #'cape-history)
+  ;;(add-to-list 'completion-at-point-functions #'cape-keyword)
+  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
+  ;;(add-to-list 'completion-at-point-functions #'cape-dict)
+  ;;(add-to-list 'completion-at-point-functions #'cape-elisp-symbol)
+  ;;(add-to-list 'completion-at-point-functions #'cape-line)
+
   :bind (:prefix-map cape-prefix-map :prefix "C-c p")
   (:map cape-prefix-map
         ("p" . completion-at-point) ;; capf
@@ -2315,26 +2329,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
         ("l" . cape-line)
         ("w" . cape-dict)
         (":" . cape-emoji)
-        ("r" . cape-rfc1345))
-
-  :init
-  ;; Add to the global default value of `completion-at-point-functions' which is used by `completion-at-point'.
-  ;; The order of the functions matters, the first function returning a result wins.
-  ;; Note that the list of buffer-local completion functions takes precedence over the global list.
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions #'cape-elisp-block)
-  ;;(add-to-list 'completion-at-point-functions #'cape-history)
-  ;;(add-to-list 'completion-at-point-functions #'cape-keyword)
-  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
-  ;;(add-to-list 'completion-at-point-functions #'cape-dict)
-  ;;(add-to-list 'completion-at-point-functions #'cape-elisp-symbol)
-  ;;(add-to-list 'completion-at-point-functions #'cape-line)
-  )
-#+end_src
-
-#+begin_src emacs-lisp
-;; (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
+        ("r" . cape-rfc1345)))
 #+end_src
 
 ** consult
