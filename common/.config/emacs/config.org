@@ -2013,6 +2013,8 @@ Get the relevant package subdirectories from the llvm source
 
 ** python
 
+*** python
+
 #+begin_src emacs-lisp
 (use-package python
   :straight nil
@@ -2021,6 +2023,8 @@ Get the relevant package subdirectories from the llvm source
   (python-indent-offset 4)
   (python-indent-guess-indent-offset-verbose nil))
 #+end_src
+
+*** python
 
 #+begin_src emacs-lisp
 (use-package pet
@@ -2196,15 +2200,15 @@ https://robert.kra.hn/posts/rust-emacs-setup/
   :mode ("\\.org\\'" . org-mode)
 
   :custom
-  (org-directory "~/org")
+  (org-directory (file-name-as-directory (expand-file-name "~/org")))
 
-  (org-agenda-files (file-expand-wildcards "~/org/*.org")) ;; Include all org files into the agenda.
+  (org-agenda-files (file-expand-wildcards (expand-file-name "*.org" org-directory))) ;; Include all org files into the agenda.
 
   (org-adapt-indentation nil) ;; prevent demoting heading also shifting text inside sections
   (org-catch-invisible-edits 'show-and-error) ;; if editing in an invisible region, complain.
   (org-confirm-babel-evaluate t) ;; ask when evaluating every src block
 
-  (org-default-notes-file (concat org-directory "/org_capture.org"))
+  (org-default-notes-file (expand-file-name "org_capture.org" org-directory))
 
   (org-hide-emphasis-markers nil)
 
@@ -2252,7 +2256,9 @@ https://robert.kra.hn/posts/rust-emacs-setup/
   :straight t
 
   :init
-  (defvar my-org-node-directory "~/org-node/" "Directory containing org-node notes.")
+  (defvar my-org-node-directory
+    (file-name-as-directory (expand-file-name "~/org-node"))
+    "Directory containing org-node notes.")
 
   :custom
   (org-mem-watch-dirs (list my-org-node-directory))
@@ -2273,8 +2279,11 @@ https://robert.kra.hn/posts/rust-emacs-setup/
   ;; Optional key bindings
   ;; Tip: Try changing these to just "M-o"!
   (keymap-global-set "M-o n" org-node-global-prefix-map)
+  (keymap-global-set "M-o b" #'org-node-context-dwim)
+  (keymap-global-set "M-o f" #'org-node-find)
   (with-eval-after-load 'org
-    (keymap-set org-mode-map "M-o n" org-node-org-prefix-map))
+    (keymap-set org-mode-map "M-o n" org-node-org-prefix-map)
+    (keymap-set org-mode-map "M-o i" #'org-node-insert-link))
 
   :custom
   (org-node-file-directory-ask my-org-node-directory)
