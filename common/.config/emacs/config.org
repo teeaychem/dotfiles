@@ -1710,6 +1710,33 @@ To highlight indentations
 (use-package c-ts-mode
   :straight nil
 
+  :preface
+  (defun my/clang-format-column-limit ()
+    "Return the effective clang-format ColumnLimit for the current buffer."
+    (when-let* ((clang-format (executable-find "clang-format"))
+                (filename (or buffer-file-name
+                              (if (derived-mode-p 'c++-ts-mode)
+                                  "buffer.cpp"
+                                "buffer.c"))))
+      (with-temp-buffer
+        (let ((status
+               (process-file clang-format nil `(t nil) nil
+                             "-style=file"
+                             "-assume-filename" filename
+                             "-dump-config")))
+          (when (zerop status)
+            (goto-char (point-min))
+            (when (re-search-forward "^ColumnLimit:[[:space:]]*\\([0-9]+\\)" nil t)
+              (string-to-number (match-string 1))))))))
+
+  (defun my/c-set-fill-column-from-clang-format ()
+    "Set `fill-column' from clang-format's effective ColumnLimit."
+    (when (= fill-column (default-value 'fill-column))
+      (when-let ((column-limit (my/clang-format-column-limit)))
+        (when (> column-limit 0)
+          (setq-local fill-column column-limit)
+          (display-fill-column-indicator-mode 1)))))
+
   :mode (("\\.c\\'" . c-ts-mode)
          ("\\.\\(?:H\\|cc\\|hh\\|cpp\\|hpp\\|cxx\\|hxx\\|c\\+\\+\\|h\\+\\+\\|ipp\\|ixx\\|cppm\\)\\'" . c++-ts-mode)
          ("\\.\\(?:cc\\|cpp\\|cxx\\|h\\|hh\\|hpp\\|hxx\\)\\.inc\\'" . c++-ts-mode)
@@ -1740,7 +1767,10 @@ To highlight indentations
               ("i" . #'tempel-insert))
 
   :custom
-  (c-ts-mode-indent-style 'linux))
+  (c-ts-mode-indent-style 'linux)
+
+  :hook
+  ((c-ts-mode c++-ts-mode) . my/c-set-fill-column-from-clang-format))
 #+end_src
 
 
