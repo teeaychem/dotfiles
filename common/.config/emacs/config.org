@@ -95,6 +95,12 @@ This block must therefore precede all third-party packages.
   (kill-do-not-save-duplicates t)
   (save-interprogram-paste-before-kill t)
 
+  (delete-pair-push-mark t)
+  (kill-region-dwim 'emacs-word)
+  (view-lossage-auto-refresh t)
+  (display-fill-column-indicator-warning nil)
+  (world-clock-sort-order "%FT%T")
+
   (window-combination-resize t)
 
   (auto-save-interval 200)
@@ -263,6 +269,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :straight nil
 
   :custom
+  (treesit-auto-install-grammar t)
+  (treesit-enabled-modes t)
   (treesit-font-lock-level 4))
 #+end_src
 
@@ -394,6 +402,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :straight nil
 
   :custom
+  (uniquify-after-kill-buffer-flag t)
   (uniquify-buffer-name-style 'forward))
 #+end_src
 
@@ -448,9 +457,11 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
          ("="         . balance-windows-area)
          ("c"         . compare-windows)
          ("d"         . my/window-toggle-dedicated)
+         ("h"         . window-layout-flip-leftright)
          ("r"         . window-layout-rotate-clockwise)
          ("R"         . window-layout-rotate-anticlockwise)
          ("t"         . window-layout-transpose)
+         ("v"         . window-layout-flip-topdown)
          ("u"         . winner-undo)
          ("U"         . winner-redo)
          ("l"         . display-line-numbers-mode))
@@ -543,6 +554,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   :custom
   (dired-kill-when-opening-new-dired-buffer t)
+  (dired-hide-details-hide-absolute-location t)
   (dired-recursive-copies 'always)
   (dired-recursive-deletes 'always)
   (dired-omit-files (concat "\\`[.]\\'"
@@ -686,6 +698,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (eldoc-echo-area-display-truncation-message nil)
   (eldoc-echo-area-prefer-doc-buffer t)
   (eldoc-echo-area-use-multiline-p 1)
+  (eldoc-help-at-pt t)
   (eldoc-documentation-strategy #'eldoc-documentation-compose)
 
   :bind (:prefix-map eldoc-prefix-map
@@ -2536,6 +2549,7 @@ maybe: https://github.com/casouri/eldoc-box
   (eglot-events-buffer-config '(:size 0 :format short))
   ;; (eglot-confirm-server-edits t)
   (jsonrpc-event-hook nil)
+  (eglot-documentation-renderer 'markdown-ts-view-mode)
   (eglot-code-action-indications nil)
 
   :config
