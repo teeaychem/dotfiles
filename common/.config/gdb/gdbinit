@@ -5,7 +5,8 @@ set print vtbl on
 set demangle-style gnu-v3
 set pagination off
 set history save on
-set history filename ~/.cache/gdb/history
+shell mkdir -p ~/.local/state/gdb 2>/dev/null
+set history filename ~/.local/state/gdb/history
 set disassemble-next-line on
 set breakpoint pending on
 

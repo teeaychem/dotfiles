@@ -20,7 +20,7 @@ setenv NPM_CONFIG_USERCONFIG "$env(XDG_CONFIG_HOME)/npm/npmrc"
 setenv OPAMROOT "$env(XDG_DATA_HOME)/opam"
 
 setenv PYTHONPYCACHEPREFIX "$env(XDG_CACHE_HOME)/python_cache"
-setenv PYTHON_HISTORY "$env(XDG_CACHE_HOME)/python/history"
+setenv PYTHON_HISTORY "$env(XDG_STATE_HOME)/python/history"
 setenv IPYTHONDIR "$env(XDG_CACHE_HOME)/ipython"
 setenv MPLCONFIGDIR "$env(XDG_CACHE_HOME)/matplotlib"
 

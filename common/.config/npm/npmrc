@@ -1,2 +1,2 @@
-cache=~${HOME}/.cache/npm
+cache=${XDG_CACHE_HOME}/npm
 prefix=${HOME}/.npm-packages
