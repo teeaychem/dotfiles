@@ -1026,6 +1026,13 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 * theme
 
+** batppuccin
+
+#+begin_src emacs-lisp
+(use-package batppuccin
+  :straight (batppuccin :type git :host github :repo "bbatsov/batppuccin-emacs"))
+(load-theme 'batppuccin-mocha t)
+#+end_src
 
 ** catppuccin
 
@@ -1044,11 +1051,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (catppuccin-italic-variables t))
 #+end_src
 
-#+begin_src emacs-lisp
-(use-package batppuccin
-  :straight (batppuccin :type git :host github :repo "bbatsov/batppuccin-emacs"))
-(load-theme 'batppuccin-mocha t)
-#+end_src
 
 
 * external, etc.
