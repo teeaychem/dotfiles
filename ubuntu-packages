@@ -1,25 +1,13 @@
 # Shells and environment management
 build-essential
-direnv
 environment-modules
 file
-fish
 procps
 stow
 zsh
 
-# Shared command-line tools
-bat
+# Homebrew on Linux prerequisites
 curl
-dasel
-fd-find
-hunspell
-neovim
-ripgrep
-shfmt
-tmux
-tree
-zoxide
 
 # Debugging
 gdb
@@ -29,7 +17,3 @@ python3-venv
 
 # Git configuration
 git
-git-delta
-git-lfs
-
-# fzf is installed with ~/.local/bin/install-fzf.

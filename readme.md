@@ -40,22 +40,23 @@ On Ubuntu, use the package list and installer:
 ./linux/.local/bin/install-ubuntu-packages ubuntu-packages
 ```
 
-This installs the prerequisites for Homebrew on Linux. To install Homebrew
-itself, use the installer from <https://brew.sh/>. The supported Linux prefix is
+This installs the prerequisites for Homebrew on Linux plus the small set of
+packages needed before Homebrew is available. To install Homebrew itself, use
+the installer from <https://brew.sh/>. The supported Linux prefix is
 `/home/linuxbrew/.linuxbrew`; the Linux environment module also recognizes
 `~/.linuxbrew`.
-
-After Homebrew is installed and the dotfiles are linked, install the Homebrew
-tools:
-
-```sh
-brew bundle --file linux/.config/brew/Brewfile
-```
 
 Then apply the Stow links:
 
 ```sh
 ./install
+```
+
+After Homebrew is installed and the dotfiles are linked, start a fresh shell and
+install the Homebrew tools:
+
+```sh
+brew bundle --file linux/.config/brew/Brewfile
 ```
 
 After the first install, the wrapper command is available from any directory:

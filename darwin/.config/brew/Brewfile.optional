@@ -9,7 +9,6 @@ brew "gdb"
 brew "grep"
 brew "gnupg"
 brew "htop"
-brew "hunspell"
 brew "imagemagick"
 brew "llvm" # lldb-dap; keg-only, resolved by ~/.local/bin/lldb-dap
 brew "navidrome"
