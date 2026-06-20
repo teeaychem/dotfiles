@@ -12,4 +12,3 @@ abort("Brewfile.core not found") unless core_brewfile
 
 instance_eval(File.read(core_brewfile))
 instance_eval(File.read(common_optional_brewfile)) if common_optional_brewfile
-instance_eval(File.read(File.join(brewfile_dir, "Brewfile.optional")))

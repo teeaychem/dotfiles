@@ -1,7 +1,10 @@
 # Shells and environment management
+build-essential
 direnv
 environment-modules
+file
 fish
+procps
 stow
 zsh
 

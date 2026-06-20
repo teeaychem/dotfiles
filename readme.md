@@ -31,13 +31,25 @@ cd ~/dotfiles
 On macOS, use the core Homebrew bundle:
 
 ```sh
-brew bundle --file darwin/.config/brew/Brewfile.core
+brew bundle --file common/.config/brew/Brewfile.core
 ```
 
 On Ubuntu, use the package list and installer:
 
 ```sh
 ./linux/.local/bin/install-ubuntu-packages ubuntu-packages
+```
+
+This installs the prerequisites for Homebrew on Linux. To install Homebrew
+itself, use the installer from <https://brew.sh/>. The supported Linux prefix is
+`/home/linuxbrew/.linuxbrew`; the Linux environment module also recognizes
+`~/.linuxbrew`.
+
+After Homebrew is installed and the dotfiles are linked, install the Homebrew
+tools:
+
+```sh
+brew bundle --file linux/.config/brew/Brewfile
 ```
 
 Then apply the Stow links:
@@ -66,10 +78,14 @@ After applying the dotfiles, the command is available as
 
 These package lists include Environment Modules (`modules` on Homebrew,
 `environment-modules` on Ubuntu), which Fish uses to load the shared, platform,
-and machine-local environment modulefiles.
+and machine-local environment modulefiles. The platform modules also set
+`HOMEBREW_BUNDLE_FILE`, so after module initialization `brew bundle` uses the
+platform Brewfile by default.
 
 For a fuller macOS workstation install, use `darwin/.config/brew/Brewfile`,
-which includes both the core and optional bundles.
+which includes the shared core bundle, shared optional bundle, and the macOS
+optional bundle. The Linux platform Brewfile includes the shared core and shared
+optional bundles.
 
 ## Debugging
 

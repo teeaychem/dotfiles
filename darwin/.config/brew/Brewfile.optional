@@ -25,7 +25,6 @@ brew "tree-sitter-cli"
 # linting
 brew "gersemi" # cmake
 brew "prettier"
-brew "shfmt"
 brew "texlab" # TeX
 brew "typos-cli" # typos
 
