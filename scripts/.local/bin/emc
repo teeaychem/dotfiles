@@ -25,6 +25,21 @@ shell_quote() {
     printf "'%s'" "$(printf '%s' "$1" | sed "s/'/'\\\\''/g")"
 }
 
+elisp_string() {
+    printf '"%s"' "$(printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g')"
+}
+
+env_sync_form() {
+    form='(progn'
+    for name in TERM TERMINFO TERMINFO_DIRS COLORTERM; do
+        eval "value=\${$name-}"
+        if [ -n "$value" ]; then
+            form="$form (setenv $(elisp_string "$name") $(elisp_string "$value"))"
+        fi
+    done
+    printf '%s)' "$form"
+}
+
 host=
 
 while [ "$#" -gt 0 ]; do
@@ -78,4 +93,5 @@ if [ -n "$host" ]; then
 fi
 
 require_command emacsclient
+emacsclient --alternate-editor= --eval "$(env_sync_form)" >/dev/null
 exec emacsclient --tty --alternate-editor= -- "$@"

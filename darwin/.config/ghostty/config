@@ -11,10 +11,9 @@ cursor-style = block
 
 font-family = "M+1Code Nerd Font Mono"
 
-# Disable ligatures
-font-feature = -dlig
-font-feature = -liga
-font-feature = -calt
+# Enable standard ligature/contextual font features.
+font-feature = +liga
+font-feature = +calt
 
 font-size = 14
 

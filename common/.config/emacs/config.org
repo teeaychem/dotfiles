@@ -1591,11 +1591,9 @@ To highlight indentations
   (diff-hl-flydiff-mode -1)
   (diff-hl-show-hunk-mouse-mode -1)
   ;; (diff-hl-update-async t)
-
-  :custom-face
-  ;; (diff-hl-change ((t (:background ,(face-attribute 'default :background)))))
-  ;; (diff-hl-insert ((t (:background ,(face-attribute 'default :background)))))
-  ;; (diff-hl-delete ((t (:background ,(face-attribute 'default :background)))))
+  ;; (set-face-attribute 'diff-hl-change nil :background (face-attribute 'default :background))
+  ;; (set-face-attribute 'diff-hl-insert nil :background (face-attribute 'default :background))
+  ;; (set-face-attribute 'diff-hl-delete nil :background (face-attribute 'default :background))
 
   :hook
   (magit-pre-refresh . diff-hl-magit-pre-refresh)
@@ -1640,8 +1638,11 @@ To highlight indentations
   (blamer-idle-time 0.3)
   (blamer-type 'echo-area)
 
-  :custom-face
-  (blamer-face ((t (:inherit shadow :background unspecified :slant normal)))))
+  :config
+  (set-face-attribute 'blamer-face nil
+                      :inherit 'shadow
+                      :background 'unspecified
+                      :slant 'normal))
 #+end_src
 
 ** magit-delta
@@ -1812,10 +1813,11 @@ To highlight indentations
 
   (reftex-plug-into-AUCTeX t)
 
-  :custom-face
-  ;; (font-latex-math-face ((t (:foreground "pale violet red"))))
-  (font-latex-subscript-face ((t nil)))
-  (font-latex-superscript-face ((t nil)))
+  :config
+  ;; Keep TeX scripts visually inline; terminals do not benefit from scaled script faces.
+  ;; (set-face-attribute 'font-latex-math-face nil :foreground "pale violet red")
+  (set-face-attribute 'font-latex-subscript-face nil :height 'unspecified)
+  (set-face-attribute 'font-latex-superscript-face nil :height 'unspecified)
 
   :hook
   (LaTeX-mode . LaTeX-math-mode)
@@ -2644,6 +2646,14 @@ maybe: https://github.com/casouri/eldoc-box
   (add-to-list 'eglot-server-programs `((pdll-mode :language-id "pdll") . my-eglot-strict-pdll))
   (add-to-list 'eglot-server-programs `((tablegen-mode :language-id "tablegen") . my-eglot-strict-tablegen))
 
+  (set-face-attribute 'eglot-highlight-symbol-face nil
+                      :weight 'normal
+                      :background 'unspecified
+                      :underline '(:style dots :position nil))
+  (set-face-attribute 'eglot-diagnostic-tag-unnecessary-face nil
+                      :inherit 'unspecified
+                      :underline '(:color "#7cb6cb" :style wave :position nil))
+
   :bind (("C-c l l" . eglot)
          :map eglot-mode-map
          :prefix-map eglot-prefix-map
@@ -2704,11 +2714,7 @@ maybe: https://github.com/casouri/eldoc-box
               ("w" . #'eglot-show-workspace-configuration))
 
   :bind (:map format-prefix-map
-              ("e" . #'eglot-format-buffer))
-
-  :custom-face
-  (eglot-highlight-symbol-face ((t (:bold nil  :underline (:style dots :position nil)))))
-  (eglot-diagnostic-tag-unnecessary-face ((t (:inherit f  :underline (:color "#7cb6cb" :style wave :position nil))))))
+              ("e" . #'eglot-format-buffer)))
 #+end_src
 
 ** eglot-x
