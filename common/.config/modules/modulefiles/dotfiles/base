@@ -12,6 +12,8 @@ setenv XDG_PICTURES_DIR "$env(HOME)/Pictures"
 setenv XDG_VIDEOS_DIR "$env(HOME)/Videos"
 
 setenv EDITOR nvim
+setenv PAGER less
+setenv LESS -RF
 setenv MANPAGER {nvim +Man!}
 setenv FD_OPTIONS {--hidden --follow}
 setenv FZF_DEFAULT_COMMAND {fd --type f --hidden --follow --exclude .git}
