@@ -37,14 +37,13 @@ brew bundle --file common/.config/brew/Brewfile.core
 On Ubuntu, use the package list and installer:
 
 ```sh
-./linux/.local/bin/install-ubuntu-packages ubuntu-packages
+./linux/.local/bin/install-apt-packages common/.config/apt/packages
 ```
 
 This installs the prerequisites for Homebrew on Linux plus the small set of
 packages needed before Homebrew is available. To install Homebrew itself, use
-the installer from <https://brew.sh/>. The supported Linux prefix is
-`/home/linuxbrew/.linuxbrew`; the Linux environment module also recognizes
-`~/.linuxbrew`.
+the installer from <https://brew.sh/>. This setup uses a home-local Linuxbrew
+prefix at `~/.linuxbrew`, which is appropriate for shared SSH machines.
 
 Then apply the Stow links:
 
@@ -57,6 +56,22 @@ install the Homebrew tools:
 
 ```sh
 brew bundle --file linux/.config/brew/Brewfile
+```
+
+For a fresh apt-based SSH host, bootstrap the foundations from an existing
+checkout:
+
+```sh
+bootstrap-apt-host HOST
+```
+
+This reads the apt and core Brew package lists from local installed config,
+runs the remote apt bootstrap, installs Homebrew under `~/.linuxbrew`, and
+installs the shared core Brew bundle. Reconnect into Brew Fish, then clone or
+copy the dotfiles into a persistent checkout and run the normal install:
+
+```sh
+ssh -t HOST '~/.linuxbrew/bin/fish -l'
 ```
 
 After the first install, the wrapper command is available from any directory:
@@ -75,7 +90,7 @@ The installer uses `--no-folding`, allowing machine-local files to coexist
 with links managed by Stow.
 
 After applying the dotfiles, the command is available as
-`install-ubuntu-packages PACKAGE_FILE`.
+`install-apt-packages PACKAGE_FILE`.
 
 These package lists include Environment Modules (`modules` on Homebrew,
 `environment-modules` on Ubuntu), which Fish uses to load the shared, platform,

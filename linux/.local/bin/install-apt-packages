@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Install packages listed in a file on Ubuntu.
+# Install packages listed in a file with apt.
 
 set -eu
 
@@ -18,14 +18,8 @@ case "$#" in
         ;;
 esac
 
-if [ ! -r /etc/os-release ] ||
-    ! grep -Eq '^ID="?ubuntu"?$' /etc/os-release; then
-    printf '%s\n' 'install-ubuntu-packages: Ubuntu is required' >&2
-    exit 1
-fi
-
 if ! command -v apt-get >/dev/null 2>&1; then
-    printf '%s\n' 'install-ubuntu-packages: apt-get is required' >&2
+    printf '%s\n' 'install-apt-packages: apt-get is required' >&2
     exit 1
 fi
 
@@ -36,13 +30,13 @@ run_as_root() {
         sudo "$@"
     else
         printf '%s\n' \
-            'install-ubuntu-packages: run as root or install sudo' >&2
+            'install-apt-packages: run as root or install sudo' >&2
         exit 1
     fi
 }
 
 if [ ! -r "$packages_file" ]; then
-    printf 'install-ubuntu-packages: cannot read %s\n' "$packages_file" >&2
+    printf 'install-apt-packages: cannot read %s\n' "$packages_file" >&2
     exit 1
 fi
 
@@ -54,7 +48,7 @@ while IFS= read -r line || [ -n "$line" ]; do
     for package in $line; do
         case "$package" in
             -*|*[!A-Za-z0-9+._:-]*)
-                printf 'install-ubuntu-packages: invalid package name: %s\n' \
+                printf 'install-apt-packages: invalid package name: %s\n' \
                     "$package" >&2
                 exit 1
                 ;;
@@ -66,7 +60,7 @@ done < "$packages_file"
 set +f
 
 if [ "$#" -eq 0 ]; then
-    printf 'install-ubuntu-packages: no packages listed in %s\n' \
+    printf 'install-apt-packages: no packages listed in %s\n' \
         "$packages_file" >&2
     exit 1
 fi
