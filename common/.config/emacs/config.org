@@ -2975,6 +2975,7 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 #+begin_src emacs-lisp
 (use-package agent-shell
   :straight t
+  :disabled
 
   :commands (agent-shell
              agent-shell-new-shell
