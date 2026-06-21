@@ -1,0 +1,128 @@
+#!/bin/sh
+
+# Compare Homebrew package names with Ubuntu apt package availability.
+
+set -eu
+
+usage() {
+    printf '%s\n' \
+        "Usage: ${0##*/} [--suite SUITE] [--arch ARCH] BREWFILE ..." \
+        '' \
+        'Defaults:' \
+        '  SUITE: noble' \
+        '  ARCH: amd64'
+}
+
+die() {
+    printf '%s: %s\n' "${0##*/}" "$*" >&2
+    exit 1
+}
+
+suite=noble
+arch=amd64
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --suite)
+            [ "$#" -ge 2 ] || die '--suite needs an argument'
+            suite=$2
+            shift 2
+            ;;
+        --arch)
+            [ "$#" -ge 2 ] || die '--arch needs an argument'
+            arch=$2
+            shift 2
+            ;;
+        -h | --help)
+            usage
+            exit
+            ;;
+        --)
+            shift
+            break
+            ;;
+        -*)
+            die "unknown option: $1"
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+if [ "$#" -eq 0 ]; then
+    usage >&2
+    exit 2
+fi
+
+command -v awk >/dev/null 2>&1 || die 'awk is required'
+command -v curl >/dev/null 2>&1 || die 'curl is required'
+command -v gzip >/dev/null 2>&1 || die 'gzip is required'
+
+cache_home=${XDG_CACHE_HOME:-"$HOME/.cache"}
+cache_dir=$cache_home/dotfiles/apt-index
+temporary_directory=$(mktemp -d "${TMPDIR:-/tmp}/brew-apt.XXXXXXXX")
+trap 'rm -rf "$temporary_directory"' EXIT HUP INT TERM
+
+mkdir -p "$cache_dir"
+
+components='main universe restricted multiverse'
+package_index=$temporary_directory/packages
+: > "$package_index"
+
+for component in $components; do
+    package_file=$cache_dir/ubuntu-$suite-$component-$arch.Packages.gz
+    url=https://archive.ubuntu.com/ubuntu/dists/$suite/$component/binary-$arch/Packages.gz
+
+    if [ ! -s "$package_file" ]; then
+        printf 'Fetching %s %s %s package index...\n' "$suite" "$component" "$arch" >&2
+        curl -fsSL "$url" -o "$package_file"
+    fi
+
+    gzip -cd "$package_file" |
+        awk '/^Package: / { print $2 }' >> "$package_index"
+done
+
+sort -u "$package_index" -o "$package_index"
+
+brew_packages=$temporary_directory/brew-packages
+: > "$brew_packages"
+
+for brewfile in "$@"; do
+    [ -r "$brewfile" ] || die "cannot read $brewfile"
+    sed -n 's/^[[:space:]]*brew "\([^"]*\)".*/\1/p' "$brewfile" >> "$brew_packages"
+done
+
+awk '!seen[$0]++' "$brew_packages" > "$brew_packages.ordered"
+mv "$brew_packages.ordered" "$brew_packages"
+
+available=$temporary_directory/available
+missing=$temporary_directory/missing
+: > "$available"
+: > "$missing"
+
+while IFS= read -r brew_package; do
+    short_name=${brew_package##*/}
+
+    found=
+    if grep -qx -- "$short_name" "$package_index"; then
+        found=$short_name
+    fi
+
+    if [ -n "$found" ]; then
+        printf '%s -> %s\n' "$brew_package" "$found" >> "$available"
+    else
+        printf '%s\n' "$brew_package" >> "$missing"
+    fi
+done < "$brew_packages"
+
+available_count=$(wc -l < "$available" | tr -d ' ')
+missing_count=$(wc -l < "$missing" | tr -d ' ')
+
+printf '%s\n' 'Available in apt:'
+sed 's/^/  /' "$available"
+
+printf '\n%s\n' 'No apt package found:'
+sed 's/^/  /' "$missing"
+
+printf '\n%s available, %s missing\n' "$available_count" "$missing_count"

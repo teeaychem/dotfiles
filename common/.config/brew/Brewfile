@@ -1,0 +1,21 @@
+brewfile_dir = __dir__
+
+def eval_brewfile(path, required: true)
+  abort("#{File.basename(path)} not found") if required && !File.file?(path)
+  return unless File.file?(path)
+
+  instance_eval(File.read(path), path)
+end
+
+platform = case RUBY_PLATFORM
+           when /darwin/
+             "darwin"
+           when /linux/
+             "linux"
+           else
+             abort("Unsupported platform: #{RUBY_PLATFORM}")
+           end
+
+eval_brewfile(File.join(brewfile_dir, "Brewfile.core"))
+eval_brewfile(File.join(brewfile_dir, "Brewfile.optional"), required: false)
+eval_brewfile(File.join(brewfile_dir, "Brewfile.#{platform}"))

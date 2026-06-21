@@ -1,0 +1,48 @@
+tap "kgarner7/feishin"
+
+brew "difftastic"
+brew "llvm" # lldb-dap; keg-only, resolved by ~/.local/bin/lldb-dap
+brew "navidrome"
+brew "pass"
+brew "qemu"
+
+# casks
+cask "appcleaner"
+cask "calibre"
+# cask "feishin"
+cask "hammerspoon"
+cask "iina"
+cask "keepassxc"
+cask "keka"
+cask "raycast"
+cask "rectangle"
+cask "skim"
+cask "vlc"
+
+# git
+brew "gitui"
+
+# linting
+brew "gersemi"   # cmake
+brew "prettier"
+brew "texlab"    # TeX
+brew "typos-cli" # typos
+
+# lisp
+brew "minimal-racket"
+
+# markdown
+brew "comrak" # GFM(arkdown)
+
+# sh
+brew "bash-language-server" # mostly works for zsh
+
+# toml
+brew "taplo"
+
+# libs
+brew "openblas"
+
+# fonts
+cask "font-m+-nerd-font"
+cask "font-source-code-pro"

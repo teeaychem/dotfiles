@@ -55,7 +55,7 @@ After Homebrew is installed and the dotfiles are linked, start a fresh shell and
 install the Homebrew tools:
 
 ```sh
-brew bundle --file linux/.config/brew/Brewfile
+brew bundle --file common/.config/brew/Brewfile
 ```
 
 For a fresh apt-based SSH host, bootstrap the foundations from an existing
@@ -96,12 +96,11 @@ These package lists include Environment Modules (`modules` on Homebrew,
 `environment-modules` on Ubuntu), which Fish uses to load the shared, platform,
 and machine-local environment modulefiles. The platform modules also set
 `HOMEBREW_BUNDLE_FILE`, so after module initialization `brew bundle` uses the
-platform Brewfile by default.
+shared Brewfile by default.
 
-For a fuller macOS workstation install, use `darwin/.config/brew/Brewfile`,
-which includes the shared core bundle, shared optional bundle, and the macOS
-optional bundle. The Linux platform Brewfile includes the shared core and shared
-optional bundles.
+For a fuller Homebrew install, use `common/.config/brew/Brewfile`, which
+includes the shared core bundle, shared optional bundle, and the current
+platform bundle.
 
 ## Debugging
 
