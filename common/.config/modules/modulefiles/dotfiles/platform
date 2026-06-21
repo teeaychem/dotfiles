@@ -3,6 +3,7 @@
 module-whatis {loads the platform-specific dotfiles environment}
 
 setenv HOMEBREW_BUNDLE_FILE "$env(XDG_CONFIG_HOME)/brew/Brewfile"
+setenv HOMEBREW_BAT 1
 setenv HOMEBREW_NO_AUTO_UPDATE 1
 setenv HOMEBREW_NO_ENV_HINTS 1
 

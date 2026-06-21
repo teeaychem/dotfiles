@@ -2,10 +2,6 @@ if test -x /opt/homebrew/bin/brew
     /opt/homebrew/bin/brew shellenv fish | source
 end
 
-if command -q bat
-    set -gx HOMEBREW_BAT 1
-end
-
 function cdf
     set -l finder_dir (finder-pwd)
     or return
