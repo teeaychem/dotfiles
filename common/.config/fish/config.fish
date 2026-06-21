@@ -108,13 +108,7 @@ end
 if type -q module
     module use "$XDG_CONFIG_HOME/modules/modulefiles"
     module load dotfiles/base
-
-    switch (uname)
-        case Darwin
-            module load dotfiles/darwin
-        case Linux
-            module load dotfiles/linux
-    end
+    module is-avail dotfiles/platform >/dev/null 2>&1; and module load dotfiles/platform
 
     module is-avail dotfiles/local >/dev/null 2>&1; and module load dotfiles/local
 end

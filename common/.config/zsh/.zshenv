@@ -73,10 +73,9 @@ if (( $+functions[module] )); then
     module use "$XDG_CONFIG_HOME/modules/modulefiles"
     module load dotfiles/base
 
-    case "$OSTYPE" in
-        darwin*) module load dotfiles/darwin ;;
-        linux*) module load dotfiles/linux ;;
-    esac
+    if module is-avail dotfiles/platform >/dev/null 2>&1; then
+        module load dotfiles/platform
+    fi
 
     if module is-avail dotfiles/local >/dev/null 2>&1; then
         module load dotfiles/local

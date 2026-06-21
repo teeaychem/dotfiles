@@ -94,7 +94,7 @@ After applying the dotfiles, the command is available as
 
 These package lists include Environment Modules (`modules` on Homebrew,
 `environment-modules` on Ubuntu), which Fish uses to load the shared, platform,
-and machine-local environment modulefiles. The platform modules also set
+and machine-local environment modulefiles. The platform module also sets
 `HOMEBREW_BUNDLE_FILE`, so after module initialization `brew bundle` uses the
 shared Brewfile by default.
 
@@ -163,12 +163,11 @@ configuration:
 
 ```text
 ~/.config/modules/modulefiles/dotfiles/base
-~/.config/modules/modulefiles/dotfiles/darwin
-~/.config/modules/modulefiles/dotfiles/linux
+~/.config/modules/modulefiles/dotfiles/platform
 ~/.config/modules/modulefiles/dotfiles/local
 ```
 
-Shell startup loads `dotfiles/base`, the current platform module, then the
+Shell startup loads `dotfiles/base`, `dotfiles/platform`, then the
 optional untracked `dotfiles/local` module. This gives machine-local values the
 highest priority.
 
