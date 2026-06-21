@@ -135,8 +135,10 @@ end
 abbr -a !! --position anywhere --function last_history_item
 
 function fish_should_add_to_history
+    string match -qr '^\s' -- "$argv[1]"; and return 1
+
     for pattern in $history_ignore_patterns
-        string match -qr -- "$pattern" "$argv"; and return 1
+        string match -qr -- "$pattern" "$argv[1]"; and return 1
     end
 
     return 0
