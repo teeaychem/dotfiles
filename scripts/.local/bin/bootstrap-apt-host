@@ -15,10 +15,8 @@ command -v ssh >/dev/null 2>&1 || die 'ssh is required'
 
 config_home=${XDG_CONFIG_HOME:-$HOME/.config}
 apt_package_file=$config_home/apt/packages
-brew_core_file=$config_home/brew/Brewfile.core
 
 [ -r "$apt_package_file" ] || die "cannot read $apt_package_file"
-[ -r "$brew_core_file" ] || die "cannot read $brew_core_file"
 
 # Source package names from local config; nothing is copied remotely.
 apt_packages=$(
@@ -26,12 +24,8 @@ apt_packages=$(
         awk 'NF { for (i = 1; i <= NF; i++) print $i }'
 )
 
-brew_packages=$(
-    sed -n 's/^[[:space:]]*brew "\([^"]*\)".*/\1/p' "$brew_core_file"
-)
-
 # Keep package interpolation into the remote shell constrained to package names.
-printf '%s\n' "$apt_packages" "$brew_packages" |
+printf '%s\n' "$apt_packages" |
     awk '
         $0 !~ /^[A-Za-z0-9+._:-]+$/ {
             printf "bootstrap-apt-host: invalid package name: %s\n", $0 > "/dev/stderr"
@@ -60,18 +54,4 @@ fi
 
 \$sudo apt-get update
 \$sudo apt-get install -y -- $apt_packages
-
-# Install Homebrew under the user's home directory.
-brew_prefix=\${HOMEBREW_PREFIX:-\$HOME/.linuxbrew}
-
-if [ ! -x "\$brew_prefix/bin/brew" ]; then
-    git clone --depth=1 https://github.com/Homebrew/brew "\$brew_prefix/Homebrew"
-    mkdir -p "\$brew_prefix/bin"
-    ln -sf ../Homebrew/bin/brew "\$brew_prefix/bin/brew"
-fi
-
-# Use the fresh Brew for this SSH command only; later dotfiles handle shell init.
-eval "\$("\$brew_prefix/bin/brew" shellenv)"
-brew update --force --quiet
-brew install $brew_packages
 EOF

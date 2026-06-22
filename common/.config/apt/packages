@@ -6,9 +6,6 @@ procps
 stow
 zsh
 
-# Homebrew on Linux prerequisites
-curl
-
 # Debugging
 gdb
 lldb

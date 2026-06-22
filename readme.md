@@ -40,10 +40,9 @@ On Ubuntu, use the package list and installer:
 ./linux/.local/bin/install-apt-packages common/.config/apt/packages
 ```
 
-This installs the prerequisites for Homebrew on Linux plus the small set of
-packages needed before Homebrew is available. To install Homebrew itself, use
-the installer from <https://brew.sh/>. This setup uses a home-local Linuxbrew
-prefix at `~/.linuxbrew`, which is appropriate for shared SSH machines.
+This installs the small apt baseline needed before the dotfiles are linked.
+Install Homebrew manually from <https://brew.sh/> when it is needed on Linux;
+the standard Linux install prefix is assumed.
 
 Then apply the Stow links:
 
@@ -51,8 +50,8 @@ Then apply the Stow links:
 ./install
 ```
 
-After Homebrew is installed and the dotfiles are linked, start a fresh shell and
-install the Homebrew tools:
+After Homebrew is installed and the dotfiles are linked, start a fresh shell
+and install the Homebrew tools:
 
 ```sh
 brew bundle --file common/.config/brew/Brewfile
@@ -65,13 +64,12 @@ checkout:
 bootstrap-apt-host HOST
 ```
 
-This reads the apt and core Brew package lists from local installed config,
-runs the remote apt bootstrap, installs Homebrew under `~/.linuxbrew`, and
-installs the shared core Brew bundle. Reconnect into Brew Fish, then clone or
-copy the dotfiles into a persistent checkout and run the normal install:
+This reads the apt package list from local installed config and runs the remote
+apt bootstrap. Install Homebrew manually if wanted, then clone or copy the
+dotfiles into a persistent checkout and run the normal install:
 
 ```sh
-ssh -t HOST '~/.linuxbrew/bin/fish -l'
+ssh HOST
 ```
 
 After the first install, the wrapper command is available from any directory:

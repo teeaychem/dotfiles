@@ -20,11 +20,11 @@ switch -- $tcl_platform(os) {
         }
     }
     Linux {
-        setenv HOMEBREW_PREFIX "$env(HOME)/.linuxbrew"
+        set linuxbrew_prefix /home/linuxbrew/.linuxbrew
 
         foreach directory [list \
-            "$env(HOMEBREW_PREFIX)/sbin" \
-            "$env(HOMEBREW_PREFIX)/bin" \
+            "$linuxbrew_prefix/sbin" \
+            "$linuxbrew_prefix/bin" \
         ] {
             if {[file isdirectory $directory]} {
                 prepend-path PATH $directory
