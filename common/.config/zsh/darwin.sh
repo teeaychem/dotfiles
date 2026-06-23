@@ -1,5 +1,3 @@
-eval "$(/opt/homebrew/bin/brew shellenv zsh)"
-
 # export LDFLAGS="-L/opt/homebrew/opt/llvm/lib -L/opt/homebrew/opt/llvm/lib/c++ -L/opt/homebrew/opt/llvm/lib/unwind -lunwind"
 # export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
 # export CMAKE_PREFIX_PATH="/opt/homebrew/opt/llvm"

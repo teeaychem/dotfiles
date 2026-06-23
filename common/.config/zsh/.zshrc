@@ -34,6 +34,10 @@ case "$OSTYPE" in
     ;;
 esac
 
+if [[ -f ${XDG_CONFIG_HOME}/zsh/local.zsh ]]; then
+    source ${XDG_CONFIG_HOME}/zsh/local.zsh
+fi
+
 load_aliases "$XDG_CONFIG_HOME/shell/aliases/base.aliases"
 
 # options

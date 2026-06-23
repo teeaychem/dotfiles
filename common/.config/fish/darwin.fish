@@ -1,6 +1,5 @@
-if test -x /opt/homebrew/bin/brew
-    /opt/homebrew/bin/brew shellenv fish | source
-end
+# hammerspoon
+# defaults write org.hammerspoon.Hammerspoon MJConfigFile "~/.config/hammerspoon/init.lua"
 
 function cdf
     set -l finder_dir (finder-pwd)

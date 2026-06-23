@@ -85,10 +85,15 @@ set -q HOMEBREW_PREFIX; or switch (uname)
         set -gx HOMEBREW_PREFIX /home/linuxbrew/.linuxbrew
 end
 
+if test -x "$HOMEBREW_PREFIX/bin/brew"
+    "$HOMEBREW_PREFIX/bin/brew" shellenv fish | source
+end
+
 # Usage inside config.fish:
 load_vars "$XDG_CONFIG_HOME/shell/vars/base.vars"
 
 load_aliases "$XDG_CONFIG_HOME/shell/aliases/base.aliases"
+
 load_history_ignore "$XDG_CONFIG_HOME/shell/history/ignore"
 
 if test -r "$HOMEBREW_PREFIX/opt/modules/init/fish"
@@ -117,8 +122,7 @@ switch (uname)
         echo "No configuration for: "(uname)
 end
 
-# hammerspoon
-# defaults write org.hammerspoon.Hammerspoon MJConfigFile "~/.config/hammerspoon/init.lua"
+test -f $__fish_config_dir/local.fish; and source $__fish_config_dir/local.fish
 
 # OCaml
 # This adds: the correct directories to the PATH, auto-completion for the opam binary

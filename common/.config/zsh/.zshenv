@@ -17,6 +17,10 @@ case "$OSTYPE" in
     linux*)  export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-/home/linuxbrew/.linuxbrew}" ;;
 esac
 
+if [[ -x "${HOMEBREW_PREFIX:-}/bin/brew" ]]; then
+    eval "$("${HOMEBREW_PREFIX}/bin/brew" shellenv zsh)"
+fi
+
 load_vars() {
   setopt local_options extended_glob
 
