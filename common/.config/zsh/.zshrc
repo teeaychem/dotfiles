@@ -10,6 +10,14 @@ antidote load
 fpath=("${XDG_CONFIG_HOME}/zsh/functions" $fpath)
 autoload -Uz fix-ssh-agent load_aliases venv-activate
 
+# macOS login shells run path_helper after .zshenv, moving system paths ahead
+# of the paths added by the dotfiles modules. Reloading modules here restores
+# the base/platform/local module layer before shell-specific platform setup.
+# Non-interactive login shells (zsh -lc) keep path_helper's system-first order.
+if [[ "$OSTYPE" == darwin* ]] && (( $+functions[module] )); then
+    module reload
+fi
+
 case "$OSTYPE" in
     darwin*)
     if [[ -f ${XDG_CONFIG_HOME}/zsh/darwin.sh ]]; then
@@ -25,15 +33,6 @@ case "$OSTYPE" in
     echo "No configuration for: $OSTYPE"
     ;;
 esac
-
-# macOS login shells run path_helper after .zshenv, moving system paths ahead
-# of the paths added by the dotfiles modules. brew shellenv may then adjust
-# PATH again when the platform configuration above is sourced. Reloading the
-# modules here restores their intended precedence for interactive shells.
-# Non-interactive login shells (zsh -lc) keep path_helper's system-first order.
-if [[ "$OSTYPE" == darwin* ]] && (( $+functions[module] )); then
-    module reload
-fi
 
 load_aliases "$XDG_CONFIG_HOME/shell/aliases/base.aliases"
 

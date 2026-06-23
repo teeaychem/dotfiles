@@ -12,6 +12,11 @@ mkdir -p \
 export ZDOTDIR="${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}"
 mkdir -p "$ZDOTDIR"
 
+case "$OSTYPE" in
+    darwin*) export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-/opt/homebrew}" ;;
+    linux*)  export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-/home/linuxbrew/.linuxbrew}" ;;
+esac
+
 load_vars() {
   setopt local_options extended_glob
 
@@ -58,16 +63,11 @@ export SAVEHIST=10000                # Maximum events in history file
 
 typeset -gU path fpath # ensure path arrays do not contain duplicates.
 
-case "$OSTYPE" in
-    darwin*)
-        [[ -r "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/modules/init/zsh" ]] &&
-            source "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/modules/init/zsh"
-        ;;
-    linux*)
-        [[ -r /usr/share/modules/init/zsh ]] &&
-            source /usr/share/modules/init/zsh
-        ;;
-esac
+if [[ -r "${HOMEBREW_PREFIX:-}/opt/modules/init/zsh" ]]; then
+    source "${HOMEBREW_PREFIX:-}/opt/modules/init/zsh"
+elif [[ "$OSTYPE" == linux* && -r /usr/share/modules/init/zsh ]]; then
+    source /usr/share/modules/init/zsh
+fi
 
 if (( $+functions[module] )); then
     module use "$XDG_CONFIG_HOME/modules/modulefiles"

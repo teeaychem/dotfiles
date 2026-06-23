@@ -78,6 +78,12 @@ set -gx XDG_STATE_HOME $HOME/.local/state
 set -gx XDG_DATA_HOME $HOME/.local/share
 set -gx XDG_CACHE_HOME $HOME/.cache
 
+set -q HOMEBREW_PREFIX; or switch (uname)
+    case Darwin
+        set -gx HOMEBREW_PREFIX /opt/homebrew
+    case Linux
+        set -gx HOMEBREW_PREFIX /home/linuxbrew/.linuxbrew
+end
 
 # Usage inside config.fish:
 load_vars "$XDG_CONFIG_HOME/shell/vars/base.vars"
@@ -85,24 +91,13 @@ load_vars "$XDG_CONFIG_HOME/shell/vars/base.vars"
 load_aliases "$XDG_CONFIG_HOME/shell/aliases/base.aliases"
 load_history_ignore "$XDG_CONFIG_HOME/shell/history/ignore"
 
-switch (uname)
-    case Darwin
-        test -f $__fish_config_dir/darwin.fish; and source $__fish_config_dir/darwin.fish
-    case Linux
-        test -f $__fish_config_dir/linux.fish; and source $__fish_config_dir/linux.fish
-    case '*'
-        echo "No configuration for: "(uname)
-end
-
-switch (uname)
-    case Darwin
-        if test -r "$HOMEBREW_PREFIX/opt/modules/init/fish"
-            source "$HOMEBREW_PREFIX/opt/modules/init/fish"
-            test -r "$HOMEBREW_PREFIX/opt/modules/init/fish_completion"; and source "$HOMEBREW_PREFIX/opt/modules/init/fish_completion"
-        end
-    case Linux
-        test -r /usr/share/modules/init/fish; and source /usr/share/modules/init/fish
-        test -r /usr/share/modules/init/fish_completion; and source /usr/share/modules/init/fish_completion
+if test -r "$HOMEBREW_PREFIX/opt/modules/init/fish"
+    source "$HOMEBREW_PREFIX/opt/modules/init/fish"
+else
+    switch (uname)
+        case Linux
+            test -r /usr/share/modules/init/fish; and source /usr/share/modules/init/fish
+    end
 end
 
 if type -q module
@@ -111,6 +106,15 @@ if type -q module
     module is-avail dotfiles/platform >/dev/null 2>&1; and module load dotfiles/platform
 
     module is-avail dotfiles/local >/dev/null 2>&1; and module load dotfiles/local
+end
+
+switch (uname)
+    case Darwin
+        test -f $__fish_config_dir/darwin.fish; and source $__fish_config_dir/darwin.fish
+    case Linux
+        test -f $__fish_config_dir/linux.fish; and source $__fish_config_dir/linux.fish
+    case '*'
+        echo "No configuration for: "(uname)
 end
 
 # hammerspoon
