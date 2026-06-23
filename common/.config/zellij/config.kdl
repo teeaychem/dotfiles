@@ -1,8 +1,13 @@
 keybinds clear-defaults=true {
+    normal {
+        bind "f" { ToggleFloatingPanes; SwitchToMode "locked"; }
+    }
     locked {
-        bind "Ctrl w" { SwitchToMode "normal"; }
+        bind "Ctrl t" { SwitchToMode "normal"; }
     }
     pane {
+        bind "|" { NewPane "right"; SwitchToMode "locked"; }
+        bind "-" { NewPane "down"; SwitchToMode "locked"; }
         bind "left" { MoveFocus "left"; }
         bind "down" { MoveFocus "down"; }
         bind "up" { MoveFocus "up"; }
@@ -171,8 +176,8 @@ keybinds clear-defaults=true {
     shared_except "locked" "entersearch" {
         bind "enter" { SwitchToMode "locked"; }
     }
-    shared_except "locked" "entersearch" "renametab" "renamepane" "prompt" "tmux" {
-        bind "Ctrl w" { SwitchToMode "locked"; }
+    shared_except "locked" "entersearch" "renametab" "renamepane" "prompt" {
+        bind "Ctrl t" { SwitchToMode "locked"; }
     }
     shared_except "locked" "entersearch" "renametab" "renamepane" {
         bind "esc" { SwitchToMode "locked"; }
@@ -186,10 +191,10 @@ keybinds clear-defaults=true {
     shared_except "locked" "tab" "entersearch" "renametab" "renamepane" {
         bind "t" { SwitchToMode "tab"; }
     }
-    shared_among "normal" "resize" "tab" "scroll" "prompt" "tmux" {
+    shared_among "normal" "resize" "tab" "scroll" "prompt" {
         bind "p" { SwitchToMode "pane"; }
     }
-    shared_among "normal" "resize" "search" "move" "prompt" "tmux" {
+    shared_among "normal" "resize" "search" "move" "prompt" {
         bind "s" { SwitchToMode "scroll"; }
     }
     shared_except "locked" "resize" "pane" "tab" "entersearch" "renametab" "renamepane" {
@@ -217,7 +222,7 @@ keybinds clear-defaults=true {
         bind "esc" { SwitchToMode "scroll"; }
         bind "enter" { SwitchToMode "search"; }
     }
-    shared_among "entersearch" "prompt" "tmux" {
+    shared_among "entersearch" "prompt" {
         bind "Ctrl g" { SwitchToMode "locked"; }
     }
     renametab {
@@ -288,7 +293,7 @@ default_mode "locked"
 // The name of the default layout to load on startup
 // Default: "default"
 //
-// default_layout "compact"
+default_layout "compact"
 
 // The folder in which Zellij will look for layouts
 // (Requires restart)
@@ -434,7 +439,8 @@ scrollback_lines_to_serialize 10000
 // (Requires restart)
 // Default: true (if the host terminal supports it)
 //
-// support_kitty_keyboard_protocol false
+support_kitty_keyboard_protocol true
+
 // Whether to make sure a local web server is running when a new Zellij session starts.
 // This web server will allow creating new sessions and attaching to existing ones that have
 // opted in to being shared in the browser.
