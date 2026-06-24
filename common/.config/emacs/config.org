@@ -57,7 +57,6 @@ This block must therefore precede all third-party packages.
 (setq-default bidi-display-reordering 'left-to-right)
 (setq-default bidi-paragraph-direction 'left-to-right)
 (setq bidi-inhibit-bpa t)
-(setq idle-update-delay 1.0)
 #+end_src
 
 #+begin_src emacs-lisp
