@@ -519,12 +519,14 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
         ("j" . bookmark-jump)
         ("s" . bookmark-set-no-overwrite)
         ("S" . bookmark-set)))
-  #+end_src
+#+end_src
 
 ** dabbrev
 
 #+begin_src emacs-lisp
 (use-package dabbrev
+  :straight nil
+
   :config
   (dolist (regexp '("\\` "
                     "\\.log\\'"
@@ -727,6 +729,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package elec-pair
+  :straight nil
+
   :hook ((prog-mode LaTeX-mode) . electric-pair-mode))
 #+end_src
 
@@ -760,6 +764,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package repeat
+  :straight nil
+
   :init (repeat-mode 1)
 
   :custom
@@ -794,6 +800,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package skeleton
+  :straight nil
+
   :init
   (defconst slash-escaped-pairs
     '((?\( . ?\))
@@ -905,6 +913,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package winner
+  :straight nil
+
   :init (winner-mode 1))
 #+end_src
 
