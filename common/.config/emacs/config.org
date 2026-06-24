@@ -1233,7 +1233,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
    ("a" . dirvish-setup-menu)        ; [a]ttributes settings:`t' toggles mtime, `f' toggles fullframe, etc.
    ("f" . dirvish-file-info-menu)    ; [f]ile info
    ("o" . dirvish-quick-access)      ; [o]pen `dirvish-quick-access-entries'
-   ("s" . dirvish-quicksort)         ; [s]ort flie list
+   ("s" . dirvish-quicksort)         ; [s]ort file list
    ("r" . dirvish-history-jump)      ; [r]ecent visited
    ("l" . dirvish-ls-switches-menu)  ; [l]s command flags
    ("v" . dirvish-vc-menu)           ; [v]ersion control commands
@@ -1955,7 +1955,7 @@ To highlight indentations
 
 - use Skim as default pdf viewer
   - Skim's displayline is used for forward search (from .tex to .pdf)
-  - option -r relaods the file; option -b highlights the current line; option -g opens Skim in the background
+  - option -r reloads the file; option -b highlights the current line; option -g opens Skim in the background
   - For this to work, it seems one needs no spaces in the file name
 
 ** lean4
@@ -2140,7 +2140,7 @@ Get the relevant package subdirectories from the llvm source
   (python-indent-guess-indent-offset-verbose nil))
 #+end_src
 
-*** python
+*** pet
 
 #+begin_src emacs-lisp
 (use-package pet
@@ -2545,7 +2545,7 @@ These buffers can be seen by using space.
   (dolist (regex '("\\*Async-native-compile"
                    "\\*EGLOT"
                    "\\*Flymake"
-                   "\\*aphelelia"
+                   "\\*apheleia"
                    "\\*envrc"
                    "\\*straight"
                    "clangd"
