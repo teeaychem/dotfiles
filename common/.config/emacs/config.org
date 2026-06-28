@@ -2364,47 +2364,55 @@ https://robert.kra.hn/posts/rust-emacs-setup/
   (keymap-unset org-mode-map "<backtab>" 'remove))
 #+end_src
 
-** org-mem
+** vulpea
 
 #+begin_src emacs-lisp
-(use-package org-mem
+(use-package vulpea
   :straight t
+  :commands (vulpea-db-sync-full-scan
+             vulpea-find
+             vulpea-insert)
 
   :init
-  (defvar my-org-node-directory
-    (file-name-as-directory (expand-file-name "~/org-node"))
-    "Directory containing org-node notes.")
+  (defvar my-org-directory
+    (file-name-as-directory (expand-file-name "~/org"))
+    "Directory containing Org notes.")
+
+  (define-prefix-command 'my-vulpea-prefix-map)
+  (keymap-global-set "M-o f" #'vulpea-find)
+  (keymap-global-set "M-o v" my-vulpea-prefix-map)
+  (keymap-set my-vulpea-prefix-map "f" #'vulpea-find)
+  (keymap-set my-vulpea-prefix-map "i" #'vulpea-insert)
+  (keymap-set my-vulpea-prefix-map "s" #'vulpea-db-sync-full-scan)
+  (with-eval-after-load 'org
+    (keymap-set org-mode-map "M-o i" #'vulpea-insert))
 
   :custom
-  (org-mem-watch-dirs (list my-org-node-directory))
-  (org-mem-do-look-everywhere nil)
+  (vulpea-db-sync-directories (list my-org-directory))
+  (vulpea-default-notes-directory my-org-directory)
 
   :config
-  (org-mem-updater-mode 1))
+  (vulpea-db-autosync-mode 1))
 #+end_src
 
-** org-node
+** consult-vulpea
 
 #+begin_src emacs-lisp
-(use-package org-node
-  :straight t
-  :after org-mem
+(use-package consult-vulpea
+  :straight (consult-vulpea
+             :type git
+             :host github
+             :repo "fabcontigiani/consult-vulpea")
+  :after vulpea
+  :commands (consult-vulpea-find
+             consult-vulpea-grep)
 
   :init
-  ;; Optional key bindings
-  ;; Tip: Try changing these to just "M-o"!
-  (keymap-global-set "M-o n" org-node-global-prefix-map)
-  (keymap-global-set "M-o b" #'org-node-context-dwim)
-  (keymap-global-set "M-o f" #'org-node-find)
-  (with-eval-after-load 'org
-    (keymap-set org-mode-map "M-o n" org-node-org-prefix-map)
-    (keymap-set org-mode-map "M-o i" #'org-node-insert-link))
-
-  :custom
-  (org-node-file-directory-ask my-org-node-directory)
+  (keymap-set my-vulpea-prefix-map "d" #'consult-vulpea-find)
+  (keymap-set my-vulpea-prefix-map "g" #'consult-vulpea-grep)
 
   :config
-  (org-node-cache-mode 1))
+  (consult-vulpea-mode 1))
 #+end_src
 
 
