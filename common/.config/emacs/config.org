@@ -1064,6 +1064,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 * external, etc.
 
+
 ** activities
 
 #+begin_src emacs-lisp
@@ -3116,28 +3117,6 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
   :commands gptel-agent
 
   :config (gptel-agent-update))         ;Read files from agents directories
-#+end_src
-
-** agent-shell
-
-#+begin_src emacs-lisp
-(use-package agent-shell
-  :straight t
-  :disabled
-
-  :commands (agent-shell
-             agent-shell-new-shell
-             agent-shell-new-temp-shell
-             agent-shell-toggle)
-
-  ;; :ensure-system-package
-  ;; ((codex-acp . "brew install codex-acp"))
-
-  :config
-  ;; Shell startup loads the dotfiles modules; `exec-path-from-shell'
-  ;; imports their agent credentials for GUI Emacs sessions.
-  (setq agent-shell-openai-codex-environment
-        (agent-shell-make-environment-variables :inherit-env t)))
 #+end_src
 
 
