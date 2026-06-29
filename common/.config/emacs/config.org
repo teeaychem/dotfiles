@@ -1701,6 +1701,28 @@ To highlight indentations
 * vc
 
 
+** blamer
+
+#+begin_src emacs-lisp
+(use-package blamer
+  :straight t
+
+  :bind
+  (:map magit-prefix-map
+        ("B" . blamer-mode))
+  ("s-i" . blamer-show-commit-info)
+
+  :custom
+  (blamer-idle-time 0.3)
+  (blamer-type 'echo-area)
+
+  :config
+  (set-face-attribute 'blamer-face nil
+                      :inherit 'shadow
+                      :background 'unspecified
+                      :slant 'normal))
+#+end_src
+
 ** diff-hl
 
 #+begin_src emacs-lisp
@@ -1756,28 +1778,6 @@ To highlight indentations
   ;; (magit-commit-show-diff nil)
   (magit-branch-direct-configure nil)
   (magit-refresh-status-buffer nil))
-#+end_src
-
-** blamer
-
-#+begin_src emacs-lisp
-(use-package blamer
-  :straight t
-
-  :bind
-  (:map magit-prefix-map
-        ("B" . blamer-mode))
-  ("s-i" . blamer-show-commit-info)
-
-  :custom
-  (blamer-idle-time 0.3)
-  (blamer-type 'echo-area)
-
-  :config
-  (set-face-attribute 'blamer-face nil
-                      :inherit 'shadow
-                      :background 'unspecified
-                      :slant 'normal))
 #+end_src
 
 ** magit-delta
@@ -2426,6 +2426,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 
 
 * completion
+
 
 ** cape
 
