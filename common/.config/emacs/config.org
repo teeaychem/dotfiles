@@ -191,302 +191,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 * internal
 
 
-** emacs
-
-#+begin_src emacs-lisp
-(use-package emacs
-  :preface
-  (defun my/visible-bell-invert ()
-    "Briefly invert the mode line to provide a visible bell."
-    (invert-face 'mode-line)
-    (run-with-timer 0.2 nil #'invert-face 'mode-line))
-
-  :init
-  (setq-default fill-column 1024)
-  (setq-default indicate-empty-lines t)
-  (setq-default line-spacing nil)
-
-  (tool-bar-mode -1)
-  ;; (scroll-bar-mode -1)
-  ;; (horizontal-scroll-bar-mode -1)
-
-  (set-frame-parameter nil 'internal-border-width 2)
-
-  :bind (:prefix-map format-prefix-map
-         :prefix "C-c f")
-  :bind (:prefix-map search-prefix-map
-         :prefix "C-c s")
-  :bind (:prefix-map goto-prefix-map
-         :prefix "C-c g")
-
-  :custom
-  (cursor-in-non-selected-windows t)
-  (fast-but-imprecise-scrolling t)
-  (redisplay-skip-fontification-on-input t)
-  ;; (jit-lock-defer-time 0.1) ; Defer fontification while input is pending.
-  (right-margin-width 1)
-  (scroll-conservatively 101)
-  (scroll-preserve-screen-position t)
-  (truncate-string-ellipsis "…")
-  (use-dialog-box nil)
-  (use-short-answers t)
-  (visible-bell t)
-  (ring-bell-function #'my/visible-bell-invert)
-  (warning-minimum-level :error))
-#+end_src
-
-** comint
-
-#+begin_src emacs-lisp
-(use-package comint
-  :straight nil
-
-  :custom
-  (comint-scroll-to-bottom-on-output t))
-#+end_src
-
-** font-lock
-
-#+begin_src emacs-lisp
-(use-package font-lock
-  :straight nil
-
-  :init
-  (global-font-lock-mode 1))
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package hi-lock
-  :straight nil
-
-  :init
-  (global-hi-lock-mode 1))
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package treesit
-  :straight nil
-
-  :custom
-  (treesit-auto-install-grammar t)
-  (treesit-enabled-modes t)
-  (treesit-font-lock-level 4))
-#+end_src
-
-** files
-
-#+begin_src emacs-lisp
-(use-package files
-  :straight nil
-
-  :init
-  (add-to-list 'completion-ignored-extensions ".DS_Store")
-  (add-to-list 'completion-ignored-extensions ".stow-local-ignore")
-
-  :bind
-  (("s-s" . #'save-buffer)
-   ("s-u" . #'revert-buffer)))
-#+end_src
-
-** help
-
-#+begin_src emacs-lisp
-(use-package help
-  :straight nil
-
-  :custom
-  (help-window-select t))
-#+end_src
-
-** mouse
-
-#+begin_src emacs-lisp
-(use-package mouse
-  :straight nil
-
-  :init
-  (context-menu-mode 1)
-
-  :config
-  (keymap-global-unset "<mouse-2>")
-  (keymap-global-unset "C-<wheel-down>")
-  (keymap-global-unset "C-<wheel-up>")
-
-  (setq context-menu-functions
-        (delete 'context-menu-undo context-menu-functions))
-
-  :bind
-  ("<mouse-3>" . #'context-menu-open)
-
-  :custom
-  (mouse-wheel-follow-mouse t))
-#+end_src
-
-** minibuffer
-
-#+begin_src emacs-lisp
-(use-package minibuffer
-  :straight nil
-
-  :bind
-  (("C-<tab>" . #'completion-at-point)
-   ("<backtab>" . #'completion-at-point)))
-#+end_src
-
-** simple
-
-#+begin_src emacs-lisp
-(use-package simple
-  :straight nil
-
-  :preface
-  (defun my/backward-delete-word (arg)
-    "Delete ARG words backward without adding them to the kill ring."
-    (interactive "p")
-    (delete-region (point) (progn (backward-word arg) (point))))
-
-  (defun my/forward-delete-line ()
-    "Delete from point to the end of the line without killing it."
-    (interactive)
-    (delete-region (point) (line-end-position)))
-
-  ;; https://protesilaos.com/codelog/2024-11-28-basic-emacs-configuration/
-  (defun my/keyboard-quit-dwim ()
-    "Quit the current context or deactivate the active region."
-    (interactive)
-    (cond
-     ((region-active-p)                      (keyboard-quit))
-     ((derived-mode-p 'completion-list-mode) (delete-completion-window))
-     ((> (minibuffer-depth) 0)               (abort-recursive-edit))
-     (t                                      (keyboard-quit))))
-
-  :init
-  (column-number-mode 1)
-  (line-number-mode 1)
-  (global-visual-line-mode 1)
-
-  :config
-  (keymap-global-unset "C-_")
-  (keymap-global-unset "C-z")
-  (keymap-global-unset "M-z")
-
-  :bind
-  (("C-<backspace>" . #'my/backward-delete-word)
-   ("M-DEL" . #'my/backward-delete-word)
-   ("C-g" . #'my/keyboard-quit-dwim)
-   ("C-k" . #'my/forward-delete-line)
-   ("C-x k" . #'kill-current-buffer)
-   ("C-x K" . #'kill-buffer)
-   ("M-c" . #'capitalize-dwim)
-   ("M-l" . #'downcase-dwim)
-   ("M-u" . #'upcase-dwim)
-   ("s-:" . #'eval-expression)
-   ("C-x C-r" . #'execute-extended-command)
-   ("s-x" . #'execute-extended-command)
-   ("s-c" . #'kill-ring-save)
-   ("s-v" . #'yank)
-   ("RET" . #'newline)))
-#+end_src
-
-** tooltip
-
-#+begin_src emacs-lisp
-(use-package tooltip
-  :straight nil
-
-  :init
-  (tooltip-mode -1))
-#+end_src
-
-** uniquify
-
-#+begin_src emacs-lisp
-(use-package uniquify
-  :straight nil
-
-  :custom
-  (uniquify-after-kill-buffer-flag t)
-  (uniquify-buffer-name-style 'forward))
-#+end_src
-
-** visual-wrap
-
-#+begin_src emacs-lisp
-(use-package visual-wrap
-  :straight nil
-
-  :init
-  (global-visual-wrap-prefix-mode 1))
-#+end_src
-
-** window
-
-#+begin_src emacs-lisp
-(use-package window
-  :straight nil
-
-  :preface
-  (defun my/window-toggle-dedicated ()
-    "Toggle whether the selected window is dedicated to its buffer."
-    (interactive)
-    (let* ((window (selected-window))
-           (dedicated (not (window-dedicated-p window))))
-      (set-window-dedicated-p window dedicated)
-      (message "Window %sdedicated" (if dedicated "" "no longer "))))
-
-  :bind (:prefix-map my/window-prefix-map
-         :prefix "C-c w")
-  :bind (:repeat-map my/window-prefix-map
-         :exit
-         :continue
-         ("<left>"    . windmove-left)
-         ("<right>"   . windmove-right)
-         ("<up>"      . windmove-up)
-         ("<down>"    . windmove-down)
-         ("S-<left>"  . windmove-swap-states-left)
-         ("S-<right>" . windmove-swap-states-right)
-         ("S-<up>"    . windmove-swap-states-up)
-         ("S-<down>"  . windmove-swap-states-down)
-         ("C-<left>"  . shrink-window-horizontally)
-         ("C-<right>" . enlarge-window-horizontally)
-         ("C-<up>"    . enlarge-window)
-         ("C-<down>"  . shrink-window)
-         ("["         . previous-buffer)
-         ("]"         . next-buffer)
-         ("0"         . delete-window)
-         ("1"         . delete-other-windows)
-         ("2"         . split-window-below)
-         ("3"         . split-window-right)
-         ("="         . balance-windows-area)
-         ("c"         . compare-windows)
-         ("d"         . my/window-toggle-dedicated)
-         ("h"         . window-layout-flip-leftright)
-         ("r"         . window-layout-rotate-clockwise)
-         ("R"         . window-layout-rotate-anticlockwise)
-         ("t"         . window-layout-transpose)
-         ("v"         . window-layout-flip-topdown)
-         ("u"         . winner-undo)
-         ("U"         . winner-redo)
-         ("l"         . display-line-numbers-mode))
-
-  :custom
-  (split-height-threshold 0) ; Prefer side-by-side automatic splits.
-  (split-width-threshold nil))
-#+end_src
-
-** xref
-
-#+begin_src emacs-lisp
-(use-package xref
-  :straight nil
-
-  :bind
-  (("s-." . #'xref-find-definitions)
-   ("M-." . #'xref-find-definitions)
-   ("M-s-," . #'xref-go-back)
-   ("M-s-." . #'xref-go-forward)))
-#+end_src
-
 ** autorevert
 
 #+begin_src emacs-lisp
@@ -520,6 +224,16 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
         ("S" . bookmark-set)))
 #+end_src
 
+** comint
+
+#+begin_src emacs-lisp
+(use-package comint
+  :straight nil
+
+  :custom
+  (comint-scroll-to-bottom-on-output t))
+#+end_src
+
 ** dabbrev
 
 #+begin_src emacs-lisp
@@ -544,6 +258,33 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
                 (let ((inhibit-message t)
                       (message-log-max nil))
                   (apply orig-fun args)))))
+#+end_src
+
+** desktop
+
+#+begin_src emacs-lisp
+(use-package desktop
+  :straight nil
+
+  :init
+  (let ((desktop-dir (expand-file-name "var/desktops/" user-emacs-directory)))
+    (make-directory desktop-dir t)
+    (setq desktop-path (list desktop-dir)))
+  (desktop-save-mode 1)
+
+  :custom
+  (desktop-save t)
+  (desktop-auto-save-timeout nil)
+  (desktop-restore-eager 5)
+
+  (desktop-load-locked-desktop t)
+
+  :bind (:prefix-map desktop-prefix-map
+                     :prefix "C-c D"
+                     ("c" . desktop-change-dir)
+                     ("r" . desktop-read)
+                     ("s" . desktop-save)
+                     ("v" . desktop-revert)))
 #+end_src
 
 ** dired
@@ -578,33 +319,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   :hook
   (dired-mode . dired-omit-mode))
-#+end_src
-
-** desktop
-
-#+begin_src emacs-lisp
-(use-package desktop
-  :straight nil
-
-  :init
-  (let ((desktop-dir (expand-file-name "var/desktops/" user-emacs-directory)))
-    (make-directory desktop-dir t)
-    (setq desktop-path (list desktop-dir)))
-  (desktop-save-mode 1)
-
-  :custom
-  (desktop-save t)
-  (desktop-auto-save-timeout nil)
-  (desktop-restore-eager 5)
-
-  (desktop-load-locked-desktop t)
-
-  :bind (:prefix-map desktop-prefix-map
-                     :prefix "C-c D"
-                     ("c" . desktop-change-dir)
-                     ("r" . desktop-read)
-                     ("s" . desktop-save)
-                     ("v" . desktop-revert)))
 #+end_src
 
 ** editorconfig
@@ -733,6 +447,176 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :hook ((prog-mode LaTeX-mode) . electric-pair-mode))
 #+end_src
 
+** emacs
+
+#+begin_src emacs-lisp
+(use-package emacs
+  :preface
+  (defun my/visible-bell-invert ()
+    "Briefly invert the mode line to provide a visible bell."
+    (invert-face 'mode-line)
+    (run-with-timer 0.2 nil #'invert-face 'mode-line))
+
+  :init
+  (setq-default fill-column 1024)
+  (setq-default indicate-empty-lines t)
+  (setq-default line-spacing nil)
+
+  (tool-bar-mode -1)
+  ;; (scroll-bar-mode -1)
+  ;; (horizontal-scroll-bar-mode -1)
+
+  (set-frame-parameter nil 'internal-border-width 2)
+
+  :bind (:prefix-map format-prefix-map
+         :prefix "C-c f")
+  :bind (:prefix-map search-prefix-map
+         :prefix "C-c s")
+  :bind (:prefix-map goto-prefix-map
+         :prefix "C-c g")
+
+  :custom
+  (cursor-in-non-selected-windows t)
+  (fast-but-imprecise-scrolling t)
+  (redisplay-skip-fontification-on-input t)
+  ;; (jit-lock-defer-time 0.1) ; Defer fontification while input is pending.
+  (right-margin-width 1)
+  (scroll-conservatively 101)
+  (scroll-preserve-screen-position t)
+  (truncate-string-ellipsis "…")
+  (use-dialog-box nil)
+  (use-short-answers t)
+  (visible-bell t)
+  (ring-bell-function #'my/visible-bell-invert)
+  (warning-minimum-level :error))
+#+end_src
+
+** files
+
+#+begin_src emacs-lisp
+(use-package files
+  :straight nil
+
+  :init
+  (add-to-list 'completion-ignored-extensions ".DS_Store")
+  (add-to-list 'completion-ignored-extensions ".stow-local-ignore")
+
+  :bind
+  (("s-s" . #'save-buffer)
+   ("s-u" . #'revert-buffer)))
+#+end_src
+
+** font-lock
+
+#+begin_src emacs-lisp
+(use-package font-lock
+  :straight nil
+
+  :init
+  (global-font-lock-mode 1))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package hi-lock
+  :straight nil
+
+  :init
+  (global-hi-lock-mode 1))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package treesit
+  :straight nil
+
+  :custom
+  (treesit-auto-install-grammar t)
+  (treesit-enabled-modes t)
+  (treesit-font-lock-level 4))
+#+end_src
+
+** help
+
+#+begin_src emacs-lisp
+(use-package help
+  :straight nil
+
+  :custom
+  (help-window-select t))
+#+end_src
+
+** isearch
+
+#+begin_src emacs-lisp
+(use-package isearch
+  :straight nil
+
+  :config
+  (setq isearch-lazy-count t)
+  (setq isearch-repeat-on-direction-change t)
+  (setq lazy-count-prefix-format "(%s/%s) ")
+  (setq lazy-count-suffix-format nil)
+  (setq search-whitespace-regexp ".*?")
+
+  :bind (:map isearch-mode-map
+              ("C-o" . isearch-occur)
+              ("M-%" . isearch-query-replace)
+              ("C-M-%" . isearch-query-replace-regexp)))
+#+end_src
+
+** ispell
+
+#+begin_src emacs-lisp
+(use-package ispell
+  :after exec-path-from-shell
+
+  :if (executable-find "hunspell")
+
+  :custom
+  (ispell-program-name "hunspell")
+  (ispell-personal-dictionary
+   (expand-file-name "hunspell/dictionaries/hunspell_personal"
+                     (getenv "XDG_CONFIG_HOME")))
+  (ispell-dictionary "en_GB")
+
+  :hook
+  (prog-mode . flyspell-prog-mode))
+#+end_src
+
+** minibuffer
+
+#+begin_src emacs-lisp
+(use-package minibuffer
+  :straight nil
+
+  :bind
+  (("C-<tab>" . #'completion-at-point)
+   ("<backtab>" . #'completion-at-point)))
+#+end_src
+
+** mouse
+
+#+begin_src emacs-lisp
+(use-package mouse
+  :straight nil
+
+  :init
+  (context-menu-mode 1)
+
+  :config
+  (keymap-global-unset "<mouse-2>")
+  (keymap-global-unset "C-<wheel-down>")
+  (keymap-global-unset "C-<wheel-up>")
+
+  (setq context-menu-functions
+        (delete 'context-menu-undo context-menu-functions))
+
+  :bind
+  ("<mouse-3>" . #'context-menu-open)
+
+  :custom
+  (mouse-wheel-follow-mouse t))
+#+end_src
+
 ** recentf
 
 #+begin_src emacs-lisp
@@ -795,6 +679,61 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (after-init . savehist-mode))
 #+end_src
 
+** simple
+
+#+begin_src emacs-lisp
+(use-package simple
+  :straight nil
+
+  :preface
+  (defun my/backward-delete-word (arg)
+    "Delete ARG words backward without adding them to the kill ring."
+    (interactive "p")
+    (delete-region (point) (progn (backward-word arg) (point))))
+
+  (defun my/forward-delete-line ()
+    "Delete from point to the end of the line without killing it."
+    (interactive)
+    (delete-region (point) (line-end-position)))
+
+  ;; https://protesilaos.com/codelog/2024-11-28-basic-emacs-configuration/
+  (defun my/keyboard-quit-dwim ()
+    "Quit the current context or deactivate the active region."
+    (interactive)
+    (cond
+     ((region-active-p)                      (keyboard-quit))
+     ((derived-mode-p 'completion-list-mode) (delete-completion-window))
+     ((> (minibuffer-depth) 0)               (abort-recursive-edit))
+     (t                                      (keyboard-quit))))
+
+  :init
+  (column-number-mode 1)
+  (line-number-mode 1)
+  (global-visual-line-mode 1)
+
+  :config
+  (keymap-global-unset "C-_")
+  (keymap-global-unset "C-z")
+  (keymap-global-unset "M-z")
+
+  :bind
+  (("C-<backspace>" . #'my/backward-delete-word)
+   ("M-DEL" . #'my/backward-delete-word)
+   ("C-g" . #'my/keyboard-quit-dwim)
+   ("C-k" . #'my/forward-delete-line)
+   ("C-x k" . #'kill-current-buffer)
+   ("C-x K" . #'kill-buffer)
+   ("M-c" . #'capitalize-dwim)
+   ("M-l" . #'downcase-dwim)
+   ("M-u" . #'upcase-dwim)
+   ("s-:" . #'eval-expression)
+   ("C-x C-r" . #'execute-extended-command)
+   ("s-x" . #'execute-extended-command)
+   ("s-c" . #'kill-ring-save)
+   ("s-v" . #'yank)
+   ("RET" . #'newline)))
+#+end_src
+
 ** skeleton
 
 #+begin_src emacs-lisp
@@ -825,42 +764,14 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
     (keymap-global-set (string opening-char) #'insert-pair-or-slash-escaped-pair)))
 #+end_src
 
-** ispell
+** tooltip
 
 #+begin_src emacs-lisp
-(use-package ispell
-  :after exec-path-from-shell
-
-  :if (executable-find "hunspell")
-
-  :custom
-  (ispell-program-name "hunspell")
-  (ispell-personal-dictionary
-   (expand-file-name "hunspell/dictionaries/hunspell_personal"
-                     (getenv "XDG_CONFIG_HOME")))
-  (ispell-dictionary "en_GB")
-
-  :hook
-  (prog-mode . flyspell-prog-mode))
-#+end_src
-
-** isearch
-
-#+begin_src emacs-lisp
-(use-package isearch
+(use-package tooltip
   :straight nil
 
-  :config
-  (setq isearch-lazy-count t)
-  (setq isearch-repeat-on-direction-change t)
-  (setq lazy-count-prefix-format "(%s/%s) ")
-  (setq lazy-count-suffix-format nil)
-  (setq search-whitespace-regexp ".*?")
-
-  :bind (:map isearch-mode-map
-              ("C-o" . isearch-occur)
-              ("M-%" . isearch-query-replace)
-              ("C-M-%" . isearch-query-replace-regexp)))
+  :init
+  (tooltip-mode -1))
 #+end_src
 
 ** tramp
@@ -888,6 +799,27 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (tramp-verbose 2))
 #+end_src
 
+** uniquify
+
+#+begin_src emacs-lisp
+(use-package uniquify
+  :straight nil
+
+  :custom
+  (uniquify-after-kill-buffer-flag t)
+  (uniquify-buffer-name-style 'forward))
+#+end_src
+
+** visual-wrap
+
+#+begin_src emacs-lisp
+(use-package visual-wrap
+  :straight nil
+
+  :init
+  (global-visual-wrap-prefix-mode 1))
+#+end_src
+
 ** which-key
 
 #+begin_src emacs-lisp
@@ -908,6 +840,61 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (set-face-attribute 'which-key-local-map-description-face nil :weight 'bold))
 #+end_src
 
+** window
+
+#+begin_src emacs-lisp
+(use-package window
+  :straight nil
+
+  :preface
+  (defun my/window-toggle-dedicated ()
+    "Toggle whether the selected window is dedicated to its buffer."
+    (interactive)
+    (let* ((window (selected-window))
+           (dedicated (not (window-dedicated-p window))))
+      (set-window-dedicated-p window dedicated)
+      (message "Window %sdedicated" (if dedicated "" "no longer "))))
+
+  :bind (:prefix-map my/window-prefix-map
+         :prefix "C-c w")
+  :bind (:repeat-map my/window-prefix-map
+         :exit
+         :continue
+         ("<left>"    . windmove-left)
+         ("<right>"   . windmove-right)
+         ("<up>"      . windmove-up)
+         ("<down>"    . windmove-down)
+         ("S-<left>"  . windmove-swap-states-left)
+         ("S-<right>" . windmove-swap-states-right)
+         ("S-<up>"    . windmove-swap-states-up)
+         ("S-<down>"  . windmove-swap-states-down)
+         ("C-<left>"  . shrink-window-horizontally)
+         ("C-<right>" . enlarge-window-horizontally)
+         ("C-<up>"    . enlarge-window)
+         ("C-<down>"  . shrink-window)
+         ("["         . previous-buffer)
+         ("]"         . next-buffer)
+         ("0"         . delete-window)
+         ("1"         . delete-other-windows)
+         ("2"         . split-window-below)
+         ("3"         . split-window-right)
+         ("="         . balance-windows-area)
+         ("c"         . compare-windows)
+         ("d"         . my/window-toggle-dedicated)
+         ("h"         . window-layout-flip-leftright)
+         ("r"         . window-layout-rotate-clockwise)
+         ("R"         . window-layout-rotate-anticlockwise)
+         ("t"         . window-layout-transpose)
+         ("v"         . window-layout-flip-topdown)
+         ("u"         . winner-undo)
+         ("U"         . winner-redo)
+         ("l"         . display-line-numbers-mode))
+
+  :custom
+  (split-height-threshold 0) ; Prefer side-by-side automatic splits.
+  (split-width-threshold nil))
+#+end_src
+
 ** winner
 
 #+begin_src emacs-lisp
@@ -926,6 +913,19 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   :config
   (xclip-mode 1))
+#+end_src
+
+** xref
+
+#+begin_src emacs-lisp
+(use-package xref
+  :straight nil
+
+  :bind
+  (("s-." . #'xref-find-definitions)
+   ("M-." . #'xref-find-definitions)
+   ("M-s-," . #'xref-go-back)
+   ("M-s-." . #'xref-go-forward)))
 #+end_src
 
 
@@ -1469,6 +1469,14 @@ To highlight indentations
   (defun my/enable-global-kkp-mode ()
     "Enable KKP support for terminal frames."
     (global-kkp-mode 1))
+
+  :config
+  (defun my/kkp-ignore-dead-delete-frame (orig-fun &optional frame &rest args)
+    "Skip KKP frame teardown when FRAME has already been deleted."
+    (when (or (null frame) (frame-live-p frame))
+      (apply orig-fun frame args)))
+
+  (advice-add #'kkp--pre-delete-frame :around #'my/kkp-ignore-dead-delete-frame)
 
   :hook
   (tty-setup . my/enable-global-kkp-mode))
