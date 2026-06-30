@@ -1277,13 +1277,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
      "XDG_CONFIG_HOME"
      "OPENAI_API_KEY"
      "CODEX_API_KEY"
-     "CLANGD_JOBS"
-     "LLVM_SRC"
-     "MLIR_LSP_SERVER_BIN"
-     "MLIR_PDLL_LSP_SERVER_BIN"
-     "PDLL_COMPILATION_DATABASE"
-     "TABLEGEN_LSP_SERVER_BIN"
-     "TABLEGEN_COMPILATION_DATABASE"))
+     "CLANGD_JOBS"))
 
   :config
   (exec-path-from-shell-initialize))
@@ -1971,26 +1965,22 @@ https://github.com/llvm/llvm-project.git
 Get the relevant package subdirectories from the llvm source
 
 #+begin_src emacs-lisp
-(defvar my/llvm-source-root (getenv "LLVM_SRC")
-  "LLVM source root for this buffer or project.")
-
-(defvar-local my/mlir-lsp-server-bin (getenv "MLIR_LSP_SERVER_BIN")
+(defvar-local my/mlir-lsp-server-bin nil
   "MLIR language server executable for this buffer or project.")
 
-(defvar-local my/mlir-pdll-lsp-server-bin (getenv "MLIR_PDLL_LSP_SERVER_BIN")
+(defvar-local my/mlir-pdll-lsp-server-bin nil
   "PDLL language server executable for this buffer or project.")
 
-(defvar-local my/pdll-compilation-database (getenv "PDLL_COMPILATION_DATABASE")
+(defvar-local my/pdll-compilation-database nil
   "PDLL compilation database for this buffer or project.")
 
-(defvar-local my/tablegen-lsp-server-bin (getenv "TABLEGEN_LSP_SERVER_BIN")
+(defvar-local my/tablegen-lsp-server-bin nil
   "TableGen language server executable for this buffer or project.")
 
-(defvar-local my/tablegen-compilation-database (getenv "TABLEGEN_COMPILATION_DATABASE")
+(defvar-local my/tablegen-compilation-database nil
   "TableGen compilation database for this buffer or project.")
 
-(dolist (variable '(my/llvm-source-root
-                    my/mlir-lsp-server-bin
+(dolist (variable '(my/mlir-lsp-server-bin
                     my/mlir-pdll-lsp-server-bin
                     my/pdll-compilation-database
                     my/tablegen-lsp-server-bin
