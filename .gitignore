@@ -19,10 +19,15 @@
 /emacs/recentf
 /emacs/savehist
 /emacs/srecode-map.el
+/emacs/elpaca
 /emacs/straight
 /emacs/tree-sitter/*
 /emacs/undo-tree/*
 /emacs/var/*
+
+/common/.config/emacs/config*.el*
+/common/.config/emacs/eln-cache/**
+/common/.config/emacs/elpaca
 
 /fish/fish_variables
 /fish/functions/_autopair_*.fish

@@ -33,22 +33,6 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
 (setq debug-on-error nil)
 #+end_src
 
-** straight built-ins
-
-Some libraries bundled with Emacs are also released independently.
-Packages may depend on release names, and straight may install a copy after emacs has already loaded the bundled.
-
-Prefer every package reported by Emacs as built in, an external version must be explicitly removed.
-This block must therefore precede all third-party packages.
-
-#+begin_src emacs-lisp
-(require 'finder-inf)
-
-(dolist (package (mapcar #'car package--builtins))
-  (add-to-list 'straight-built-in-pseudo-packages package))
-#+end_src
-
-
 * general
 
 #+begin_src emacs-lisp
@@ -111,7 +95,7 @@ This block must therefore precede all third-party packages.
 
 #+begin_src emacs-lisp
 (use-package subword
-  :straight nil
+  :elpaca nil
   :delight subword-mode
 
   :init
@@ -195,7 +179,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package autorevert
-  :straight nil
+  :elpaca nil
 
   :init
   (global-auto-revert-mode 1))
@@ -211,7 +195,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package bookmark
-  :straight nil
+  :elpaca nil
 
   :bind (:prefix-map bookmark-prefix-map
                      :prefix "C-c b")
@@ -228,7 +212,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package comint
-  :straight nil
+  :elpaca nil
 
   :custom
   (comint-scroll-to-bottom-on-output t))
@@ -238,7 +222,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package dabbrev
-  :straight nil
+  :elpaca nil
 
   :config
   (dolist (regexp '("\\` "
@@ -264,7 +248,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package desktop
-  :straight nil
+  :elpaca nil
 
   :init
   (let ((desktop-dir (expand-file-name "var/desktops/" user-emacs-directory)))
@@ -291,7 +275,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package dired
-  :straight nil
+  :elpaca nil
 
   :init
   (when (and (eq system-type 'darwin) (executable-find "gls"))
@@ -325,7 +309,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package editorconfig
-  :straight nil
+  :elpaca nil
   :delight
 
   :init
@@ -346,7 +330,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package eglot-signature-eldoc-talkative
-  :straight t
+  :elpaca t
   :after eglot
 
   :config
@@ -356,7 +340,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package eldoc
-  :straight nil
+  :elpaca nil
   :demand t
   :delight eldoc-mode
 
@@ -442,7 +426,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package elec-pair
-  :straight nil
+  :elpaca nil
 
   :hook ((prog-mode LaTeX-mode) . electric-pair-mode))
 #+end_src
@@ -495,7 +479,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package files
-  :straight nil
+  :elpaca nil
 
   :init
   (add-to-list 'completion-ignored-extensions ".DS_Store")
@@ -510,7 +494,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package font-lock
-  :straight nil
+  :elpaca nil
 
   :init
   (global-font-lock-mode 1))
@@ -518,7 +502,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package hi-lock
-  :straight nil
+  :elpaca nil
 
   :init
   (global-hi-lock-mode 1))
@@ -526,7 +510,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package treesit
-  :straight nil
+  :elpaca nil
 
   :custom
   (treesit-auto-install-grammar t)
@@ -538,7 +522,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package help
-  :straight nil
+  :elpaca nil
 
   :custom
   (help-window-select t))
@@ -548,7 +532,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package isearch
-  :straight nil
+  :elpaca nil
 
   :config
   (setq isearch-lazy-count t)
@@ -586,7 +570,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package minibuffer
-  :straight nil
+  :elpaca nil
 
   :bind
   (("C-<tab>" . #'completion-at-point)
@@ -597,7 +581,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package mouse
-  :straight nil
+  :elpaca nil
 
   :init
   (context-menu-mode 1)
@@ -647,7 +631,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package repeat
-  :straight nil
+  :elpaca nil
 
   :init (repeat-mode 1)
 
@@ -683,7 +667,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package simple
-  :straight nil
+  :elpaca nil
 
   :preface
   (defun my/backward-delete-word (arg)
@@ -738,7 +722,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package skeleton
-  :straight nil
+  :elpaca nil
 
   :init
   (defconst slash-escaped-pairs
@@ -768,7 +752,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package tooltip
-  :straight nil
+  :elpaca nil
 
   :init
   (tooltip-mode -1))
@@ -778,7 +762,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package tramp
-  :straight nil
+  :elpaca nil
 
   :config
   (connection-local-set-profile-variables
@@ -803,7 +787,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package uniquify
-  :straight nil
+  :elpaca nil
 
   :custom
   (uniquify-after-kill-buffer-flag t)
@@ -814,7 +798,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package visual-wrap
-  :straight nil
+  :elpaca nil
 
   :init
   (global-visual-wrap-prefix-mode 1))
@@ -824,7 +808,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package which-key
-  :straight nil
+  :elpaca nil
   :delight which-key-mode
 
   :init
@@ -844,7 +828,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package window
-  :straight nil
+  :elpaca nil
 
   :preface
   (defun my/window-toggle-dedicated ()
@@ -899,7 +883,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package winner
-  :straight nil
+  :elpaca nil
 
   :init (winner-mode 1))
 #+end_src
@@ -908,7 +892,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package xclip
-  :straight t
+  :elpaca t
   :disabled
 
   :config
@@ -919,7 +903,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package xref
-  :straight nil
+  :elpaca nil
 
   :bind
   (("s-." . #'xref-find-definitions)
@@ -929,14 +913,14 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 
-* internal straight
+* internal elpaca
 
 
 ** flymake
 
 #+begin_src emacs-lisp :result silent
 (use-package flymake
-  :straight nil
+  :elpaca nil
   :init
   (setq python-flymake-command '("ruff" "check" "--quiet" "--output-format=concise"
                                  "--stdin-filename=stdin" "-"))
@@ -994,7 +978,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package project
-  :straight nil
+  :elpaca nil
 
   :custom
   (project-mode-line 'non-remote)
@@ -1039,8 +1023,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package batppuccin
-  :straight (batppuccin :type git :host github :repo "bbatsov/batppuccin-emacs"))
-(load-theme 'batppuccin-mocha t)
+  :elpaca (batppuccin :type git :host github :repo "bbatsov/batppuccin-emacs")
+  :config
+  (load-theme 'batppuccin-mocha t))
 #+end_src
 
 ** catppuccin
@@ -1048,7 +1033,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package catppuccin-theme
   :disabled
-  :straight (catppuccin-theme :local-repo "catppuccin" :type git :host github :repo "catppuccin/emacs" :branch "main")
+  :elpaca (catppuccin-theme :type git :host github :repo ("catppuccin/emacs" . "catppuccin") :branch "main")
 
   :config
   (load-theme 'catppuccin t)
@@ -1069,7 +1054,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package activities
-  :straight t
+  :elpaca t
   :init
   (activities-mode)
   (setq edebug-inhibit-emacs-lisp-mode-bindings t)
@@ -1092,7 +1077,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package avy
-  :straight t
+  :elpaca t
   :bind (("C-'" . avy-goto-char-timer)
          ("M-g w" . avy-goto-word-1)
          ("M-g l" . avy-goto-line)))
@@ -1129,7 +1114,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package apheleia
-  :straight t
+  :elpaca t
 
   :config
   (setf (alist-get 'python-mode apheleia-mode-alist) '(yapf ruff-isort))
@@ -1164,7 +1149,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package bookmark+
-  :straight t
+  :elpaca (bookmark+ :host github :repo "emacsmirror/bookmark-plus")
 
   :after bookmark
 
@@ -1183,7 +1168,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package breadcrumb
-  :straight t
+  :elpaca t
 
   :hook
   (prog-mode . breadcrumb-local-mode))
@@ -1193,21 +1178,21 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package crux
-  :straight t)
+  :elpaca t)
 #+end_src
 
 ** delight
 
 #+begin_src emacs-lisp
 (use-package delight
-  :straight t)
+  :elpaca t)
 #+end_src
 
 ** dirvish
 
 #+begin_src emacs-lisp
 (use-package dirvish
-  :straight t
+  :elpaca t
 
   :init
   (dirvish-override-dired-mode 1)
@@ -1251,7 +1236,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package dumb-jump
-  :straight t
+  :elpaca t
 
   :commands dumb-jump-xref-activate
 
@@ -1268,7 +1253,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package envrc
-  :straight t
+  :elpaca t
 
   :custom
   (envrc-show-summary-in-minibuffer nil)
@@ -1280,7 +1265,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package exec-path-from-shell
-  :straight t
+  :elpaca t
   :if (memq system-type '(darwin gnu/linux))
 
   :custom
@@ -1312,9 +1297,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package ghostel
-  :straight (:url "https://github.com/dakra/ghostel"
-             :lisp-dir "lisp"
-             :rev :newest)
+  :elpaca (:repo "https://github.com/dakra/ghostel"
+             :files ("lisp/*.el"))
 
   :defer t
 
@@ -1327,7 +1311,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package gumshoe
-  :straight t
+  :elpaca t
 
   :hook
   (after-init . global-gumshoe-mode)
@@ -1339,7 +1323,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package consult-gumshoe
-  :straight (consult-gumshoe
+  :elpaca (consult-gumshoe
              :type git
              :host github
              :repo "Overdr0ne/gumshoe"
@@ -1355,7 +1339,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package helpful
-  :straight t
+  :elpaca t
   :commands (helpful-callable
              helpful-variable
              helpful-key
@@ -1380,7 +1364,7 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package highlight-indent-guides
-  :straight t
+  :elpaca t
   :disabled
 
   :custom
@@ -1396,7 +1380,7 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package indent-bars
-  :straight t
+  :elpaca t
 
   :config
   (defun my/safe-enable-indent-bars ()
@@ -1463,7 +1447,7 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package kkp
-  :straight t
+  :elpaca t
   :commands global-kkp-mode
 
   :preface
@@ -1487,7 +1471,7 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package meow
-  :straight t
+  :elpaca t
   :commands (meow-global-mode meow-mode meow-tutor)
 
   :config
@@ -1580,7 +1564,7 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package multiple-cursors
-  :straight t
+  :elpaca t
 
   :bind (("C-S-." . mc/mark-next-like-this)
          ("C-S-," . mc/mark-previous-like-this)
@@ -1595,7 +1579,7 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package no-littering
-  :straight t
+  :elpaca t
 
   :init
   (require 'recentf)
@@ -1612,7 +1596,7 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package rainbow-delimiters
-  :straight t
+  :elpaca t
   :hook
   (prog-mode . rainbow-delimiters-mode))
 #+end_src
@@ -1621,7 +1605,7 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package rg
-  :straight t
+  :elpaca t
 
   :bind (:map search-prefix-map
               ("l" . rg-list-searches)
@@ -1642,7 +1626,7 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package ws-butler
-  :straight (ws-butler :type git :host github :repo "lewang/ws-butler" :branch "master")
+  :elpaca (ws-butler :type git :host github :repo "lewang/ws-butler" :branch "master")
   :delight ws-butler-mode
 
   :custom
@@ -1661,7 +1645,7 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package undo-fu
-  :straight t
+  :elpaca t
 
   :init
   (setq undo-limit (* 8 1024 1024))
@@ -1676,7 +1660,7 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package undo-fu-session
-  :straight t
+  :elpaca t
 
   :custom
   (undo-fu-session-incompatible-files '("/COMMIT_EDITMSG\\'" "/git-rebase-todo\\'"))
@@ -1688,7 +1672,7 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package vundo
-  :straight t
+  :elpaca t
 
   :custom
   (vundo-compact-display t)
@@ -1705,7 +1689,7 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package blamer
-  :straight t
+  :elpaca t
 
   :bind
   (:map magit-prefix-map
@@ -1727,7 +1711,7 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package diff-hl
-  :straight t
+  :elpaca t
   :after magit
 
   :custom
@@ -1761,7 +1745,7 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package magit
-  :straight t
+  :elpaca t
 
   :bind (:prefix-map magit-prefix-map
          :prefix "C-c v"
@@ -1784,7 +1768,7 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package magit-delta
-  :straight t
+  :elpaca t
   :after magit
   :hook (magit-mode . magit-delta-mode))
 #+end_src
@@ -1793,7 +1777,7 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package magit-prime
-  :straight t
+  :elpaca t
   :after magit
 
   :config
@@ -1804,7 +1788,7 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package magit-todos
-  :straight t
+  :elpaca t
   :after magit
   :bind (:map magit-prefix-map
               ("t" . magit-todos-list)))
@@ -1821,7 +1805,7 @@ To highlight indentations
 ;; (add-to-list 'load-path (concat user-emacs-directory "../../projects/emacs/clingo-asp-mode/"))
 (use-package clingo-asp-mode
   :mode "\\.lp\\'"
-  :vc (:fetcher github :repo teeaychem/clingo-asp-mode))
+  :elpaca (:fetcher github :repo "teeaychem/clingo-asp-mode"))
 ;;   :load-path (lambda() (concat user-emacs-directory "../../projects/emacs/clingo-asp-mode/")))
 #+end_src
 
@@ -1829,7 +1813,7 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package c-ts-mode
-  :straight nil
+  :elpaca nil
 
   :preface
   (defun my/clang-format-column-limit ()
@@ -1897,7 +1881,7 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package cmake-ts-mode
-  :straight nil
+  :elpaca nil
   :mode (("CMakeLists\\.txt\\'" . cmake-ts-mode)
          ("\\.cmake\\'" . cmake-ts-mode)))
 #+end_src
@@ -1914,7 +1898,7 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package fish-mode
-  :straight t
+  :elpaca t
   :mode "\\.fish\\'")
 #+end_src
 
@@ -1923,12 +1907,10 @@ To highlight indentations
 #+begin_src emacs-lisp
 (use-package tex
   :mode ("\\.tex\\'" . LaTeX-mode)
-  :straight (auctex :host nil
-                    :repo "git://git.git.savannah.gnu.org/auctex.git"
+  :elpaca (auctex :repo "git://git.git.savannah.gnu.org/auctex.git"
                     :branch "main"
                     :depth 1
                     :files (:defaults (:exclude "*.xpm")))
-  :ensure auctex
 
   :custom
   (TeX-electric-math (cons "\\(" "\\)"))
@@ -1970,8 +1952,10 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package nael-mode
-  ;; :straight (nael :type git :host codeberg :repo "mekeor/nael")
-  :straight (nael-mode :type git :repo "https://codeberg.org/mekeor/nael.git" :branch "release" :files ("nael/*.el"))
+  :elpaca (nael :type git
+                 :host codeberg
+                 :repo "mekeor/nael"
+                 :files ("nael/*.el" "nael/nael.info" "nael/nael.texi"))
   :mode "\\.lean\\'"
   :commands (nael-mode))
 #+end_src
@@ -1980,7 +1964,7 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package lua-ts-mode
-  :straight nil
+  :elpaca nil
 
   :custom
   (lua-ts-indent-offset 2))
@@ -2042,7 +2026,7 @@ Get the relevant package subdirectories from the llvm source
 
 #+begin_src emacs-lisp
 (use-package mlir-mode
-  :straight nil
+  :elpaca nil
   :after exec-path-from-shell
   :mode (("\\.mlir\\'" . mlir-mode)
          ("\\.pdll\\'" . pdll-mode))
@@ -2075,7 +2059,7 @@ Get the relevant package subdirectories from the llvm source
 
 #+begin_src emacs-lisp
 (use-package tablegen-mode
-  :straight nil
+  :elpaca nil
   :after exec-path-from-shell
   :mode "\\.td\\'"
 
@@ -2096,7 +2080,7 @@ Get the relevant package subdirectories from the llvm source
 
 #+begin_src emacs-lisp
 (use-package llvm-mode
-  :straight nil
+  :elpaca nil
   :mode "\\.ll\\'")
 #+end_src
 
@@ -2104,7 +2088,7 @@ Get the relevant package subdirectories from the llvm source
 
 #+begin_src emacs-lisp
 (use-package llvm-mir-mode
-  :straight nil
+  :elpaca nil
   :mode "\\.mir\\'")
 #+end_src
 
@@ -2112,13 +2096,13 @@ Get the relevant package subdirectories from the llvm source
 
 #+begin_src emacs-lisp
 (use-package tuareg
-  :straight t
+  :elpaca t
   :mode (("\\.ocamlinit\\'" . tuareg-mode)))
 
-(use-package dune :straight t)
+(use-package dune :elpaca t)
 
 (use-package utop
-  :straight t
+  :elpaca t
 
   :config
   (add-hook 'tuareg-mode-hook #'utop-minor-mode)
@@ -2127,7 +2111,7 @@ Get the relevant package subdirectories from the llvm source
   )
 
 (use-package ocaml-eglot
-  :straight t
+  :elpaca t
   :after tuareg
 
   :hook
@@ -2141,7 +2125,7 @@ Get the relevant package subdirectories from the llvm source
 
 #+begin_src emacs-lisp
 (use-package python
-  :straight nil
+  :elpaca nil
 
   :custom
   (python-indent-offset 4)
@@ -2152,7 +2136,7 @@ Get the relevant package subdirectories from the llvm source
 
 #+begin_src emacs-lisp
 (use-package pet
-  :straight t
+  :elpaca t
 
   :custom
   (python-shell-interpreter "python")
@@ -2179,7 +2163,7 @@ Get the relevant package subdirectories from the llvm source
 
 #+begin_src emacs-lisp
 (use-package uv-mode
-  :straight t
+  :elpaca t
   :disabled
 
   :hook (python-base-mode . uv-mode-auto-activate-hook))
@@ -2193,7 +2177,7 @@ raco pkg install --auto drracket
 
 #+begin_src emacs-lisp
 (use-package racket-mode
-  :straight t
+  :elpaca t
   :mode "\\.rkt\\'")
 #+end_src
 
@@ -2203,7 +2187,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 
 #+begin_src emacs-lisp
 (use-package rust-ts-mode
-  :straight nil
+  :elpaca nil
 
   :mode ("\\.rs\\'" . rust-ts-mode)
 
@@ -2246,7 +2230,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 
 #+begin_src emacs-lisp
 (use-package cargo
-  :straight t
+  :elpaca t
   :delight cargo-minor-mode
   :hook (rust-ts-mode . cargo-minor-mode))
 #+end_src
@@ -2259,7 +2243,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 
 #+begin_src emacs-lisp
 (use-package json-ts-mode
-  :straight nil
+  :elpaca nil
   :mode ("\\.json\\'" . json-ts-mode))
 #+end_src
 
@@ -2267,7 +2251,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 
 #+begin_src emacs-lisp
 (use-package markdown-mode
-  :straight t
+  :elpaca t
   :mode (("/README\\(?:\\.md\\)?\\'" . gfm-mode)
          ("\\.m[k]d\\'" . gfm-mode))
 
@@ -2288,7 +2272,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 
 #+begin_src emacs-lisp
 (use-package math-preview
-  :straight (math-preview :type git :host gitlab :repo "matsievskiysv/math-preview" :branch "master")
+  :elpaca (math-preview :type git :host gitlab :repo "matsievskiysv/math-preview" :branch "master")
 
   :defer t
 
@@ -2300,7 +2284,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 
 #+begin_src emacs-lisp
 (use-package toml-ts-mode
-  :straight nil
+  :elpaca nil
   :mode ("\\.toml\\'" . toml-ts-mode))
 #+end_src
 
@@ -2308,7 +2292,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 
 #+begin_src emacs-lisp
 (use-package yaml-ts-mode
-  :straight nil
+  :elpaca nil
   :mode ("\\.ya?ml\\'" . yaml-ts-mode))
 #+end_src
 
@@ -2320,7 +2304,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 
 #+begin_src emacs-lisp
 (use-package org
-  :straight nil
+  :elpaca nil
   :mode ("\\.org\\'" . org-mode)
 
   :custom
@@ -2377,7 +2361,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 
 #+begin_src emacs-lisp
 (use-package vulpea
-  :straight t
+  :elpaca t
   :commands (vulpea-db-sync-full-scan
              vulpea-find
              vulpea-insert)
@@ -2408,7 +2392,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 
 #+begin_src emacs-lisp
 (use-package consult-vulpea
-  :straight (consult-vulpea
+  :elpaca (consult-vulpea
              :type git
              :host github
              :repo "fabcontigiani/consult-vulpea")
@@ -2432,7 +2416,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 
 #+begin_src emacs-lisp
 (use-package cape
-  :straight t
+  :elpaca t
 
   :init
   ;; Add to the global default value of `completion-at-point-functions' which is used by `completion-at-point'.
@@ -2469,7 +2453,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 
 #+begin_src emacs-lisp :noweb yes
 (use-package consult
-  :straight t
+  :elpaca t
 
   :init
   ;; Configure the register formatting. This improves the register preview for `consult-register', etc. and the emacs built-ins.
@@ -2564,7 +2548,7 @@ These buffers can be seen by using space.
                    "\\*Flymake"
                    "\\*apheleia"
                    "\\*envrc"
-                   "\\*straight"
+                   "\\*elpaca"
                    "clangd"
                    "lsp"
                    "magit"))
@@ -2613,7 +2597,7 @@ These buffers can be seen by using space.
 
 #+begin_src emacs-lisp
 (use-package consult-dir
-  :straight t
+  :elpaca t
   :bind (("C-x C-d" . consult-dir)
          :map minibuffer-local-completion-map
          ("C-x C-d" . consult-dir)
@@ -2624,7 +2608,7 @@ These buffers can be seen by using space.
 
 #+begin_src emacs-lisp
 (use-package corfu
-  :straight t
+  :elpaca t
 
   :bind (:map corfu-map
               ;; ("C-SPC" . corfu-insert-separator)
@@ -2649,7 +2633,7 @@ These buffers can be seen by using space.
 
 #+begin_src emacs-lisp :result silent
 (use-package marginalia
-  :straight t
+  :elpaca t
 
   :custom
   (marginalia-max-relative-age 0)
@@ -2667,7 +2651,7 @@ These buffers can be seen by using space.
 
 #+begin_src emacs-lisp
 (use-package orderless
-  :straight t
+  :elpaca t
 
   :custom
   (completion-styles '(orderless partial-completion basic))
@@ -2681,7 +2665,7 @@ These buffers can be seen by using space.
 
 #+begin_src emacs-lisp
 (use-package vertico
-  :straight t
+  :elpaca t
 
   :custom
   (vertico-scroll-margin 0) ;; Different scroll margin
@@ -2701,7 +2685,7 @@ These buffers can be seen by using space.
 
 #+begin_src emacs-lisp
 (use-package embark
-  :straight t
+  :elpaca t
 
   :bind (("C-c a" . embark-act)       ;; pick some comfortable binding
          ("C-;" . embark-dwim)        ;; good alternative: M-.
@@ -2723,7 +2707,7 @@ These buffers can be seen by using space.
 
 #+begin_src emacs-lisp
 (use-package embark-consult
-  :straight t
+  :elpaca t
   :after (embark consult))
 #+end_src
 
@@ -2737,7 +2721,7 @@ maybe: https://github.com/casouri/eldoc-box
 
 #+begin_src emacs-lisp
 (use-package eglot
-  :straight nil
+  :elpaca nil
   ;; :pin manual
 
   :custom
@@ -2870,7 +2854,7 @@ for rust dev
 (use-package eglot-x
   :disabled
   :if (memq system-type '(darwin))
-  :vc (eglot-x :url "https://github.com/nemethf/eglot-x" :rev :newest)
+  :elpaca (eglot-x :repo "https://github.com/nemethf/eglot-x")
   :after eglot
 
   :config
@@ -2881,7 +2865,7 @@ for rust dev
 
 #+begin_src emacs-lisp
 (use-package eglot-tempel
-  :straight t
+  :elpaca t
   :after eglot
 
   :config
@@ -2892,7 +2876,7 @@ for rust dev
 
 #+begin_src emacs-lisp
 (use-package consult-eglot
-  :straight t
+  :elpaca t
 
   :commands consult-eglot-symbols)
 #+end_src
@@ -2927,7 +2911,7 @@ for rust dev
 
 #+begin_src emacs-lisp
 (use-package combobulate
-  :straight (:host github :repo "mickeynp/combobulate")
+  :elpaca (:host github :repo "mickeynp/combobulate")
   :hook ((python-ts-mode
           json-ts-mode
           toml-ts-mode
@@ -2942,7 +2926,7 @@ https://github.com/renzmann/treesit-auto
 
 #+begin_src emacs-lisp
 (use-package treesit-auto
-  :straight t
+  :elpaca t
 
   :custom
   (treesit-auto-install 'prompt)
@@ -2969,7 +2953,7 @@ https://github.com/renzmann/treesit-auto
 
 #+begin_src emacs-lisp
 (use-package treesit-fold
-  :straight (:host github :repo "emacs-tree-sitter/treesit-fold")
+  :elpaca (:host github :repo "emacs-tree-sitter/treesit-fold")
   :bind (:map prog-mode-map
               ("C-c TAB" . treesit-fold-toggle)))
 #+end_src
@@ -2979,7 +2963,7 @@ https://github.com/renzmann/treesit-auto
 
 #+begin_src emacs-lisp
 (use-package tempel
-  :straight t
+  :elpaca t
 
   :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
          ("M-*" . tempel-insert)
@@ -3018,7 +3002,7 @@ https://github.com/renzmann/treesit-auto
 (use-package dape
   ;; Keep Dape ordered after Pet: Pet supplies buffer-local Python interpreter, project-root, and `dape-command' settings.
   :after (eglot pet)
-  :straight t
+  :elpaca t
 
   :preface
   ;; By default dape shares the same keybinding prefix as `gud'
@@ -3066,7 +3050,7 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 
 #+begin_src emacs-lisp
 (use-package clipetty
-  :straight t
+  :elpaca t
 
   :bind
   ("M-w" . clipetty-kill-ring-save)
@@ -3081,7 +3065,7 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 
 #+begin_src emacs-lisp
 (use-package gptel
-  :straight t
+  :elpaca t
   :bind (:prefix-map gptel-prefix-map
                      :prefix "C-c z")
   :bind (:map gptel-prefix-map
@@ -3113,7 +3097,7 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 
 #+begin_src emacs-lisp
 (use-package gptel-agent
-  :straight t
+  :elpaca t
 
   :commands gptel-agent
 
