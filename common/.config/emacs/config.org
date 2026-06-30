@@ -2009,18 +2009,91 @@ Get the relevant package subdirectories from the llvm source
        (not (string= path ""))
        (file-readable-p path)))
 
-(with-eval-after-load 'exec-path-from-shell
-  (let ((llvm-root my/llvm-source-root))
-    (when (and llvm-root (file-directory-p llvm-root))
-      (add-to-list 'load-path (expand-file-name "llvm/utils/emacs" llvm-root))
-      (add-to-list 'load-path (expand-file-name "mlir/utils/emacs" llvm-root)))))
+(defconst my/llvm-elisp-sparse-paths
+  '("llvm/utils/emacs" "mlir/utils/emacs")
+  "LLVM repository paths needed for Emacs Lisp modes.")
+
+(defconst my/elpaca-llvm-source-steps
+  '(my/elpaca-git-sparse-clone
+    elpaca-git--configure-remotes
+    elpaca-git--checkout-ref
+    my/elpaca-llvm-sparse-checkout
+    my/elpaca-llvm-source-ready)
+  "Elpaca source steps for LLVM sparse checkouts.")
+
+(defun my/elpaca-git-sparse-clone-sentinel (process _event)
+  "Continue Elpaca after sparse clone PROCESS.
+Unlike `elpaca-git--clone-process-sentinel', this does not resolve
+`source-dir-exists'; LLVM packages should wait until sparse checkout
+has populated the requested files."
+  (if-let* ((e (process-get process :elpaca))
+            (success (= (process-exit-status process) 0)))
+      (progn
+        (elpaca--propertize-subprocess process)
+        (elpaca-continue e))
+    (if-let* ((e (process-get process :elpaca)))
+        (elpaca--fail e "Sparse clone failure (see previous log entries)")
+      (error "Unable to find Elpaca for sparse clone process"))))
+
+(defun my/elpaca-git-sparse-clone (e)
+  "Clone E using Git partial clone and sparse checkout."
+  (let* ((recipe (elpaca<-recipe e))
+         (repo-dir (elpaca<-source-dir e))
+         (default-directory elpaca-directory)
+         (command `("git" "clone"
+                    "--filter=tree:0"
+                    "--sparse"
+                    ,(elpaca-git--repo-uri recipe)
+                    ,repo-dir)))
+    (if (file-exists-p repo-dir)
+        (progn
+          (elpaca-note e (format "%s exists. Skipping clone." repo-dir))
+          (elpaca-continue e))
+      (elpaca--make-process e
+        :name "sparse-clone"
+        :command command
+        :connection-type 'pty
+        :sentinel #'my/elpaca-git-sparse-clone-sentinel))))
+
+(defun my/elpaca-llvm-sparse-checkout (e)
+  "Restrict LLVM's worktree to Emacs Lisp mode directories."
+  (let ((default-directory (elpaca<-source-dir e)))
+    (elpaca--make-process e
+      :name "sparse-checkout"
+      :command `("git" "sparse-checkout" "set" ,@my/llvm-elisp-sparse-paths)
+      :sentinel (lambda (process event)
+                  (elpaca--process-sentinel "Sparse checkout set" process event)))))
+
+(defun my/elpaca-llvm-source-ready (e)
+  "Mark LLVM source dir ready for other shared-source packages."
+  (elpaca-resolve 'source-dir-exists (elpaca<-source-dir e))
+  (elpaca-continue e))
+
+(defun my/elpaca-llvm-source (e)
+  "Populate LLVM source files for E using sparse checkout."
+  (if-let* (((not (elpaca<-builtp e)))
+            (source-dir (elpaca<-source-dir e))
+            (shared (elpaca--shared-source-dir (elpaca<-id e) source-dir))
+            ((or (gethash (cons 'source-dir-exists source-dir) elpaca--conditions)
+                 (memq (elpaca<-current-step shared)
+                       my/elpaca-llvm-source-steps)
+                 (cl-intersection my/elpaca-llvm-source-steps
+                                  (elpaca<-build-steps shared)))))
+      (elpaca-block-until e 'source-dir-exists source-dir)
+    (setf (elpaca<-build-steps e)
+          (append my/elpaca-llvm-source-steps (elpaca<-build-steps e)))
+    (elpaca-continue e)))
+
 #+end_src
 
 *** mlir
 
 #+begin_src emacs-lisp
 (use-package mlir-mode
-  :elpaca nil
+  :elpaca (mlir-mode :host github
+                     :repo "llvm/llvm-project"
+                     :files ("mlir/utils/emacs/mlir-mode.el")
+                     :build (:sub elpaca-source my/elpaca-llvm-source))
   :after exec-path-from-shell
   :mode (("\\.mlir\\'" . mlir-mode)
          ("\\.pdll\\'" . pdll-mode))
@@ -2053,7 +2126,10 @@ Get the relevant package subdirectories from the llvm source
 
 #+begin_src emacs-lisp
 (use-package tablegen-mode
-  :elpaca nil
+  :elpaca (tablegen-mode :host github
+                         :repo "llvm/llvm-project"
+                         :files ("llvm/utils/emacs/tablegen-mode.el")
+                         :build (:sub elpaca-source my/elpaca-llvm-source))
   :after exec-path-from-shell
   :mode "\\.td\\'"
 
@@ -2074,7 +2150,10 @@ Get the relevant package subdirectories from the llvm source
 
 #+begin_src emacs-lisp
 (use-package llvm-mode
-  :elpaca nil
+  :elpaca (llvm-mode :host github
+                     :repo "llvm/llvm-project"
+                     :files ("llvm/utils/emacs/llvm-mode.el")
+                     :build (:sub elpaca-source my/elpaca-llvm-source))
   :mode "\\.ll\\'")
 #+end_src
 
@@ -2082,7 +2161,11 @@ Get the relevant package subdirectories from the llvm source
 
 #+begin_src emacs-lisp
 (use-package llvm-mir-mode
-  :elpaca nil
+  :elpaca (llvm-mir-mode :host github
+                         :repo "llvm/llvm-project"
+                         :files ("llvm/utils/emacs/llvm-mir-mode.el")
+                         :build (:sub elpaca-source my/elpaca-llvm-source))
+  :after llvm-mode
   :mode "\\.mir\\'")
 #+end_src
 
