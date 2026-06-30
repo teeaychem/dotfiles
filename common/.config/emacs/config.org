@@ -1448,12 +1448,7 @@ To highlight indentations
 #+begin_src emacs-lisp
 (use-package kkp
   :elpaca t
-  :commands global-kkp-mode
-
-  :preface
-  (defun my/enable-global-kkp-mode ()
-    "Enable KKP support for terminal frames."
-    (global-kkp-mode 1))
+  :demand t
 
   :config
   (defun my/kkp-ignore-dead-delete-frame (orig-fun &optional frame &rest args)
@@ -1463,8 +1458,7 @@ To highlight indentations
 
   (advice-add #'kkp--pre-delete-frame :around #'my/kkp-ignore-dead-delete-frame)
 
-  :hook
-  (tty-setup . my/enable-global-kkp-mode))
+  (global-kkp-mode 1))
 #+end_src
 
 ** meow
