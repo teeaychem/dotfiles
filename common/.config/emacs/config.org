@@ -6,6 +6,10 @@
 ;; -*- lexical-binding: t; -*-
 #+end_src
 
+#+begin_src emacs-lisp
+(setq debug-on-error nil)
+#+end_src
+
 * COMMENT profiling-start
 
 #+begin_src emacs-lisp
@@ -26,12 +30,6 @@ https://github.com/pierre-rouleau/pel
 https://whhone.com/emacs-config/
 https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emacs
 
-
-* startup
-
-#+begin_src emacs-lisp
-(setq debug-on-error nil)
-#+end_src
 
 * general
 
@@ -1023,6 +1021,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 
 * theme
+
 
 ** batppuccin
 
@@ -3078,6 +3077,7 @@ https://github.com/renzmann/treesit-auto
 * terminal
 
 See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
+
 
 ** clipetty
 
