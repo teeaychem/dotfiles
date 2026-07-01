@@ -605,9 +605,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package recentf
-  :commands (recentf-mode recentf-cleanup)
-  :hook
-  (after-init . recentf-mode)
+  :elpaca nil
+  :demand t
+  :after no-littering
 
   :custom
   (recentf-auto-cleanup 300) ;; Removes duplicates, excluded paths, and files that no longer exist.
@@ -623,6 +623,11 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
                      "COMMIT_EDITMSG\\'"))
 
   :config
+  (add-to-list 'recentf-exclude no-littering-var-directory)
+  (add-to-list 'recentf-exclude no-littering-etc-directory)
+
+  (recentf-mode 1)
+
   ;; to ensure `recentf-cleanup` runs before `recentf-save-list`
   (add-hook 'kill-emacs-hook #'recentf-cleanup -90))
 #+end_src
@@ -1568,15 +1573,13 @@ To highlight indentations
 #+begin_src emacs-lisp
 (use-package no-littering
   :elpaca t
+  :demand t
 
   :init
-  (require 'recentf)
   (setq auto-save-file-name-transforms
         `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
 
   :config
-  (add-to-list 'recentf-exclude no-littering-var-directory)
-  (add-to-list 'recentf-exclude no-littering-etc-directory)
   (setq create-lockfiles nil))
 #+end_src
 
@@ -1999,6 +2002,16 @@ Get the relevant package subdirectories from the llvm source
        (not (string= path ""))
        (file-readable-p path)))
 
+(defun my/llvm-lsp-server-path (setting path fallback interactive)
+  "Return explicit PATH, or FALLBACK from `exec-path' when INTERACTIVE.
+Signal a user error when neither names an executable."
+  (cond
+   ((my/llvm-file-executable-p path) path)
+   ((and interactive (executable-find fallback)))
+   (t (user-error "Eglot aborted: %s is invalid (%s)"
+                  setting
+                  (or path "Unset")))))
+
 (defconst my/llvm-elisp-sparse-paths
   '("llvm/utils/emacs" "mlir/utils/emacs")
   "LLVM repository paths needed for Emacs Lisp modes.")
@@ -2055,27 +2068,29 @@ Get the relevant package subdirectories from the llvm source
                                          my/elpaca-llvm-source))
   (use-package mlir-mode
     :elpaca nil
-    :after exec-path-from-shell
     :mode (("\\.mlir\\'" . mlir-mode)
            ("\\.pdll\\'" . pdll-mode))
 
     :init
-    (defun my-eglot-strict-mlir (&optional _interactive)
+    (defun my-eglot-strict-mlir (&optional interactive _project)
       "Return the MLIR language-server command for the current buffer."
-      (let ((server-path my/mlir-lsp-server-bin))
-        (unless (my/llvm-file-executable-p server-path)
-          (user-error "Eglot aborted: my/mlir-lsp-server-bin or MLIR_LSP_SERVER_BIN is invalid (%s)"
-                      (or server-path "Unset")))
+      (let ((server-path (my/llvm-lsp-server-path
+                          'my/mlir-lsp-server-bin
+                          my/mlir-lsp-server-bin
+                          "mlir-lsp-server"
+                          interactive)))
         (list server-path)))
 
-    (defun my-eglot-strict-pdll (&optional _interactive)
+    (defun my-eglot-strict-pdll (&optional interactive _project)
       "Return the PDLL language-server command for the current buffer."
-      (let ((server-path my/mlir-pdll-lsp-server-bin)
+      (let ((server-path (my/llvm-lsp-server-path
+                          'my/mlir-pdll-lsp-server-bin
+                          my/mlir-pdll-lsp-server-bin
+                          "mlir-pdll-lsp-server"
+                          interactive))
             (db-path my/pdll-compilation-database))
-        (unless (and (my/llvm-file-executable-p server-path)
-                     (my/llvm-file-readable-p db-path))
-          (user-error "Eglot aborted: PDLL server or compilation database setting is invalid (%s, %s)"
-                      (or server-path "Unset")
+        (unless (my/llvm-file-readable-p db-path)
+          (user-error "Eglot aborted: PDLL compilation database setting is invalid (%s)"
                       (or db-path "Unset")))
         (list server-path (format "--pdll-compilation-database=%s" db-path))))
 
@@ -2084,18 +2099,19 @@ Get the relevant package subdirectories from the llvm source
 
   (use-package tablegen-mode
     :elpaca nil
-    :after exec-path-from-shell
     :mode "\\.td\\'"
 
     :init
-    (defun my-eglot-strict-tablegen (&optional _interactive)
+    (defun my-eglot-strict-tablegen (&optional interactive _project)
       "Return the TableGen language-server command for the current buffer."
-      (let ((server-path my/tablegen-lsp-server-bin)
+      (let ((server-path (my/llvm-lsp-server-path
+                          'my/tablegen-lsp-server-bin
+                          my/tablegen-lsp-server-bin
+                          "tblgen-lsp-server"
+                          interactive))
             (db-path my/tablegen-compilation-database))
-        (unless (and (my/llvm-file-executable-p server-path)
-                     (my/llvm-file-readable-p db-path))
-          (user-error "Eglot aborted: TableGen server or compilation database setting is invalid (%s, %s)"
-                      (or server-path "Unset")
+        (unless (my/llvm-file-readable-p db-path)
+          (user-error "Eglot aborted: TableGen compilation database setting is invalid (%s)"
                       (or db-path "Unset")))
         (list server-path (format "--tablegen-compilation-database=%s" db-path)))))
 
