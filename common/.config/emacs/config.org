@@ -1061,11 +1061,13 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (use-package activities
   :elpaca t
   :init
-  (activities-mode)
   (setq edebug-inhibit-emacs-lisp-mode-bindings t)
 
   :custom
   (activities-resume-into-frame 'current)
+
+  :config
+  (activities-mode)
 
   :bind (("C-x C-a C-n" . activities-new)
          ("C-x C-a C-d" . activities-define)
@@ -1199,15 +1201,13 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (use-package dirvish
   :elpaca t
 
-  :init
-  (dirvish-override-dired-mode 1)
-
   :custom
   (dirvish-quick-access-entries ; It's a custom option, `setq' won't work
    '(("h" "~/"          "home")
      ("p" "~/projects/" "projects")))
 
   :config
+  (dirvish-override-dired-mode 1)
   (dirvish-peek-mode 1)
   (setq dirvish-peek-key '(:debounce 0.5 any))
   (setq dirvish-mode-line-format '(:left (sort symlink) :right (omit yank index)))
@@ -1575,11 +1575,10 @@ To highlight indentations
   :elpaca t
   :demand t
 
-  :init
+  :config
   (setq auto-save-file-name-transforms
         `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
 
-  :config
   (setq create-lockfiles nil))
 #+end_src
 
@@ -1681,6 +1680,7 @@ To highlight indentations
 #+begin_src emacs-lisp
 (use-package blamer
   :elpaca t
+  :after magit
 
   :bind
   (:map magit-prefix-map
@@ -2658,7 +2658,7 @@ These buffers can be seen by using space.
   (corfu-preselect 'directory) ;; Select the first candidate, except for directories
   ;; (corfu-on-exact-match nil)
 
-  :init
+  :config
   (global-corfu-mode 1))
 #+end_src
 
@@ -2672,7 +2672,7 @@ These buffers can be seen by using space.
   (marginalia-max-relative-age 0)
   (marginalia-align 'right)
 
-  :init
+  :config
   (marginalia-mode 1)
 
   :bind (:map minibuffer-local-map
@@ -2707,7 +2707,7 @@ These buffers can be seen by using space.
   (vertico-cycle nil)
   (vertico-multiform-commands '((find-file (vertico-sort-function . vertico-sort-alpha))))
 
-  :init
+  :config
   (vertico-mode 1)
   (vertico-multiform-mode 1))
 #+end_src
