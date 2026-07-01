@@ -2007,23 +2007,8 @@ Get the relevant package subdirectories from the llvm source
   '(my/elpaca-git-sparse-clone
     elpaca-git--configure-remotes
     elpaca-git--checkout-ref
-    my/elpaca-llvm-sparse-checkout
-    my/elpaca-llvm-source-ready)
-  "Elpaca source steps for LLVM sparse checkouts.")
-
-(defun my/elpaca-git-sparse-clone-sentinel (process _event)
-  "Continue Elpaca after sparse clone PROCESS.
-Unlike `elpaca-git--clone-process-sentinel', this does not resolve
-`source-dir-exists'; LLVM packages should wait until sparse checkout
-has populated the requested files."
-  (if-let* ((e (process-get process :elpaca))
-            (success (= (process-exit-status process) 0)))
-      (progn
-        (elpaca--propertize-subprocess process)
-        (elpaca-continue e))
-    (if-let* ((e (process-get process :elpaca)))
-        (elpaca--fail e "Sparse clone failure (see previous log entries)")
-      (error "Unable to find Elpaca for sparse clone process"))))
+    my/elpaca-llvm-sparse-checkout)
+  "Elpaca source steps for LLVM sparse checkout.")
 
 (defun my/elpaca-git-sparse-clone (e)
   "Clone E using Git partial clone and sparse checkout."
@@ -2038,12 +2023,13 @@ has populated the requested files."
     (if (file-exists-p repo-dir)
         (progn
           (elpaca-note e (format "%s exists. Skipping clone." repo-dir))
+          (elpaca-resolve 'source-dir-exists repo-dir)
           (elpaca-continue e))
       (elpaca--make-process e
         :name "sparse-clone"
         :command command
         :connection-type 'pty
-        :sentinel #'my/elpaca-git-sparse-clone-sentinel))))
+        :sentinel #'elpaca-git--clone-process-sentinel))))
 
 (defun my/elpaca-llvm-sparse-checkout (e)
   "Restrict LLVM's worktree to Emacs Lisp mode directories."
@@ -2054,109 +2040,73 @@ has populated the requested files."
       :sentinel (lambda (process event)
                   (elpaca--process-sentinel "Sparse checkout set" process event)))))
 
-(defun my/elpaca-llvm-source-ready (e)
-  "Mark LLVM source dir ready for other shared-source packages."
-  (elpaca-resolve 'source-dir-exists (elpaca<-source-dir e))
-  (elpaca-continue e))
-
 (defun my/elpaca-llvm-source (e)
   "Populate LLVM source files for E using sparse checkout."
-  (if-let* (((not (elpaca<-builtp e)))
-            (source-dir (elpaca<-source-dir e))
-            (shared (elpaca--shared-source-dir (elpaca<-id e) source-dir))
-            ((or (gethash (cons 'source-dir-exists source-dir) elpaca--conditions)
-                 (memq (elpaca<-current-step shared)
-                       my/elpaca-llvm-source-steps)
-                 (cl-intersection my/elpaca-llvm-source-steps
-                                  (elpaca<-build-steps shared)))))
-      (elpaca-block-until e 'source-dir-exists source-dir)
-    (setf (elpaca<-build-steps e)
-          (append my/elpaca-llvm-source-steps (elpaca<-build-steps e)))
-    (elpaca-continue e)))
+  (setf (elpaca<-build-steps e)
+        (append my/elpaca-llvm-source-steps (elpaca<-build-steps e)))
+  (elpaca-continue e))
 
-#+end_src
+(elpaca (llvm-project-modes :host github
+                            :repo "llvm/llvm-project"
+                            :files ("llvm/utils/emacs/*.el"
+                                    "mlir/utils/emacs/*.el")
+                            :main nil
+                            :build (:sub elpaca-source
+                                         my/elpaca-llvm-source))
+  (use-package mlir-mode
+    :elpaca nil
+    :after exec-path-from-shell
+    :mode (("\\.mlir\\'" . mlir-mode)
+           ("\\.pdll\\'" . pdll-mode))
 
-*** mlir
+    :init
+    (defun my-eglot-strict-mlir (&optional _interactive)
+      "Return the MLIR language-server command for the current buffer."
+      (let ((server-path my/mlir-lsp-server-bin))
+        (unless (my/llvm-file-executable-p server-path)
+          (user-error "Eglot aborted: my/mlir-lsp-server-bin or MLIR_LSP_SERVER_BIN is invalid (%s)"
+                      (or server-path "Unset")))
+        (list server-path)))
 
-#+begin_src emacs-lisp
-(use-package mlir-mode
-  :elpaca (mlir-mode :host github
-                     :repo "llvm/llvm-project"
-                     :files ("mlir/utils/emacs/mlir-mode.el")
-                     :build (:sub elpaca-source my/elpaca-llvm-source))
-  :after exec-path-from-shell
-  :mode (("\\.mlir\\'" . mlir-mode)
-         ("\\.pdll\\'" . pdll-mode))
+    (defun my-eglot-strict-pdll (&optional _interactive)
+      "Return the PDLL language-server command for the current buffer."
+      (let ((server-path my/mlir-pdll-lsp-server-bin)
+            (db-path my/pdll-compilation-database))
+        (unless (and (my/llvm-file-executable-p server-path)
+                     (my/llvm-file-readable-p db-path))
+          (user-error "Eglot aborted: PDLL server or compilation database setting is invalid (%s, %s)"
+                      (or server-path "Unset")
+                      (or db-path "Unset")))
+        (list server-path (format "--pdll-compilation-database=%s" db-path))))
 
-  :init
-  (defun my-eglot-strict-mlir (&optional _interactive)
-    "Return the MLIR language-server command for the current buffer."
-    (let ((server-path my/mlir-lsp-server-bin))
-      (unless (my/llvm-file-executable-p server-path)
-        (user-error "Eglot aborted: my/mlir-lsp-server-bin or MLIR_LSP_SERVER_BIN is invalid (%s)"
-                    (or server-path "Unset")))
-      (list server-path)))
+    :config
+    (define-derived-mode pdll-mode mlir-mode "PDLL"))
 
-  (defun my-eglot-strict-pdll (&optional _interactive)
-    "Return the PDLL language-server command for the current buffer."
-    (let ((server-path my/mlir-pdll-lsp-server-bin)
-          (db-path my/pdll-compilation-database))
-      (unless (and (my/llvm-file-executable-p server-path)
-                   (my/llvm-file-readable-p db-path))
-        (user-error "Eglot aborted: PDLL server or compilation database setting is invalid (%s, %s)"
-                    (or server-path "Unset")
-                    (or db-path "Unset")))
-      (list server-path (format "--pdll-compilation-database=%s" db-path))))
+  (use-package tablegen-mode
+    :elpaca nil
+    :after exec-path-from-shell
+    :mode "\\.td\\'"
 
-  :config
-  (define-derived-mode pdll-mode mlir-mode "PDLL"))
-#+end_src
+    :init
+    (defun my-eglot-strict-tablegen (&optional _interactive)
+      "Return the TableGen language-server command for the current buffer."
+      (let ((server-path my/tablegen-lsp-server-bin)
+            (db-path my/tablegen-compilation-database))
+        (unless (and (my/llvm-file-executable-p server-path)
+                     (my/llvm-file-readable-p db-path))
+          (user-error "Eglot aborted: TableGen server or compilation database setting is invalid (%s, %s)"
+                      (or server-path "Unset")
+                      (or db-path "Unset")))
+        (list server-path (format "--tablegen-compilation-database=%s" db-path)))))
 
-*** tablegen
+  (use-package llvm-mode
+    :elpaca nil
+    :mode "\\.ll\\'")
 
-#+begin_src emacs-lisp
-(use-package tablegen-mode
-  :elpaca (tablegen-mode :host github
-                         :repo "llvm/llvm-project"
-                         :files ("llvm/utils/emacs/tablegen-mode.el")
-                         :build (:sub elpaca-source my/elpaca-llvm-source))
-  :after exec-path-from-shell
-  :mode "\\.td\\'"
-
-  :init
-  (defun my-eglot-strict-tablegen (&optional _interactive)
-    "Return the TableGen language-server command for the current buffer."
-    (let ((server-path my/tablegen-lsp-server-bin)
-          (db-path my/tablegen-compilation-database))
-      (unless (and (my/llvm-file-executable-p server-path)
-                   (my/llvm-file-readable-p db-path))
-        (user-error "Eglot aborted: TableGen server or compilation database setting is invalid (%s, %s)"
-                    (or server-path "Unset")
-                    (or db-path "Unset")))
-      (list server-path (format "--tablegen-compilation-database=%s" db-path)))))
-#+end_src
-
-*** llvm
-
-#+begin_src emacs-lisp
-(use-package llvm-mode
-  :elpaca (llvm-mode :host github
-                     :repo "llvm/llvm-project"
-                     :files ("llvm/utils/emacs/llvm-mode.el")
-                     :build (:sub elpaca-source my/elpaca-llvm-source))
-  :mode "\\.ll\\'")
-#+end_src
-
-*** llvm-mir
-
-#+begin_src emacs-lisp
-(use-package llvm-mir-mode
-  :elpaca (llvm-mir-mode :host github
-                         :repo "llvm/llvm-project"
-                         :files ("llvm/utils/emacs/llvm-mir-mode.el")
-                         :build (:sub elpaca-source my/elpaca-llvm-source))
-  :after llvm-mode
-  :mode "\\.mir\\'")
+  (use-package llvm-mir-mode
+    :elpaca nil
+    :after llvm-mode
+    :mode "\\.mir\\'"))
 #+end_src
 
 ** COMMENT OCaml
