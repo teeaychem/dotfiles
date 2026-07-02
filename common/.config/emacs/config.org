@@ -560,8 +560,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
                      (getenv "XDG_CONFIG_HOME")))
   (ispell-dictionary "en_GB")
 
-  :hook
-  (prog-mode . flyspell-prog-mode))
+  ;; :hook
+  ;; (prog-mode . flyspell-prog-mode)
+  )
 #+end_src
 
 ** minibuffer
