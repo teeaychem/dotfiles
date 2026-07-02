@@ -1810,10 +1810,7 @@ To highlight indentations
   (defun my/clang-format-column-limit ()
     "Return the effective clang-format ColumnLimit for the current buffer."
     (when-let* ((clang-format (executable-find "clang-format"))
-                (filename (or buffer-file-name
-                              (if (derived-mode-p 'c++-ts-mode)
-                                  "buffer.cpp"
-                                "buffer.c"))))
+                (filename buffer-file-name))
       (with-temp-buffer
         (let ((status
                (process-file clang-format nil `(t nil) nil
@@ -1827,11 +1824,16 @@ To highlight indentations
 
   (defun my/c-set-fill-column-from-clang-format ()
     "Set `fill-column' from clang-format's effective ColumnLimit."
-    (when (= fill-column (default-value 'fill-column))
-      (when-let ((column-limit (my/clang-format-column-limit)))
-        (when (> column-limit 0)
-          (setq-local fill-column column-limit)
-          (display-fill-column-indicator-mode 1)))))
+    (interactive)
+    (if-let ((column-limit (my/clang-format-column-limit)))
+        (if (> column-limit 0)
+            (progn
+              (setq-local fill-column column-limit)
+              (display-fill-column-indicator-mode 1)
+              (when (called-interactively-p 'interactive)
+                (message "fill-column set to %d from clang-format" column-limit)))
+          (user-error "clang-format ColumnLimit is 0"))
+      (user-error "Could not determine clang-format ColumnLimit")))
 
   :mode (("\\.c\\'" . c-ts-mode)
          ("\\.\\(?:H\\|cc\\|hh\\|cpp\\|hpp\\|cxx\\|hxx\\|c\\+\\+\\|h\\+\\+\\|ipp\\|ixx\\|cppm\\)\\'" . c++-ts-mode)
@@ -1852,6 +1854,9 @@ To highlight indentations
               ("r" . #'recompile))
 
   :bind (:map c-family-prefix-map
+              ("l" . #'my/c-set-fill-column-from-clang-format))
+
+  :bind (:map c-family-prefix-map
               :prefix-map c-family-file-prefix-map
               :prefix "f"
               ("f" . #'ff-find-other-file)
@@ -1863,10 +1868,7 @@ To highlight indentations
               ("i" . #'tempel-insert))
 
   :custom
-  (c-ts-mode-indent-style 'linux)
-
-  :hook
-  ((c-ts-mode c++-ts-mode) . my/c-set-fill-column-from-clang-format))
+  (c-ts-mode-indent-style 'linux))
 #+end_src
 
 
