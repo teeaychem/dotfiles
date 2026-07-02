@@ -1141,6 +1141,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   (push '(taplo . ("taplo" "format")) apheleia-formatters)
   (setf (alist-get 'toml-ts-mode apheleia-mode-alist) '(taplo))
+  (setf (alist-get 'tablegen-mode apheleia-mode-alist) '(clang-format))
 
   ;; https://github.com/radian-software/apheleia/issues/278
   (setf (alist-get 'rustfmt apheleia-formatters)
