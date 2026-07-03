@@ -1123,6 +1123,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (use-package apheleia
   :elpaca t
 
+  :init
+  (defvar-local my/mlir-opt-bin "mlir-opt")
+
   :config
   (setf (alist-get 'python-mode apheleia-mode-alist) '(yapf ruff-isort))
   (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(yapf ruff-isort))
@@ -1142,6 +1145,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (push '(taplo . ("taplo" "format")) apheleia-formatters)
   (setf (alist-get 'toml-ts-mode apheleia-mode-alist) '(taplo))
   (setf (alist-get 'tablegen-mode apheleia-mode-alist) '(clang-format))
+  (push '(my-mlir-opt . (my/mlir-opt-bin)) apheleia-formatters)
+  (setf (alist-get 'mlir-mode apheleia-mode-alist) '(my-mlir-opt))
 
   ;; https://github.com/radian-software/apheleia/issues/278
   (setf (alist-get 'rustfmt apheleia-formatters)
