@@ -1985,11 +1985,11 @@ https://github.com/llvm/llvm-project.git
 Get the relevant package subdirectories from the llvm source
 
 #+begin_src emacs-lisp
-(defvar-local my/mlir-lsp-server-bin nil
-  "MLIR language server executable for this buffer or project.")
-
 (defvar-local my/mlir-pdll-lsp-server-bin nil
   "PDLL language server executable for this buffer or project.")
+
+(defvar-local my/mlir-lsp-server-bin "mlir-lsp-server"
+  "MLIR language server executable for this buffer or project.")
 
 (defvar-local my/pdll-compilation-database nil
   "PDLL compilation database for this buffer or project.")
@@ -2000,7 +2000,9 @@ Get the relevant package subdirectories from the llvm source
 (defvar-local my/tablegen-compilation-database nil
   "TableGen compilation database for this buffer or project.")
 
-(dolist (variable '(my/mlir-lsp-server-bin
+(dolist (variable '(my/llvm-source-root
+                    my/mlir-opt-bin
+                    my/mlir-lsp-server-bin
                     my/mlir-pdll-lsp-server-bin
                     my/pdll-compilation-database
                     my/tablegen-lsp-server-bin
@@ -2028,6 +2030,14 @@ Signal a user error when neither names an executable."
    (t (user-error "Eglot aborted: %s is invalid (%s)"
                   setting
                   (or path "Unset")))))
+
+(defun my/mlir-lsp-server-path (&optional interactive)
+  "Return the MLIR language-server path for the current buffer."
+  (my/llvm-lsp-server-path
+   'my/mlir-lsp-server-bin
+   my/mlir-lsp-server-bin
+   "mlir-lsp-server"
+   interactive))
 
 (defconst my/llvm-elisp-sparse-paths
   '("llvm/utils/emacs" "mlir/utils/emacs")
@@ -2091,11 +2101,7 @@ Signal a user error when neither names an executable."
     :init
     (defun my-eglot-strict-mlir (&optional interactive _project)
       "Return the MLIR language-server command for the current buffer."
-      (let ((server-path (my/llvm-lsp-server-path
-                          'my/mlir-lsp-server-bin
-                          my/mlir-lsp-server-bin
-                          "mlir-lsp-server"
-                          interactive)))
+      (let ((server-path (my/mlir-lsp-server-path interactive)))
         (list server-path)))
 
     (defun my-eglot-strict-pdll (&optional interactive _project)
