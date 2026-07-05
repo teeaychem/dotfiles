@@ -310,6 +310,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 ** eldoc
 
+*** eglot-signature-eldoc-talkative
+
 #+begin_src emacs-lisp
 (use-package eglot-signature-eldoc-talkative
   :elpaca t
@@ -320,6 +322,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
               :override #'eglot-signature-eldoc-talkative))
 #+end_src
 
+*** eldoc
+
 #+begin_src emacs-lisp
 (use-package eldoc
   :elpaca nil
@@ -327,21 +331,34 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :delight eldoc-mode
 
   :preface
-  (defvar my/eldoc-window-side 'bottom
-    "Side on which to display the Eldoc documentation window.")
+  (defvar my/eldoc-window-side 'right
+    "Side on which to display the Eldoc documentation window.
+Supported values are `bottom' and `right'.")
 
   (defun my/eldoc-display-buffer (buffer alist)
     "Display Eldoc BUFFER according to `my/eldoc-window-side'."
-    (or (display-buffer-reuse-window buffer alist)
-        (let ((window-sides-vertical nil))
-          (display-buffer-in-side-window
-           buffer
-           (append `((side . ,my/eldoc-window-side)
-                     (slot . 0))
-                   (if (eq my/eldoc-window-side 'bottom)
-                       '((window-height . 8))
-                     '((window-width . 80)))
-                   alist)))))
+    (let* ((side my/eldoc-window-side)
+           (size (if (eq side 'bottom)
+                     8
+                   (min 80 (max 1 (/ (frame-width) 3)))))
+           (action-alist (append `((side . ,side)
+                                   (slot . 0)
+                                   ,(if (eq side 'bottom)
+                                        `(window-height . ,size)
+                                      `(window-width . ,size)))
+                                 alist))
+           (window (or (display-buffer-reuse-window buffer action-alist)
+                       (let ((window-sides-vertical nil))
+                         (display-buffer-in-side-window buffer action-alist)))))
+      (when (window-live-p window)
+        (ignore-errors
+          (window-resize window
+                         (- size (if (eq side 'bottom)
+                                     (window-total-height window)
+                                   (window-total-width window)))
+                         (not (eq side 'bottom))
+                         'safe)))
+      window))
 
   (defun my/elisp-eldoc-symbol-documentation (callback &rest _)
     "Report full documentation for the Emacs Lisp symbol at point."
@@ -362,8 +379,17 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (defun my/eldoc-quit-doc-buffer ()
     "Close the displayed Eldoc documentation window."
     (interactive)
-    (when-let ((window (get-buffer-window "*eldoc*" t)))
+    (when-let ((window (and (buffer-live-p eldoc--doc-buffer)
+                            (get-buffer-window eldoc--doc-buffer t))))
       (quit-window nil window)))
+
+  (defun my/eldoc-toggle-doc-buffer ()
+    "Toggle the displayed Eldoc documentation window."
+    (interactive)
+    (if (and (buffer-live-p eldoc--doc-buffer)
+             (get-buffer-window eldoc--doc-buffer t))
+        (my/eldoc-quit-doc-buffer)
+      (eldoc-doc-buffer t)))
 
   (defun my/eldoc-toggle-window-side ()
     "Toggle the Eldoc window between the bottom and right side."
@@ -395,7 +421,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :bind (:prefix-map eldoc-prefix-map
                      :prefix "C-c d"
                      ("d" . #'eldoc)
-                     ("b" . #'eldoc-doc-buffer)
+                     ("b" . #'my/eldoc-toggle-doc-buffer)
                      ("t" . #'eldoc-print-current-symbol-info)
                      ("q" . #'my/eldoc-quit-doc-buffer)
                      ("w" . #'my/eldoc-toggle-window-side))
