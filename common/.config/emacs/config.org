@@ -2473,6 +2473,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 #+begin_src emacs-lisp
 (use-package cape
   :elpaca t
+  :demand t
 
   :init
   ;; Add to the global default value of `completion-at-point-functions' which is used by `completion-at-point'.
@@ -2510,6 +2511,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 #+begin_src emacs-lisp :noweb yes
 (use-package consult
   :elpaca t
+  :demand t
 
   :init
   ;; Configure the register formatting. This improves the register preview for `consult-register', etc. and the emacs built-ins.
@@ -2654,6 +2656,8 @@ These buffers can be seen by using space.
 #+begin_src emacs-lisp
 (use-package consult-dir
   :elpaca t
+  :demand t
+
   :bind (("C-x C-d" . consult-dir)
          :map minibuffer-local-completion-map
          ("C-x C-d" . consult-dir)
@@ -2665,6 +2669,7 @@ These buffers can be seen by using space.
 #+begin_src emacs-lisp
 (use-package corfu
   :elpaca t
+  :demand t
 
   :bind (:map corfu-map
               ;; ("C-SPC" . corfu-insert-separator)
@@ -2690,6 +2695,7 @@ These buffers can be seen by using space.
 #+begin_src emacs-lisp :result silent
 (use-package marginalia
   :elpaca t
+  :demand t
 
   :custom
   (marginalia-max-relative-age 0)
@@ -2708,6 +2714,7 @@ These buffers can be seen by using space.
 #+begin_src emacs-lisp
 (use-package orderless
   :elpaca t
+  :demand t
 
   :custom
   (completion-styles '(orderless partial-completion basic))
@@ -2722,6 +2729,7 @@ These buffers can be seen by using space.
 #+begin_src emacs-lisp
 (use-package vertico
   :elpaca t
+  :demand t
 
   :custom
   (vertico-scroll-margin 0) ;; Different scroll margin
@@ -2742,6 +2750,7 @@ These buffers can be seen by using space.
 #+begin_src emacs-lisp
 (use-package embark
   :elpaca t
+  :demand t
 
   :bind (("C-c a" . embark-act)       ;; pick some comfortable binding
          ("C-;" . embark-dwim)        ;; good alternative: M-.
@@ -2764,7 +2773,8 @@ These buffers can be seen by using space.
 #+begin_src emacs-lisp
 (use-package embark-consult
   :elpaca t
-  :after (embark consult))
+  :after (embark consult)
+  :demand t)
 #+end_src
 
 
