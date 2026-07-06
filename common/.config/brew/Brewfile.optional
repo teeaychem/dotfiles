@@ -3,10 +3,8 @@ tap "wader/tap"
 brew "bitwise"
 brew "cmake"
 brew "coreutils" # GNU File, Shell, and Text utilities
-brew "gdb"
 brew "gnupg"
 brew "grep"
-brew "htop"
 brew "imagemagick"
 brew "pkg-config"
 brew "ranger"
@@ -25,8 +23,6 @@ brew "lazygit"
 # lua
 brew "luarocks"
 
-# python
-brew "python"
 brew "ruff"
 brew "ty"
 brew "uv"
