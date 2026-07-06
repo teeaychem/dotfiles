@@ -1,13 +1,11 @@
 tap "wader/tap"
 
 brew "bitwise"
-brew "cmake"
 brew "coreutils" # GNU File, Shell, and Text utilities
 brew "gnupg"
 brew "grep"
 brew "imagemagick"
 brew "pkg-config"
-brew "ranger"
 brew "shfmt"
 brew "wader/tap/fq"
 
@@ -22,14 +20,6 @@ brew "lazygit"
 
 # lua
 brew "luarocks"
-
-brew "ruff"
-brew "ty"
-brew "uv"
-brew "yapf"
-
-# rust
-brew "rust-analyzer"
 
 # tools
 brew "z3"

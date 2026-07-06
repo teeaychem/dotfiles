@@ -1,22 +1,36 @@
 brew "bat"
+brew "cmake"
 brew "dasel"
 brew "direnv"
 brew "fd"
 brew "fish"
 brew "fzf"
 brew "gdb"
-brew "gh"
-brew "git"
-brew "git-delta"
-brew "git-lfs"
 brew "htop"
 brew "hunspell"
 brew "modules"
 brew "neovim"
-brew "python"
 brew "ripgrep"
 brew "stow"
 brew "tmux"
 brew "tree"
 brew "zellij"
 brew "zoxide"
+
+# git
+
+brew "gh"
+brew "git"
+brew "git-delta"
+brew "git-lfs"
+
+# rust
+brew "rust-analyzer"
+
+# python
+
+brew "python"
+brew "ruff"
+brew "ty"
+brew "uv"
+brew "yapf"
