@@ -1136,6 +1136,81 @@ Supported values are `bottom' and `right'.")
   (defvar-local my/mlir-opt-bin "mlir-opt")
 
   :config
+  (defun my/apheleia-copy-local-variable (variable buffer)
+    "Copy VARIABLE's buffer-local value from BUFFER into the current buffer."
+    (when (local-variable-p variable buffer)
+      (set (make-local-variable variable)
+           (buffer-local-value variable buffer))))
+
+  (defun my/apheleia-format-region (beg end)
+    "Format region between BEG and END using Apheleia's formatter for this mode."
+    (interactive "r")
+    (unless (use-region-p)
+      (user-error "No active region"))
+    (when-let ((err (apheleia--disallowed-p)))
+      (user-error err))
+    (let* ((source-buffer (current-buffer))
+           (source-file buffer-file-name)
+           (source-directory default-directory)
+           (source-mode major-mode)
+           (source-tick (buffer-chars-modified-tick))
+           (source-beg (copy-marker beg))
+           (source-end (copy-marker end t))
+           (formatters (apheleia--get-formatters 'interactive))
+           (temp-buffer (generate-new-buffer " *apheleia-format-region*"))
+           done
+           format-error)
+      (unwind-protect
+          (condition-case quit
+              (progn
+                (with-current-buffer temp-buffer
+                  (insert-buffer-substring source-buffer beg end)
+                  (funcall source-mode)
+                  (setq-local buffer-file-name source-file)
+                  (setq-local default-directory source-directory)
+                  (my/apheleia-copy-local-variable 'apheleia-formatter source-buffer)
+                  (my/apheleia-copy-local-variable 'my/mlir-opt-bin source-buffer)
+                  (apheleia-format-buffer
+                   formatters
+                   nil
+                   :callback (lambda (&rest args)
+                               (setq format-error (plist-get args :error))
+                               (setq done t))))
+                (while (not done)
+                  (let ((process (buffer-local-value 'apheleia--current-process
+                                                     temp-buffer)))
+                    (if (process-live-p process)
+                        (accept-process-output process 0.1)
+                      (accept-process-output nil 0.1))))
+                (unless format-error
+                  (let ((formatted (with-current-buffer temp-buffer
+                                     (buffer-string))))
+                    (if (/= source-tick
+                            (with-current-buffer source-buffer
+                              (buffer-chars-modified-tick)))
+                        (message "Apheleia region format skipped: buffer changed")
+                      (with-current-buffer source-buffer
+                        (delete-region source-beg source-end)
+                        (goto-char source-beg)
+                        (insert formatted))))))
+            (quit
+             (when (buffer-live-p temp-buffer)
+               (let ((process (buffer-local-value 'apheleia--current-process
+                                                  temp-buffer)))
+                 (when (process-live-p process)
+                   (process-put process :interrupted t)
+                   (interrupt-process process)
+                   (accept-process-output process 0.1 nil 'just-this-one)
+                   (when (process-live-p process)
+                     (kill-process process)))))
+             (signal (car quit) (cdr quit))))
+        (set-marker source-beg nil)
+        (set-marker source-end nil)
+        (when (buffer-live-p temp-buffer)
+          (with-current-buffer temp-buffer
+            (set-buffer-modified-p nil))
+          (kill-buffer temp-buffer)))))
+
   (setf (alist-get 'python-mode apheleia-mode-alist) '(yapf ruff-isort))
   (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(yapf ruff-isort))
 
@@ -1164,7 +1239,9 @@ Supported values are `bottom' and `right'.")
   (push '(zsh . ("shfmt" "-filename" filepath "-ln" (cl-case (bound-and-true-p sh-shell) (sh "posix") (t "zsh")) (when apheleia-formatters-respect-indent-level (format "--indent=%d" (cond (indent-tabs-mode 0) ((boundp 'sh-basic-offset) sh-basic-offset) (t 4)))) "-")) apheleia-formatters)
 
   :bind (:map format-prefix-map
-              ("a" . apheleia-format-buffer)))
+              ("a" . apheleia-format-buffer)
+              ("i" . indent-region)
+              ("r" . my/apheleia-format-region)))
 #+end_src
 
 ** bookmark+
