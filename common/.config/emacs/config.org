@@ -2764,6 +2764,36 @@ These buffers can be seen by using space.
   ;; (corfu-on-exact-match nil)
 
   :config
+  (require 'cl-lib)
+
+  (defun my/corfu-add-tty-child-frame-terminal (params)
+    "Add an explicit terminal to Corfu tty child frame PARAMS.
+This avoids stale `tty' frame parameters on emacsclient frames causing
+Corfu's child frame and minibuffer window to be created on different
+terminals."
+    (let ((parent (cdr (assq 'parent-frame params))))
+      (if (and parent
+               (frame-live-p parent)
+               (not (display-graphic-p parent))
+               (not (assq 'terminal params))
+               (not (assq 'tty params)))
+          (cons (cons 'terminal (frame-terminal parent)) params)
+        params)))
+
+  (defun my/corfu-make-frame-with-explicit-tty-terminal (orig &rest args)
+    "Call ORIG with Corfu tty child frames pinned to their parent terminal."
+    (let ((make-frame-function (symbol-function #'make-frame)))
+      (cl-letf (((symbol-function #'make-frame)
+                 (lambda (&optional params)
+                   (funcall make-frame-function
+                            (my/corfu-add-tty-child-frame-terminal params)))))
+        (apply orig args))))
+
+  (advice-remove #'corfu--make-frame
+                 #'my/corfu-make-frame-with-explicit-tty-terminal)
+  (advice-add #'corfu--make-frame
+              :around #'my/corfu-make-frame-with-explicit-tty-terminal)
+
   (global-corfu-mode 1))
 #+end_src
 
