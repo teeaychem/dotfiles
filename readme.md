@@ -2,8 +2,7 @@
 
 GNU Stow deploys these packages into `$HOME`:
 
-- `common`: configuration shared by all systems
-- `scripts`: shared commands installed in `~/.local/bin`
+- `common`: configuration and commands shared by all systems
 - `darwin`: macOS configuration and commands
 - `linux`: Linux configuration
 
