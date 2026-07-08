@@ -74,8 +74,15 @@
 
 (setq vc-follow-symlinks t)
 
-;; Load the tangle, regenerating it when config.org is newer.
-(org-babel-load-file (expand-file-name "config.org" user-emacs-directory))
+;; Load the tangle, regenerating it under `user-emacs-directory' when needed.
+;; `config.org' is managed by Stow and may be a symlink into the dotfiles
+;; checkout; keep the generated `config.el' outside the repository.
+(require 'ob-tangle)
+(let ((config-org (expand-file-name "config.org" user-emacs-directory))
+      (config-el (expand-file-name "config.el" user-emacs-directory)))
+  (when (file-newer-than-file-p config-org config-el)
+    (org-babel-tangle-file config-org config-el "emacs-lisp"))
+  (load config-el nil 'nomessage))
 
 ;; Daemon mode starts its server after loading init.el.
 (unless (daemonp)

@@ -1021,8 +1021,12 @@ Supported values are `bottom' and `right'.")
   (message (concat "Request to load config: " name))
   (let* ((file-el (expand-file-name (concat name ".el") user-emacs-directory))
          (file-org (expand-file-name (concat name ".org") user-emacs-directory)))
-    (if (file-exists-p file-el) (delete-file file-el) (message (concat "Did not find " file-el)))
-    (if (file-exists-p file-org) (org-babel-load-file file-org) (message (concat "Did not find " file-org)))))
+    (if (file-exists-p file-org)
+        (progn
+          (when (file-newer-than-file-p file-org file-el)
+            (org-babel-tangle-file file-org file-el "emacs-lisp"))
+          (load file-el nil 'nomessage))
+      (message (concat "Did not find " file-org)))))
 #+end_src
 
 #+begin_src emacs-lisp
