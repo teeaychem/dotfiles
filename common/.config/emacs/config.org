@@ -2956,10 +2956,28 @@ maybe: https://github.com/casouri/eldoc-box
       (setf (plist-get provider :triggerCharacters)
             (vconcat (remove " " (append triggers nil))))))
 
-  (add-hook 'eglot-managed-mode-hook
-            (lambda ()
-              (when (derived-mode-p 'mlir-mode)
-                (my/mlir-eglot-setup))))
+  (defun my/mlir-eglot-completion-at-point ()
+    "Complete MLIR operation names after the final dot."
+    (when-let* ((capf (eglot-completion-at-point)))
+      (pcase-let ((`(,beg ,end ,table . ,props) capf))
+        (let ((new-beg beg))
+          (save-excursion
+            (goto-char (point))
+            (when (search-backward "." beg t)
+              (setq new-beg (1+ (point)))))
+          `(,new-beg ,end ,table ,@props)))))
+
+  (defun my/mlir-eglot-capf-setup ()
+    "Use MLIR-aware Eglot completion bounds in MLIR buffers."
+    (when (derived-mode-p 'mlir-mode)
+      (setq-local completion-at-point-functions
+                  (cons #'my/mlir-eglot-completion-at-point
+                        (remove #'eglot-completion-at-point
+                                completion-at-point-functions)))))
+
+  (add-hook 'eglot-managed-mode-hook #'my/mlir-eglot-capf-setup)
+
+  ;; (add-hook 'eglot-managed-mode-hook (lambda () (when (derived-mode-p 'mlir-mode) (my/mlir-eglot-setup))))
 
   ;; (add-to-list 'eglot-stay-out-of 'flymake)
   (let ((clangd-jobs (or (getenv "CLANGD_JOBS") "4")))
