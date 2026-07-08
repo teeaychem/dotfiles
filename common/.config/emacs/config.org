@@ -2077,6 +2077,12 @@ Get the relevant package subdirectories from the llvm source
 (defvar-local my/tablegen-compilation-database nil
   "TableGen compilation database for this buffer or project.")
 
+(defvar-local my/mlir-extra-extensions nil
+  "Project-local file extensions that should use `mlir-mode'.")
+
+(defvar-local my/mlir-extra-extension-applying nil
+  "Non-nil while applying project-local `mlir-mode' extension rules.")
+
 (dolist (variable '(my/llvm-source-root
                     my/mlir-opt-bin
                     my/mlir-lsp-server-bin
@@ -2085,6 +2091,25 @@ Get the relevant package subdirectories from the llvm source
                     my/tablegen-lsp-server-bin
                     my/tablegen-compilation-database))
   (put variable 'safe-local-variable #'stringp))
+
+(put 'my/mlir-extra-extensions
+     'safe-local-variable
+     (lambda (value)
+       (and (listp value)
+            (seq-every-p #'stringp value))))
+
+(defun my/mlir-mode-for-extra-extension ()
+  "Use `mlir-mode' for project-local IR extensions."
+  (when-let* ((file buffer-file-name)
+              (extensions my/mlir-extra-extensions)
+              (extension (file-name-extension file)))
+    (when (and (not my/mlir-extra-extension-applying)
+               (not (derived-mode-p 'mlir-mode))
+               (member extension extensions))
+      (let ((my/mlir-extra-extension-applying t))
+        (mlir-mode)))))
+
+(add-hook 'hack-local-variables-hook #'my/mlir-mode-for-extra-extension)
 
 (defun my/llvm-file-executable-p (path)
   "Return non-nil when PATH names an executable file."
@@ -2912,6 +2937,21 @@ maybe: https://github.com/casouri/eldoc-box
   (eglot-code-action-indications nil)
 
   :config
+  (defun my/mlir-eglot-setup ()
+    "Apply MLIR-specific Eglot adjustments."
+    ;; mlir-lsp-server advertises space as a completion trigger, which makes
+    ;; Corfu auto-complete eagerly after ordinary word separators.
+    (when-let* ((provider (eglot-server-capable :completionProvider))
+                ((listp provider))
+                (triggers (plist-get provider :triggerCharacters)))
+      (setf (plist-get provider :triggerCharacters)
+            (vconcat (remove " " (append triggers nil))))))
+
+  (add-hook 'eglot-managed-mode-hook
+            (lambda ()
+              (when (derived-mode-p 'mlir-mode)
+                (my/mlir-eglot-setup))))
+
   ;; (add-to-list 'eglot-stay-out-of 'flymake)
   (let ((clangd-jobs (or (getenv "CLANGD_JOBS") "4")))
     (add-to-list 'eglot-server-programs
