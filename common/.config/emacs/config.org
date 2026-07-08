@@ -252,7 +252,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (desktop-auto-save-timeout nil))
 #+end_src
 
-
 ** dired
 
 #+begin_src emacs-lisp
@@ -1301,8 +1300,10 @@ Supported values are `bottom' and `right'.")
   (dirvish-quick-access-entries ; It's a custom option, `setq' won't work
    '(("h" "~/"          "home")
      ("p" "~/projects/" "projects")))
+  (dirvish-preview-dired-sync-omit t)
 
   :config
+  (require 'dirvish-fd)
   (dirvish-override-dired-mode 1)
   (dirvish-peek-mode 1)
   (setq dirvish-peek-key '(:debounce 0.5 any))
@@ -1314,6 +1315,9 @@ Supported values are `bottom' and `right'.")
   :bind ; Bind `dirvish-fd|dirvish-side|dirvish-dwim' as you see fit
   (("C-c x" . dirvish)
    :map dirvish-mode-map             ; Dirvish inherits `dired-mode-map'
+   ("<left>" . dired-up-directory)
+   ("<right>" . dired-find-file)
+   ("/" . dirvish-fd)
    (";" . dired-up-directory)        ; So you can adjust `dired' bindings here
    ("?" . dirvish-dispatch)          ; [?] a helpful cheatsheet
    ("a" . dirvish-setup-menu)        ; [a]ttributes settings:`t' toggles mtime, `f' toggles fullframe, etc.
