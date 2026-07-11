@@ -2,16 +2,25 @@
 -- ce.cancel_delay_seconds = 0.00125
 -- ce:start()
 
-local left_square_bracket = 42
-local right_square_bracket = 30
+-- Hammerspoon's key-string map is not layout-aware for shifted punctuation.
+local tabShortcutKeyCodes = {
+  previous = 42,
+  next = 30,
+}
+
+local function sendTabShortcut(direction)
+  local keyCode = tabShortcutKeyCodes[direction]
+  hs.eventtap.event.newKeyEvent({ "cmd", "shift" }, keyCode, true):post()
+  hs.eventtap.event.newKeyEvent({ "cmd", "shift" }, keyCode, false):post()
+end
 
 mouseSideButtons = hs.eventtap.new({ hs.eventtap.event.types.otherMouseDown },
  function(e)
    if e:getButtonState(4) then
-     hs.eventtap.event.newKeyEvent({"command", "shift"}, left_square_bracket, true):post()
+     sendTabShortcut("previous")
      return true -- to supress original key
    elseif e:getButtonState(3) then
-     hs.eventtap.event.newKeyEvent({"command", "shift"}, right_square_bracket, true):post()
+     sendTabShortcut("next")
      return true -- to supress original key
    end
 
@@ -19,37 +28,29 @@ mouseSideButtons = hs.eventtap.new({ hs.eventtap.event.types.otherMouseDown },
 )
 mouseSideButtons:start()
 
-eisuuFlag = false
+local function hasOnlyCommandModifier(e)
+  local flags = e:getFlags()
+  return flags.cmd and not (flags.alt or flags.ctrl or flags.fn or flags.shift)
+end
 
-eisuuD = hs.eventtap.new({ hs.eventtap.event.types.keyDown },
+commandBracketRemap = hs.eventtap.new({ hs.eventtap.event.types.keyDown },
  function(e)
-   thisKeyCode = e:getCharacters()
-   if eisuuFlag == true then
-     if thisKeyCode == "v" then
-       hs.eventtap.event.newKeyEvent({"command", "shift"}, left_square_bracket, true):post()
-       return true
-     elseif thisKeyCode == "c" then
-       hs.eventtap.event.newKeyEvent({"command", "shift"}, right_square_bracket, true):post()
-       return true
-     end
-   elseif thisKeyCode == " " and e:getKeyCode() == 102 then
-     eisuuFlag = true
-   else
-     eisuuFlag = false
+   if not hasOnlyCommandModifier(e) then
+     return false
    end
+
+   local characters = e:getCharacters()
+   if characters == "[" then
+     hs.eventtap.keyStroke({ "shift" }, "8", 10)
+     return true
+   elseif characters == "]" then
+     hs.eventtap.keyStroke({ "shift" }, "9", 10)
+     return true
+   end
+
+   return false
  end
 ):start()
-
-eisuuU = hs.eventtap.new({ hs.eventtap.event.types.keyUp },
- function(e)
-   if e:getKeyCode() == 102 then
-     eisuuFlag = false
-   end
- end
-):start()
-
-hs.hotkey.bind({"cmd"}, 30, function() hs.eventtap.keyStroke({"shift"}, "8", 10) end)
-hs.hotkey.bind({"cmd"}, 42, function() hs.eventtap.keyStroke({"shift"}, "9", 10) end)
 
 -- hs.hotkey.bind({'cmd'}, "[", hs.eventtap.keyStroke({"shift"}, "8"), nil, hs.eventtap.keyStroke({"shift"}, "8"))
 
