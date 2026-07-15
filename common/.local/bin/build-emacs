@@ -82,16 +82,25 @@ install_dependencies() {
             fi
 
             sudo apt-get update
-            libgccjit_dev=$(
-                apt-cache search '^libgccjit-[0-9]+-dev$' |
-                    awk '{ print $1 }' |
-                    sort -V |
-                    tail -n 1
+
+            # Native compilation needs libgccjit for the default GCC version.
+            gcc_package=$(
+                apt-cache depends --important gcc |
+                    awk '$1 == "Depends:" && $2 ~ /^gcc-[0-9][0-9]*$/ { print $2; exit }'
             )
 
-            if [ -z "$libgccjit_dev" ]; then
+            if [ -z "$gcc_package" ]; then
                 printf '%s\n' \
-                    "No libgccjit development package is available." >&2
+                    "Could not determine Ubuntu's default GCC package." >&2
+                exit 1
+            fi
+
+            gcc_major=${gcc_package#gcc-}
+            libgccjit_dev="libgccjit-${gcc_major}-dev"
+
+            if ! apt-cache show "$libgccjit_dev" >/dev/null 2>&1; then
+                printf '%s\n' \
+                    "No libgccjit development package is available for ${gcc_package}." >&2
                 exit 1
             fi
 
@@ -99,6 +108,7 @@ install_dependencies() {
                 autoconf \
                 automake \
                 build-essential \
+                "$gcc_package" \
                 "$libgccjit_dev" \
                 libgnutls28-dev \
                 libncurses-dev \
