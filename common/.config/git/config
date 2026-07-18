@@ -9,6 +9,7 @@
 
 [core]
   autocrlf = false
+	excludesFile = ~/.config/git/ignore
 	pager = "delta"
   # https://github.blog/2022-06-29-improve-git-monorepo-performance-with-a-file-system-monitor/
 	fsmonitor = true

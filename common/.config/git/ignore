@@ -1,1 +1,9 @@
+.codex
+AGENTS.md
+
+# macOS
 .DS_Store
+._*
+
+# Linux
+*~
