@@ -2980,14 +2980,13 @@ maybe: https://github.com/casouri/eldoc-box
   ;; (add-hook 'eglot-managed-mode-hook (lambda () (when (derived-mode-p 'mlir-mode) (my/mlir-eglot-setup))))
 
   ;; (add-to-list 'eglot-stay-out-of 'flymake)
-  (let ((clangd-jobs (or (getenv "CLANGD_JOBS") "4")))
+  (let ((clangd-jobs (or (getenv "CLANGD_JOBS") "8")))
     (add-to-list 'eglot-server-programs
                  `((c-ts-mode c++-ts-mode) .
                    ("clangd"
                     ;; Project compiler drivers are trusted, including custom toolchains.
-                    "--query-driver=/**/*"
+                    "--query-driver=/usr/bin/**,/opt/homebrew/**,/usr/local/**,/home/linuxbrew/.linuxbrew/**"
                     "--background-index"
-                    "--background-index-priority=background"
                     "--clang-tidy"
                     "--completion-style=detailed"
                     "--header-insertion=never"
