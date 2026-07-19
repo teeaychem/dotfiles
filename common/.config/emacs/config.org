@@ -187,6 +187,17 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (interactive)
   (let ((auto-revert-stop-on-user-input nil))
     (auto-revert-buffers)))
+
+(defun my/kill-buffers-visiting-missing-files ()
+  "Kill unmodified local-file buffers whose files no longer exist and report each modified buffer that was retained."
+  (interactive)
+  (dolist (buffer (buffer-list))
+    (with-current-buffer buffer
+      (when-let ((file buffer-file-name))
+        (when (and (not (file-remote-p file)) (not (file-exists-p file)))
+          (if (buffer-modified-p)
+              (message "Kept modified buffer visiting missing file: %s" (buffer-name buffer))
+            (kill-buffer buffer)))))))
 #+end_src
 
 ** bookmarks
