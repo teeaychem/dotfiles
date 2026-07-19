@@ -1,4 +1,6 @@
-# Shells and environment management
+# Homebrew bootstrap
 build-essential
 procps
-zsh
+curl
+file
+git

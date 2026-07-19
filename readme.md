@@ -33,15 +33,25 @@ On macOS, use the core Homebrew bundle:
 brew bundle --file common/.config/brew/Brewfile.core
 ```
 
-On Ubuntu, use the package list and installer:
+On Ubuntu, install Homebrew's bootstrap dependencies:
 
 ```sh
 ./linux/.local/bin/install-apt-packages common/.config/apt/packages
 ```
 
-This installs the small apt baseline needed before the dotfiles are linked.
-Install Homebrew manually from <https://brew.sh/> when it is needed on Linux;
-the standard Linux install prefix is assumed.
+Install Homebrew at its standard Linux prefix, then load it into the current
+shell:
+
+```sh
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+```
+
+Install the shared and Linux-specific Homebrew packages:
+
+```sh
+brew bundle --file common/.config/brew/Brewfile
+```
 
 Then apply the Stow links:
 
@@ -49,26 +59,12 @@ Then apply the Stow links:
 ./install
 ```
 
-After Homebrew is installed and the dotfiles are linked, start a fresh shell
-and install the Homebrew tools:
+Start a fresh Fish shell after linking the configuration.
+
+To use that Fish directly over SSH, without changing the remote login shell:
 
 ```sh
-brew bundle --file common/.config/brew/Brewfile
-```
-
-For a fresh apt-based SSH host, bootstrap the foundations from an existing
-checkout:
-
-```sh
-bootstrap-apt-host HOST
-```
-
-This reads the apt package list from local installed config and runs the remote
-apt bootstrap. Install Homebrew manually if wanted, then clone or copy the
-dotfiles into a persistent checkout and run the normal install:
-
-```sh
-ssh HOST
+ssh -t HOST '/home/linuxbrew/.linuxbrew/bin/fish -l'
 ```
 
 After the first install, the wrapper command is available from any directory:
