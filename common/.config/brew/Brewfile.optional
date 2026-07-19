@@ -22,4 +22,5 @@ brew "lazygit"
 brew "luarocks"
 
 # tools
+brew "neocmakelsp" # CMake language server
 brew "z3"

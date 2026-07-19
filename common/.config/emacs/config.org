@@ -3012,6 +3012,7 @@ maybe: https://github.com/casouri/eldoc-box
           lua-args))
 
   (add-to-list 'eglot-server-programs '(latex-mode . ("texlab")))
+  (add-to-list 'eglot-server-programs '((cmake-ts-mode) . ("neocmakelsp" "stdio")))
   (add-to-list 'eglot-server-programs '((nix-mode nix-ts-mode) . ("nil")))
   (add-to-list 'eglot-server-programs '((python-mode python-ts-mode) . ("ty" "server")))
   (add-to-list 'eglot-server-programs '(rust-ts-mode .
