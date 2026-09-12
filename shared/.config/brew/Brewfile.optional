@@ -2,6 +2,7 @@ tap "wader/tap"
 
 brew "bitwise"
 brew "coreutils" # GNU File, Shell, and Text utilities
+brew "difftastic"
 brew "gnupg"
 brew "grep"
 brew "imagemagick"
@@ -9,17 +10,35 @@ brew "pkg-config"
 brew "shfmt"
 brew "wader/tap/fq"
 
+
 # tree-sitter
 brew "tree-sitter"
 brew "tree-sitter-cli"
 
+
 # git
 brew "git-filter-repo"
-
+brew "gitui"
 brew "lazygit"
+
 
 # lua
 brew "luarocks"
+
+
+# linting
+brew "gersemi"   # cmake
+brew "texlab"    # TeX
+brew "typos-cli" # typos
+
+
+# markdown
+brew "comrak" # GFM(arkdown)
+
+
+# toml
+brew "taplo"
+
 
 # tools
 brew "neocmakelsp" # CMake language server
