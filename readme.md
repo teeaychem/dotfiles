@@ -1,6 +1,16 @@
 # dotfiles
 
-## Install packages
+## fish
+
+```sh
+fish_plugins_sync
+```
+
+```sh
+ssh -t HOST '/home/linuxbrew/.linuxbrew/bin/fish -l'
+```
+
+## packages
 
 ```sh
 brew bundle --file ~/dotfiles/brew/Brewfile.core
@@ -14,36 +24,25 @@ brew bundle --file ~/dotfiles/brew/Brewfile.core
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 ```
 
-## Mise
+## mise
 
-Mise deploys configuration into `$HOME` and loads the shared and platform-specific environment.
+mise applys configurations to `$HOME` and loads the shared / platform-specific environments.
+Deployment is idempotent and uses individual symlinks, so a managed directory can also contain machine-local files.
 
 ```sh
 mise trust ~/dotfiles/mise/config.toml
 mise --cd ~/dotfiles bootstrap dotfiles apply
 
-mise --cd ~/dotfiles --env personal bootstrap dotfiles apply
-```
+mise --cd ~/dotfiles --env personal bootstrap dotfiles apply # `--env personal` selects the opt-in personal overlay
 
-Deployment is idempotent and uses individual symlinks, so a managed directory can also contain machine-local files.
-Check the result or preview a change with:
-
-```sh
 mise --cd ~/dotfiles bootstrap dotfiles status
 mise --cd ~/dotfiles bootstrap --only dotfiles --dry-run
 ```
 
-## Use the environment
-
-The deployment config lives under `mise/`.
-It installs the regular global Mise config from `shared/.config/mise/`, which auto loads `config.macos.toml` or `config.linux.toml`.
-
-`--env personal` selects the opt-in personal overlay and composes with the deployment commands above.
-
 Keep machine-specific values in the untracked `.config` local, highest-priority layer: `~/.config/mise/config.local.toml`
 
 
-## Use debugging tools
+## debugging tools
 
 The package lists provide GDB and an LLVM LLDB adapter.
 `~/.local/bin/lldb-dap` resolves Homebrew's keg-only LLVM installation and Ubuntu's versioned adapter names.
@@ -53,16 +52,4 @@ For a uv project:
 
 ```sh
 uv add --dev debugpy
-```
-
-Synchronise Fish plugins when their declared set changes:
-
-```sh
-fish_plugins_sync
-```
-
-To use the configured Fish directly over SSH without changing the remote login shell:
-
-```sh
-ssh -t HOST '/home/linuxbrew/.linuxbrew/bin/fish -l'
 ```
