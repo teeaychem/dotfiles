@@ -328,24 +328,12 @@ Supported values are `bottom' and `right'.")
                      ("w" . #'my/eldoc-toggle-window-side)))
 #+end_src
 
-** elec-pair
-
-#+begin_src emacs-lisp
-(use-package elec-pair
-  :elpaca nil
-
-  :hook ((prog-mode LaTeX-mode) . electric-pair-mode))
-#+end_src
-
 ** emacs
 
 #+begin_src emacs-lisp
 (use-package emacs
   :preface
-  (defun my/visible-bell-invert ()
-    "Briefly invert the mode line to provide a visible bell."
-    (invert-face 'mode-line)
-  (run-with-timer 0.2 nil #'invert-face 'mode-line))
+
 
   :init
   ;; Redisplay optimizations from doom-start.el.
@@ -355,8 +343,6 @@ Supported values are `bottom' and `right'.")
 
   (tool-bar-mode -1)
   (tooltip-mode -1)
-  ;; (scroll-bar-mode -1)
-  ;; (horizontal-scroll-bar-mode -1)
 
   (set-frame-parameter nil 'internal-border-width 2)
 
@@ -374,20 +360,28 @@ Supported values are `bottom' and `right'.")
          ("<backtab>" . #'completion-at-point))
 
   :custom
-  ;; (jit-lock-defer-time 0.1) ; Defer fontification while input is pending.
+  (uniquify-after-kill-buffer-flag t)
+  (uniquify-buffer-name-style 'forward)
 
   (comint-scroll-to-bottom-on-output t)
   (cursor-in-non-selected-windows t)
   (fill-column 1024)
   (fast-but-imprecise-scrolling t)
   (help-window-select t)
-  (indicate-empty-lines t)
+
   (line-spacing nil)
+
+  (indicate-empty-lines t)
+
   (redisplay-skip-fontification-on-input t)
+  (jit-lock-defer-time 0)
+
   (right-margin-width 1)
-  (ring-bell-function #'my/visible-bell-invert)
+  (ring-bell-function (lambda () (invert-face 'mode-line) (run-with-timer 0.2 nil #'invert-face 'mode-line)))
+
   (scroll-conservatively 101)
   (scroll-preserve-screen-position t)
+
   (truncate-string-ellipsis "…")
   (use-dialog-box nil)
   (use-short-answers t)
@@ -421,8 +415,7 @@ Supported values are `bottom' and `right'.")
   :after eldoc
 
   :init
-  (setq python-flymake-command '("ruff" "check" "--quiet" "--output-format=concise"
-                                 "--stdin-filename=stdin" "-"))
+  (setq python-flymake-command '("ruff" "check" "--quiet" "--output-format=concise" "--stdin-filename=stdin" "-"))
   (setq rust-ts-flymake-command '("clippy-driver" "-"))
 
   (defun flymake-next-error-error (&optional n interactive)
@@ -531,6 +524,15 @@ Supported values are `bottom' and `right'.")
 
   :custom
   (mouse-wheel-follow-mouse t))
+#+end_src
+
+** prog-mode
+
+#+begin_src emacs-lisp
+(use-package prog-mode
+  :elpaca nil
+
+  :hook (prog-mode . electric-pair-mode))
 #+end_src
 
 ** project
@@ -698,11 +700,7 @@ Supported values are `bottom' and `right'.")
     (interactive "p")
     (let ((closing-char (alist-get last-command-event slash-escaped-pairs)))
       (if (and closing-char (eq (char-before) ?\\))
-          (skeleton-insert `(nil
-                             ,last-command-event
-                             _
-                             ,(string ?\\ closing-char))
-                           nil)
+          (skeleton-insert `(nil ,last-command-event _ ,(string ?\\ closing-char)) nil)
         (self-insert-command arg))))
 
   :config
@@ -756,17 +754,6 @@ Supported values are `bottom' and `right'.")
   (treesit-font-lock-level 4))
 #+end_src
 
-** uniquify
-
-#+begin_src emacs-lisp
-(use-package uniquify
-  :elpaca nil
-
-  :custom
-  (uniquify-after-kill-buffer-flag t)
-  (uniquify-buffer-name-style 'forward))
-#+end_src
-
 ** xclip
 
 #+begin_src emacs-lisp
@@ -817,20 +804,13 @@ Supported values are `bottom' and `right'.")
 (use-package window
   :elpaca nil
 
-  :preface
-  (defun my/window-toggle-dedicated ()
-    "Toggle whether the selected window is dedicated to its buffer."
-    (interactive)
-    (let* ((window (selected-window))
-           (dedicated (not (window-dedicated-p window))))
-      (set-window-dedicated-p window dedicated)
-      (message "Window %sdedicated" (if dedicated "" "no longer "))))
-
   :bind (:prefix-map my/window-prefix-map
          :prefix "C-c w")
+
   :bind (:repeat-map my/window-prefix-map
-         :exit
          :continue
+         ("["         . previous-buffer)
+         ("]"         . next-buffer)
          ("<left>"    . windmove-left)
          ("<right>"   . windmove-right)
          ("<up>"      . windmove-up)
@@ -843,38 +823,30 @@ Supported values are `bottom' and `right'.")
          ("C-<right>" . enlarge-window-horizontally)
          ("C-<up>"    . enlarge-window)
          ("C-<down>"  . shrink-window)
-         ("["         . previous-buffer)
-         ("]"         . next-buffer)
+         ("r"         . window-layout-rotate-clockwise)
+         ("R"         . window-layout-rotate-anticlockwise)
+         ("u"         . winner-undo)
+         ("U"         . winner-redo)
+
+         :exit
          ("0"         . delete-window)
          ("1"         . delete-other-windows)
          ("2"         . split-window-below)
          ("3"         . split-window-right)
          ("="         . balance-windows-area)
          ("c"         . compare-windows)
-         ("d"         . my/window-toggle-dedicated)
          ("h"         . window-layout-flip-leftright)
-         ("r"         . window-layout-rotate-clockwise)
-         ("R"         . window-layout-rotate-anticlockwise)
+         ("l"         . display-line-numbers-mode)
          ("t"         . window-layout-transpose)
-         ("v"         . window-layout-flip-topdown)
-         ("u"         . winner-undo)
-         ("U"         . winner-redo)
-         ("l"         . display-line-numbers-mode))
+         ("v"         . window-layout-flip-topdown))
 
   :custom
   (split-height-threshold nil) ; Avoid top/bottom splits.
-  (split-width-threshold 0))   ; Prefer side-by-side splits.
+  (split-width-threshold 0)   ; Prefer side-by-side splits.
+
+  :init
+  (winner-mode 1))
 #+end_src
-
-** winner
-
-#+begin_src emacs-lisp
-(use-package winner
-  :elpaca nil
-
-  :init (winner-mode 1))
-#+end_src
-
 
 
 * other configs
@@ -1049,9 +1021,6 @@ Supported values are `bottom' and `right'.")
   (setf (alist-get 'gersemi apheleia-formatters) '("gersemi" (my/gersemi-config-arguments) "-"))
   (setf (alist-get 'cmake-ts-mode apheleia-mode-alist) '(gersemi))
 
-  (push '(raco-fmt . ("raco" "fmt")) apheleia-formatters)
-  (setf (alist-get 'racket-mode apheleia-mode-alist) '(raco-fmt))
-
   (push '(taplo . ("taplo" "format")) apheleia-formatters)
   (setf (alist-get 'toml-ts-mode apheleia-mode-alist) '(taplo))
   (setf (alist-get 'tablegen-mode apheleia-mode-alist) '(clang-format))
@@ -1185,6 +1154,7 @@ Supported values are `bottom' and `right'.")
 #+begin_src emacs-lisp
 (use-package envrc
   :elpaca t
+  :disabled
 
   :custom
   (envrc-show-summary-in-minibuffer nil)
@@ -1476,6 +1446,15 @@ To highlight indentations
      '("<escape>" . ignore)))
 
   (my/meow-setup))
+#+end_src
+
+** mise
+
+#+begin_src emacs-lisp
+(use-package mise
+    :elpaca t
+    :config
+    (global-mise-mode 1))
 #+end_src
 
 ** multiple cursors
@@ -1915,6 +1894,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
   (set-face-attribute 'font-latex-superscript-face nil :height 'unspecified)
 
   :hook
+  (LaTeX-mode . electric-pair-mode)
   (LaTeX-mode . LaTeX-math-mode)
   (LaTeX-mode . reftex-mode)
   (LaTeX-mode . TeX-source-correlate-mode)
@@ -2144,18 +2124,6 @@ Get the relevant package subdirectories from the llvm source
 
   :init
   (add-hook 'python-base-mode-hook #'pet-mode -10))
-#+end_src
-
-*** racket
-
-#+begin_src sh
-raco pkg install --auto drracket
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package racket-mode
-  :elpaca t
-  :mode "\\.rkt\\'")
 #+end_src
 
 *** rust
@@ -2941,13 +2909,12 @@ https://github.com/renzmann/treesit-auto
 
   :init
   (defun tempel-setup-capf ()
-    "Expand exact template names before the major mode CAPF."
-    (add-hook 'completion-at-point-functions #'tempel-expand -90 t))
+    "Offer Tempel completions after a character before the major mode CAPF."
+    (add-hook 'completion-at-point-functions (cape-capf-trigger #'tempel-complete ?\\) -90 t))
 
   :custom
   (tempel-path (list (concat user-emacs-directory "tempel/common.eld")
                      (concat user-emacs-directory "tempel/modes/*.eld")))
-  ;; (tempel-trigger-prefix "<") ;; Require trigger prefix before template name when completing.
 
   :config
   (tempel-key "." dereference c-family-template-prefix-map)
