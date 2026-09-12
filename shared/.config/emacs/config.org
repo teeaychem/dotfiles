@@ -2155,7 +2155,10 @@ Get the relevant package subdirectories from the llvm source
          ("\\.m[k]d\\'" . markdown-ts-mode))
 
   :custom
-  (markdown-ts-fontify-code-blocks-natively t))
+  (markdown-ts-fontify-code-blocks-natively t)
+
+  :config
+  (markdown-ts-mode-install-parsers nil))
 #+end_src
 
 *** toml
