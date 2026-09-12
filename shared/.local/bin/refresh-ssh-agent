@@ -1,0 +1,54 @@
+#!/usr/bin/env fish
+
+function socket_is_usable --argument-names socket
+    test -S "$socket"; or return 1
+
+    if command -q ssh-add
+        env SSH_AUTH_SOCK="$socket" ssh-add -l >/dev/null 2>&1
+        contains -- $status 0 1
+        return
+    end
+
+    return 0
+end
+
+set stable_sock $HOME/.ssh/ssh_auth_sock
+if set -q SSH_AUTH_SOCK_STABLE; and test -n "$SSH_AUTH_SOCK_STABLE"
+    set stable_sock $SSH_AUTH_SOCK_STABLE
+end
+
+set source_sock
+if set -q SSH_AUTH_SOCK; and test -n "$SSH_AUTH_SOCK"; and test "$SSH_AUTH_SOCK" != "$stable_sock"; and socket_is_usable "$SSH_AUTH_SOCK"
+    set source_sock $SSH_AUTH_SOCK
+end
+
+if test -z "$source_sock"
+    set candidates /tmp/ssh-*/agent.*
+
+    if test (count $candidates) -gt 0
+        for index in (seq (count $candidates) -1 1)
+            test -S "$candidates[$index]"; or set -e candidates[$index]
+        end
+    end
+
+    if test (count $candidates) -gt 1
+        set candidates (command ls -t $candidates 2>/dev/null)
+    end
+
+    for candidate in $candidates
+        socket_is_usable "$candidate"; or continue
+
+        set source_sock $candidate
+        break
+    end
+end
+
+if test -z "$source_sock"
+    echo 'Unable to find a usable SSH agent socket.' >&2
+    exit 1
+end
+
+mkdir -p (dirname "$stable_sock"); or exit
+ln -snf "$source_sock" "$stable_sock"; or exit
+
+echo $stable_sock

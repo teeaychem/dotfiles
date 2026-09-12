@@ -1,102 +1,77 @@
-#!/bin/sh
+#!/usr/bin/env fish
 
-# Download and install the latest en_GB-large and en_US-large dictionaries.
+# Download and install specified dictionaries.
 #
-# The upstream files are installed under their conventional en_GB and en_US
-# names. The personal dictionary is left untouched.
-#
-# Environment:
-#   DICPATH  Dictionary directory
-#            (default: ${XDG_DATA_HOME:-~/.local/share}/hunspell)
+# The upstream files are installed under their conventional en_GB, en_US, etc. names.
+# The personal dictionary is left untouched.
+set repository https://github.com/en-wl/wordlist
 
-set -eu
+if not command -q hunspell
+    echo 'Hunspell is not installed.' >&2; exit 1
+end
 
-repository=https://github.com/en-wl/wordlist
-destination="${DICPATH:-${XDG_DATA_HOME:-$HOME/.local/share}/hunspell}"
+if not set -q XDG_DATA_HOME; or test -z "$XDG_DATA_HOME"
+    echo 'XDG_DATA_HOME is not set.' >&2; exit 1
+end
 
-latest_url=$(
-    curl -fsSLo /dev/null -w '%{url_effective}\n' "$repository/releases/latest"
-)
-tag=${latest_url##*/}
+set destination $XDG_DATA_HOME/hunspell
+mkdir -p "$destination"; or exit
 
-case "$tag" in
-    rel-[0-9]*)
-        version=${tag#rel-}
-        ;;
-    *)
-        printf 'Could not determine the latest dictionary release from %s.\n' \
-            "$latest_url" >&2
-        exit 1
-        ;;
-esac
+set latest_url (curl -fsSLo /dev/null -w '%{url_effective}\n' $repository/releases/latest); or exit
 
-release_url="$repository/releases/download/$tag"
-temporary_directory=$(mktemp -d "${TMPDIR:-/tmp}/install-hunspell.XXXXXXXX")
+set tag (path basename $latest_url)
+if not string match --quiet --regex '^rel-[0-9].*$' $tag
+    echo "Failed to determine the latest dictionary release from $latest_url." >&2; exit 1
+end
 
-cleanup() {
-    rm -rf "$temporary_directory"
-    rm -f "$destination"/.*".$$"
-}
-trap cleanup EXIT HUP INT TERM
+set dictionary_version (string replace rel- '' $tag)
+set release_url $repository/releases/download/$tag
 
-install_dictionary() {
-    dictionary=$1
-    installed_name=$2
-    archive="hunspell-$dictionary-$version.zip"
-    extraction_directory="$temporary_directory/$dictionary"
-    mkdir "$extraction_directory"
+set temporary_directory (mktemp -d /tmp/install-hunspell.XXXXXXXX)
+or exit
 
-    printf 'Downloading %s %s...\n' "$dictionary" "$version"
-    curl -fsSL "$release_url/$archive" -o "$temporary_directory/$archive"
-    unzip -qt "$temporary_directory/$archive" >/dev/null
-    unzip -q "$temporary_directory/$archive" -d "$extraction_directory"
+function install_dictionary --argument-names dictionary installed_name
+    set archive hunspell-$dictionary-$dictionary_version.zip
+    set extraction_directory $temporary_directory/$dictionary
 
-    affix_file="$extraction_directory/$dictionary.aff"
-    dictionary_file="$extraction_directory/$dictionary.dic"
-    readme_file="$extraction_directory/README_$dictionary.txt"
+    mkdir "$extraction_directory"; or exit
 
-    for file in "$affix_file" "$dictionary_file" "$readme_file"; do
-        if [ ! -s "$file" ]; then
-            printf 'The release archive is missing %s.\n' "${file##*/}" >&2
-            exit 1
-        fi
-    done
+    echo "Downloading $dictionary $dictionary_version..."
+    curl -fsSL $release_url/$archive -o $temporary_directory/$archive; or exit
 
-    expected_entries=$(sed -n '1p' "$dictionary_file")
-    actual_entries=$(($(wc -l <"$dictionary_file") - 1))
+    unzip -qt $temporary_directory/$archive >/dev/null; or exit
 
-    case "$expected_entries" in
-        "" | *[!0-9]*)
-            printf 'Invalid dictionary entry count: %s\n' "$expected_entries" >&2
-            exit 1
-            ;;
-    esac
+    unzip -q $temporary_directory/$archive -d "$extraction_directory"; or exit
 
-    if [ "$actual_entries" -ne "$expected_entries" ]; then
-        printf '%s contains %s entries; expected %s.\n' \
-            "$dictionary" "$actual_entries" "$expected_entries" >&2
-        exit 1
-    fi
+    set affix_file $extraction_directory/$dictionary.aff
+    set dictionary_file $extraction_directory/$dictionary.dic
+    set readme_file $extraction_directory/README_$dictionary.txt
 
-    if command -v hunspell >/dev/null 2>&1; then
-        DICPATH=$extraction_directory hunspell -d "$dictionary" -l </dev/null
-    fi
+    for file in $affix_file $dictionary_file $readme_file
+        if not test -s "$file"
+            echo "The release archive is missing "(path basename $file)"." >&2; exit 1
+        end
+    end
 
-    temporary_affix="$destination/.$installed_name.aff.$$"
-    temporary_dictionary="$destination/.$installed_name.dic.$$"
-    temporary_readme="$destination/.README_$dictionary.txt.$$"
+    set expected_entries (sed -n '1p' $dictionary_file)
+    set actual_entries (math (wc -l < $dictionary_file) - 1); or exit
 
-    install -m 0644 "$affix_file" "$temporary_affix"
-    install -m 0644 "$dictionary_file" "$temporary_dictionary"
-    install -m 0644 "$readme_file" "$temporary_readme"
+    if not string match --quiet --regex '^[0-9]+$' $expected_entries
+        echo "Invalid dictionary entry count: $expected_entries" >&2; exit 1
+    end
 
-    mv -f "$temporary_affix" "$destination/$installed_name.aff"
-    mv -f "$temporary_dictionary" "$destination/$installed_name.dic"
-    mv -f "$temporary_readme" "$destination/README_$dictionary.txt"
-}
+    if test $actual_entries -ne $expected_entries
+        echo "$dictionary contains $actual_entries entries; expected $expected_entries." >&2; exit 1
+    end
 
-mkdir -p "$destination"
+    env DICPATH=$extraction_directory hunspell -d $dictionary -l </dev/null; or exit
+
+    install -m 0644 $affix_file $destination/$installed_name.aff; or exit
+    install -m 0644 $dictionary_file $destination/$installed_name.dic; or exit
+    install -m 0644 $readme_file $destination/README_$dictionary.txt; or exit
+end
+
 install_dictionary en_GB-large en_GB
 install_dictionary en_US-large en_US
 
-printf 'Installed English dictionaries %s in %s.\n' "$version" "$destination"
+echo "Installed dictionaries $dictionary_version in $destination"

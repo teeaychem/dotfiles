@@ -1,21 +1,14 @@
-#!/bin/sh
+#!/usr/bin/env fish
 
-set -eu
+set paths $argv
+test (count $paths) -gt 0; or set paths .
 
-if command -v fd >/dev/null 2>&1; then
-    if [ "$#" -eq 0 ]; then
-        set -- .
-    fi
+if command -q fd
+    fd -IH '(__pycache__|\.mypy_cache|\.pytest_cache)$' -t d $paths -x rm -rf --; or exit
 
-    fd -IH '(__pycache__|\.mypy_cache|\.pytest_cache)$' -t d "$@" -x rm -rf --
-    fd -IH '\.py[co]$' -t f "$@" -x rm --
-    exit
-fi
-
-if [ "$#" -eq 0 ]; then
-    set -- .
-fi
-
-find "$@" \
-    \( -type f \( -name '*.pyc' -o -name '*.pyo' \) -delete \) -o \
-    \( -type d \( -name '__pycache__' -o -name '.mypy_cache' -o -name '.pytest_cache' \) -prune -exec rm -rf -- {} + \)
+    fd -IH '\.py[co]$' -t f $paths -x rm --; or exit
+else
+    find $paths \
+        \( -type f \( -name '*.pyc' -o -name '*.pyo' \) -delete \) -o \
+        \( -type d \( -name __pycache__ -o -name '.mypy_cache' -o -name '.pytest_cache' \) -prune -exec rm -rf -- {} + \)
+end
