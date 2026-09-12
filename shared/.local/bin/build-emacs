@@ -1,177 +1,119 @@
-#!/bin/sh
-#
+#!/usr/bin/env fish
+
 # Environment:
-#   PREFIX  Installation prefix (default: ~/.local)
-#   JOBS    Number of parallel make jobs (default: online CPU count)
 #   CFLAGS  Optional compiler flags (default: Emacs configure defaults)
 #
 # Usage:
-#   build-emacs [--install-deps] [--bootstrap] [--aot]
+#   build-emacs [--install-dependencies] [--bootstrap]
 
-set -eu
+function usage
+    printf 'Usage: %s [--install-dependencies] [--bootstrap]\n' (status basename)
+end
 
-usage() {
-	printf 'Usage: %s [--install-deps] [--bootstrap] [--aot]\n' "${0##*/}"
-}
+argparse \
+    --max-args=0 \
+    install-dependencies \
+    bootstrap \
+    h/help \
+    -- $argv
+or begin
+    usage >&2
+    exit 2
+end
 
-install_deps=false
-make_target=
-native_compilation=yes
+if set -q _flag_help
+    usage
+    exit
+end
 
-while [ "$#" -gt 0 ]; do
-	case "$1" in
-	--install-deps | --install-dependencies)
-		install_deps=true
-		;;
-	--bootstrap)
-		make_target=bootstrap
-		;;
-	--aot)
-		native_compilation=aot
-		;;
-	-h | --help)
-		usage
-		exit
-		;;
-	*)
-		usage >&2
-		exit 2
-		;;
-	esac
-	shift
-done
+if not test -f configure.ac
+    echo 'Run build-emacs from the root of an Emacs source tree.' >&2
+    exit 1
+end
 
-install_dependencies() {
-	case "$(uname -s)" in
-	Darwin)
-		if ! command -v brew >/dev/null 2>&1; then
-			printf '%s\n' \
-				"Homebrew is required to install build dependencies." >&2
-			exit 1
-		fi
+set make_target
+set -q _flag_bootstrap; and set make_target bootstrap
 
-		brew install \
-			autoconf \
-			automake \
-			gnutls \
-			libgccjit \
-			pkg-config \
-			texinfo \
-			tree-sitter
-		;;
-	Linux)
-		if [ ! -r /etc/os-release ] ||
-			! grep -Eq '^ID="?ubuntu"?$' /etc/os-release; then
-			printf '%s\n' \
-				"Automatic dependency installation supports Ubuntu only." >&2
-			exit 1
-		fi
+set prefix $HOME/.local
+set jobs (getconf _NPROCESSORS_ONLN); or exit
+set native_compilation aot # Alternatives: yes, no
 
-		sudo apt-get update
+if set -q _flag_install_dependencies
+    switch (uname -s)
+        case Darwin
+            if not command -q brew
+                echo 'Homebrew is required to install build dependencies.' >&2
+                exit 1
+            end
 
-		# Native compilation needs libgccjit for the default GCC version.
-		gcc_package=$(
-			apt-cache depends --important gcc |
-				awk '$1 == "Depends:" && $2 ~ /^gcc-[0-9][0-9]*$/ { print $2; exit }'
-		)
+            brew install \
+                autoconf \
+                automake \
+                gnutls \
+                libgccjit \
+                pkg-config \
+                texinfo \
+                tree-sitter
+            or exit
+        case Linux
+            if not test -r /etc/os-release; or not grep -Eq '^ID="?ubuntu"?$' /etc/os-release
+                echo 'Automatic dependency installation supports Ubuntu only.' >&2
+                exit 1
+            end
 
-		if [ -z "$gcc_package" ]; then
-			printf '%s\n' \
-				"Could not determine Ubuntu's default GCC package." >&2
-			exit 1
-		fi
+            set -gx PKG_CONFIG /usr/bin/pkg-config
 
-		gcc_major=${gcc_package#gcc-}
-		libgccjit_dev="libgccjit-${gcc_major}-dev"
+            sudo apt-get update; or exit
 
-		if ! apt-cache show "$libgccjit_dev" >/dev/null 2>&1; then
-			printf '%s\n' \
-				"No libgccjit development package is available for ${gcc_package}." >&2
-			exit 1
-		fi
+            sudo apt-get install -y build-essential; or exit
 
-		sudo apt-get install -y \
-			autoconf \
-			automake \
-			build-essential \
-			"$gcc_package" \
-			"$libgccjit_dev" \
-			libgnutls28-dev \
-			libncurses-dev \
-			libsqlite3-dev \
-			libtree-sitter-dev \
-			libxml2-dev \
-			pkg-config \
-			texinfo \
-			zlib1g-dev
-		;;
-	*)
-		printf 'Unsupported operating system: %s\n' "$(uname -s)" >&2
-		exit 1
-		;;
-	esac
-}
+            # Native compilation needs libgccjit for the default GCC version.
+            set gcc_major (/usr/bin/gcc -dumpversion | string split .)[1]; or exit
+            set libgccjit_dev libgccjit-$gcc_major-dev
 
-if [ ! -f configure.ac ]; then
-	printf '%s\n' "Run ${0##*/} from the root of an Emacs source tree." >&2
-	exit 1
-fi
+            sudo apt-get install -y \
+                autoconf \
+                automake \
+                $libgccjit_dev \
+                libgnutls28-dev \
+                libncurses-dev \
+                libsqlite3-dev \
+                libtree-sitter-dev \
+                libxml2-dev \
+                pkg-config \
+                texinfo \
+                zlib1g-dev
+            or exit
+        case '*'
+            echo 'Unsupported operating system.' >&2
+            exit 1
+    end
+end
 
-emacs_major=$(
-	sed -n 's/^AC_INIT(\[GNU Emacs\], \[\([0-9][0-9]*\).*/\1/p' configure.ac
-)
+./autogen.sh; or exit
 
-case "$emacs_major" in
-"" | *[!0-9]*)
-	printf '%s\n' \
-		"Could not determine the Emacs version from configure.ac." >&2
-	exit 1
-	;;
-*)
-	if [ "$emacs_major" -lt 31 ]; then
-		printf 'Emacs 31 or newer is required; found major version %s.\n' \
-			"$emacs_major" >&2
-		exit 1
-	fi
-	;;
-esac
-
-if [ "$install_deps" = true ]; then
-	install_dependencies
-fi
-
-if [ "$install_deps" = true ] && [ "$(uname -s)" = Linux ] && [ -x /usr/bin/pkg-config ] && [ -z "${PKG_CONFIG:-}" ]; then
-	export PKG_CONFIG=/usr/bin/pkg-config
-fi
-
-if [ ! -x ./configure ]; then
-	./autogen.sh
-fi
-
-prefix="${PREFIX:-$HOME/.local}"
-jobs="${JOBS:-$(getconf _NPROCESSORS_ONLN)}"
-
-# For a hybrid terminal/X build, replace --without-x with:
-#   --with-x --with-x-toolkit=lucid
+# For a hybrid terminal/X build, replace --without-x with: --with-x --with-x-toolkit=lucid
 ./configure \
-	--prefix="$prefix" \
-	--program-transform-name='s/^ctags$/ctags.emacs/' \
-	--without-x \
-	--without-ns \
-	--without-pgtk \
-	--without-dbus \
-	--without-gsettings \
-	--with-sound=no \
-	--without-mailutils \
-	--with-gnutls \
-	--with-xml2 \
-	--with-sqlite3 \
-	--with-modules \
-	--with-tree-sitter \
-	--with-native-compilation="$native_compilation" \
-	--with-threads \
-	--with-file-notification=yes \
-	--without-compress-install
+    --prefix=$prefix \
+    --program-transform-name='s/^ctags$/ctags.emacs/' \
+    --without-x \
+    --without-ns \
+    --without-pgtk \
+    --without-dbus \
+    --without-gsettings \
+    --with-sound=no \
+    --without-mailutils \
+    --with-gnutls \
+    --with-xml2 \
+    --with-sqlite3 \
+    --with-modules \
+    --with-tree-sitter \
+    --with-native-compilation=$native_compilation \
+    --with-threads \
+    --with-file-notification=yes \
+    --without-compress-install
+or exit
 
-make ${make_target:+"$make_target"} -j"$jobs"
+make $make_target -j$jobs; or exit
+
 make install
