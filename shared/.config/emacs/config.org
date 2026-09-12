@@ -2913,7 +2913,7 @@ https://github.com/renzmann/treesit-auto
   :init
   (defun tempel-setup-capf ()
     "Offer Tempel completions after a character before the major mode CAPF."
-    (add-hook 'completion-at-point-functions (cape-capf-trigger #'tempel-complete ?\\) -90 t))
+    (add-hook 'completion-at-point-functions (cape-capf-trigger #'tempel-complete ?\/) -90 t))
 
   :custom
   (tempel-path (list (concat user-emacs-directory "tempel/common.eld")
