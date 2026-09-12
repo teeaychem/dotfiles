@@ -3,6 +3,7 @@ set -eu
 
 uv tool install pre-commit
 uv tool install ruff
+uv tool install snapper-fmt
 uv tool install ty
 
 tool_bin=$(uv tool dir --bin)
