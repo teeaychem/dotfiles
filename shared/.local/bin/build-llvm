@@ -1,0 +1,70 @@
+#!/usr/bin/env fish
+
+set compiler_launcher (command -s sccache ccache)[1]
+
+if not set -q LLVM_SOURCE_DIR; or test -z "$LLVM_SOURCE_DIR"
+    echo "LLVM_SOURCE_DIR is not set." >&2
+    exit 1
+end
+
+if not set -q LLVM_BUILD_DIR; or test -z "$LLVM_BUILD_DIR"
+    echo "LLVM_BUILD_DIR is not set." >&2
+    exit 1
+end
+
+if not set -q CMAKE_BUILD_TYPE; or test -z "$CMAKE_BUILD_TYPE"
+    set -gx CMAKE_BUILD_TYPE RelWithDebInfo
+end
+
+if not set -q LLVM_BUILD_JOBS; or test -z "$LLVM_BUILD_JOBS"
+    set -gx LLVM_BUILD_JOBS 8
+end
+
+argparse --max-args=1 \
+    target=+ \
+    -- $argv
+or exit 2
+
+set -q _flag_target; or set _flag_target all
+
+function configure_project
+    if not test -f "$LLVM_SOURCE_DIR/CMakeLists.txt"
+        echo "missing $LLVM_SOURCE_DIR/CMakeLists.txt" >&2
+        exit 1
+    end
+
+    cmake \
+        -G Ninja \
+        -S "$LLVM_SOURCE_DIR" \
+        -B "$LLVM_BUILD_DIR" \
+        -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" \
+        -DLLVM_ENABLE_PROJECTS=mlir \
+        -DLLVM_TARGETS_TO_BUILD=host \
+        -DLLVM_ENABLE_ASSERTIONS=ON \
+        -DLLVM_BUILD_EXAMPLES=ON \
+        -DCMAKE_C_COMPILER_LAUNCHER="$compiler_launcher" \
+        -DCMAKE_CXX_COMPILER_LAUNCHER="$compiler_launcher"
+end
+
+function build_project
+    cmake \
+        --build "$LLVM_BUILD_DIR" \
+        --target $_flag_target \
+        --parallel "$LLVM_BUILD_JOBS"
+end
+
+switch "$argv[1]"
+    case clean
+        rm -rf -- "$LLVM_BUILD_DIR"
+    case configure
+        configure_project
+    case build
+        configure_project
+        build_project
+    case ''
+        echo "an action is required" >&2
+        exit 2
+    case '*'
+        echo "unknown action: $argv[1]" >&2
+        exit 2
+end
