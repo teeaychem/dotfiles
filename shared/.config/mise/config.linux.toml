@@ -1,0 +1,5 @@
+[env._]
+path = [
+  "/home/linuxbrew/.linuxbrew/sbin",
+  "/home/linuxbrew/.linuxbrew/bin",
+]

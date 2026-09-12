@@ -1,0 +1,6 @@
+[env._]
+path = [
+  "/opt/homebrew/sbin",
+  "/opt/homebrew/bin",
+  "/usr/local/texlive/2026basic/bin/universal-darwin",
+]

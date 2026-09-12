@@ -1,0 +1,3 @@
+[dotfiles]
+"~/.config" = { source = "../darwin/.config", mode = "symlink-each", exclude = [".DS_Store"] }
+"~/.local/bin" = { source = "../darwin/.local/bin", mode = "symlink-each", exclude = [".DS_Store"] }

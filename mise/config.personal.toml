@@ -1,0 +1,8 @@
+[dotfiles]
+"~/.config/audiobookshelf" = { source = "../personal/.config/audiobookshelf", mode = "symlink-each" }
+"~/.config/invidious" = { source = "../personal/.config/invidious", mode = "symlink-each" }
+"~/.config/linkding" = { source = "../personal/.config/linkding", mode = "symlink-each" }
+"~/.config/navidrome.toml" = { source = "../personal/.config/navidrome.toml", mode = "symlink" }
+"~/.config/readeck" = { source = "../personal/.config/readeck", mode = "symlink-each" }
+"~/.local/bin/invidious-restart" = { source = "../personal/.local/bin/invidious-restart", mode = "symlink" }
+"~/Library/LaunchAgents/io.invidious.daily-restart.plist" = { source = "../personal/Library/LaunchAgents/io.invidious.daily-restart.plist", mode = "symlink" }

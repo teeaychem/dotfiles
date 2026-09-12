@@ -1,0 +1,3 @@
+[dotfiles]
+"~" = { source = "../shared", mode = "symlink-each", exclude = [".DS_Store"] }
+"~/.config/mise/miserc.toml" = { source = "../.miserc.toml", mode = "symlink" }

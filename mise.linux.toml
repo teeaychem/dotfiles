@@ -1,8 +1,0 @@
-[env._]
-path = [
-  "/home/linuxbrew/.linuxbrew/sbin",
-  "/home/linuxbrew/.linuxbrew/bin",
-]
-
-[dotfiles]
-"~/.local/bin" = { source = "linux/.local/bin", mode = "symlink-each", exclude = [".DS_Store"] }

@@ -14,16 +14,14 @@ brew bundle --file ~/dotfiles/brew/Brewfile.core
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 ```
 
-## Deploy configuration with Mise
+## Mise
 
 Mise deploys configuration into `$HOME` and loads the shared and platform-specific environment.
 
 ```sh
-mise trust ~/dotfiles/mise.toml
+mise trust ~/dotfiles/mise/config.toml
 mise --cd ~/dotfiles bootstrap dotfiles apply
-```
 
-```sh
 mise --cd ~/dotfiles --env personal bootstrap dotfiles apply
 ```
 
@@ -37,22 +35,13 @@ mise --cd ~/dotfiles bootstrap --only dotfiles --dry-run
 
 ## Use the environment
 
-Mise auto loads `mise.toml` and then `mise.macos.toml` or `mise.linux.toml`.
+The deployment config lives under `mise/`.
+It installs the regular global Mise config from `shared/.config/mise/`, which auto loads `config.macos.toml` or `config.linux.toml`.
 
 `--env personal` selects the opt-in personal overlay and composes with the deployment commands above.
 
-Keep machine-specific values in the untracked, highest-priority layer:
+Keep machine-specific values in the untracked `.config` local, highest-priority layer: `~/.config/mise/config.local.toml`
 
-```text
-~/.config/mise/config.local.toml
-```
-
-Other local configuration can coexist beside managed files:
-
-```text
-~/.config/git/config.local
-~/.config/ghostty/config.local
-```
 
 ## Use debugging tools
 

@@ -33,8 +33,9 @@ LESSHISTFILE = "{{xdg_state_home}}/less/history"
 KERAS_HOME = "{{xdg_data_home}}/keras"
 ELAN_HOME = "{{env.HOME}}/.local/opt/elan"
 
-REPOS_DIR = "{{env.HOME}}/repos"
-LLVM_SRC = "{{env.HOME}}/repos/llvm"
+
+REPOS_DIR = "{{ (env.HOME ~ '/repos') if os() == 'macos' else '' }}"
+LLVM_SRC = "{{ (env.REPOS_DIR ~ '/llvm') if env.REPOS_DIR != '' else '' }}"
 
 [env._]
 path = [
@@ -42,13 +43,6 @@ path = [
   "{{env.HOME}}/.local/bin",
   "{{env.ELAN_HOME}}/bin",
 ]
-
-[dotfiles]
-"~" = { source = "shared", mode = "symlink-each", exclude = [".DS_Store"] }
-"~/.config/mise/config.toml" = { source = "mise.toml", mode = "symlink" }
-"~/.config/mise/config.macos.toml" = { source = "mise.macos.toml", mode = "symlink" }
-"~/.config/mise/config.linux.toml" = { source = "mise.linux.toml", mode = "symlink" }
-"~/.config/mise/miserc.toml" = { source = ".miserc.toml", mode = "symlink" }
 
 [settings]
 experimental = true
