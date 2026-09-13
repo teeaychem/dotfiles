@@ -1,6 +1,0 @@
-#!/bin/sh
-set -eu
-
-repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-
-exec mise --cd="$repo_dir" bootstrap --only dotfiles "$@"
