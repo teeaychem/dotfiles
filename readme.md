@@ -36,7 +36,7 @@ brew bundle --file ~/dotfiles/brew/Brewfile.core
 ```sh
 ~/dotfiles/linux/.local/bin/install-apt-packages ~/dotfiles/shared/.config/apt/packages
 
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
 ## mise

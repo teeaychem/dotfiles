@@ -1652,16 +1652,16 @@ To highlight indentations
          ("r" . magit-refresh))
 
   :custom
-  ;; Delta is used for diffs
+  (magit-branch-direct-configure nil)
   (magit-diff-fontify-hunk nil)
-  (magit-diff-refine-hunk nil)
-  (magit-diff-paint-whitespace nil)
   (magit-diff-highlight-indentation nil)
   (magit-diff-highlight-trailing nil)
+  (magit-diff-paint-whitespace nil)
+  (magit-diff-refine-hunk nil)
   (magit-log-arguments '("--graph" "--decorate" "--color"))
-  ;; (magit-commit-show-diff nil)
-  (magit-branch-direct-configure nil)
+  (magit-log-section-commit-count 30)
   (magit-refresh-status-buffer nil)
+  ;; (magit-commit-show-diff nil)
 
   :config
   (defun my/magit-display-buffer (buffer)
@@ -1674,6 +1674,11 @@ To highlight indentations
            (slot . 0)
            (window-width . 0.33)))
       (magit-display-buffer-traditional buffer)))
+
+
+  (setf (alist-get 'recent magit-section-initial-visibility-alist) 'show)
+  (magit-add-section-hook 'magit-status-sections-hook #'magit-insert-unpushed-to-upstream #'magit-insert-unpushed-to-upstream-or-recent 'replace)
+  (magit-add-section-hook 'magit-status-sections-hook #'magit-insert-recent-commits #'magit-insert-unpushed-to-upstream t)
 
   (setq magit-display-buffer-function #'my/magit-display-buffer))
 #+end_src
