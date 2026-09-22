@@ -7,6 +7,19 @@
 [apply]
 	whitespace = fix
 
+[branch]
+	sort = -committerdate
+
+[column]
+	ui = auto
+
+[checkout]
+	defaultRemote = origin
+	workers = 0
+
+[commit]
+	verbose = true
+
 [core]
   autocrlf = false
 	excludesFile = ~/.config/git/ignore
@@ -19,8 +32,14 @@
 	dark = true
 	navigate = true
 
+[diff]
+	algorithm = histogram
+	colorMoved = plain
+	mnemonicPrefix = true
+
 [fetch]
 	prune = true
+	pruneTags = true
 	writeCommitGraph = true
 
 [feature]
@@ -35,6 +54,9 @@
 [init]
 	defaultBranch = "main"
 
+[help]
+	autocorrect = prompt
+
 [interactive]
 	diffFilter = "delta --color-only"
 
@@ -44,8 +66,14 @@
 [pull]
 	ff = only
 
+[push]
+	autoSetupRemote = true
+	negotiate = true
+	useForceIfIncludes = true
+
 [rebase]
 	autosquash = true
+	missingCommitsCheck = error
 
 [rerere]
 	enabled = true
@@ -56,7 +84,10 @@
   submodulesummary = true
 
 [submodule]
-	recurse = true
+	recurse = false
+
+[tag]
+	sort = version:refname
 
 [user]
 	useConfigOnly = true
