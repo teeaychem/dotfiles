@@ -1962,6 +1962,18 @@ Get the relevant package subdirectories from the llvm source
 
 (add-hook 'hack-local-variables-hook #'my/mlir-mode-for-extra-extension)
 
+(defun my/dirvish-apply-mlir-dir-locals ()
+  "Apply safe project-local MLIR extension rules to a Dirvish preview."
+  (when buffer-file-name
+    (let ((enable-dir-local-variables t)
+          (enable-local-variables :safe))
+      (hack-dir-local-variables))
+    (my/mlir-mode-for-extra-extension)
+    (when (derived-mode-p 'mlir-mode) (font-lock-ensure))))
+
+(with-eval-after-load 'dirvish
+  (add-hook 'dirvish-preview-setup-hook #'my/dirvish-apply-mlir-dir-locals))
+
 (defun my/llvm-file-executable-p (path)
   "Return non-nil when PATH names an executable file."
   (and (stringp path) (not (string= path "")) (file-executable-p path)))
@@ -2105,7 +2117,6 @@ Get the relevant package subdirectories from the llvm source
 #+end_src
 
 *** python
-
 **** pet
 
 #+begin_src emacs-lisp
