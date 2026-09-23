@@ -1,96 +1,96 @@
 [alias]
-	l = "log --graph --decorate --pretty=format:'%C(auto)%h %Cblue%ad %Cred%aN %C(auto)%d %n    %s' --date=human"
+  l = "log --graph --decorate --pretty=format:'%C(auto)%h %Cblue%ad %Cred%aN %C(auto)%d %n    %s' --date=human"
   # https://stackoverflow.com/questions/957928#comment9747528_957978
-	exec = "!exec "
-	root = rev-list --max-parents=0 HEAD
+  exec = "!exec "
+  root = rev-list --max-parents=0 HEAD
 
 [apply]
-	whitespace = fix
+  whitespace = fix
 
 [branch]
-	sort = -committerdate
+  sort = -committerdate
 
 [column]
-	ui = auto
+  ui = auto
 
 [checkout]
-	defaultRemote = origin
-	workers = 0
+  defaultRemote = origin
+  workers = 0
 
 [commit]
-	verbose = true
+  verbose = true
 
 [core]
   autocrlf = false
-	excludesFile = ~/.config/git/ignore
-	pager = "delta"
+  excludesFile = ~/.config/git/ignore
+  pager = "delta"
   # https://github.blog/2022-06-29-improve-git-monorepo-performance-with-a-file-system-monitor/
-	fsmonitor = true
-	untrackedcache = true
+  fsmonitor = true
+  untrackedcache = true
 
 [delta]
-	dark = true
-	navigate = true
+  dark = true
+  navigate = true
 
 [diff]
-	algorithm = histogram
-	colorMoved = plain
-	mnemonicPrefix = true
+  algorithm = histogram
+  colorMoved = plain
+  mnemonicPrefix = true
 
 [fetch]
-	prune = true
-	pruneTags = true
-	writeCommitGraph = true
+  prune = true
+  pruneTags = true
+  writeCommitGraph = true
 
 [feature]
-	manyFiles = true
+  manyFiles = true
 
 [filter "lfs"]
-	clean = "git-lfs clean -- %f"
-	process = "git-lfs filter-process"
-	required = true
-	smudge = "git-lfs smudge -- %f"
+  clean = "git-lfs clean -- %f"
+  process = "git-lfs filter-process"
+  required = true
+  smudge = "git-lfs smudge -- %f"
 
 [init]
-	defaultBranch = "main"
+  defaultBranch = "main"
 
 [help]
-	autocorrect = prompt
+  autocorrect = prompt
 
 [interactive]
-	diffFilter = "delta --color-only"
+  diffFilter = "delta --color-only"
 
 [merge]
-	conflictStyle = zdiff3
+  conflictStyle = zdiff3
 
 [pull]
-	ff = only
+  ff = only
 
 [push]
-	autoSetupRemote = true
-	negotiate = true
-	useForceIfIncludes = true
+  autoSetupRemote = true
+  negotiate = true
+  useForceIfIncludes = true
 
 [rebase]
-	autosquash = true
-	missingCommitsCheck = error
+  autosquash = true
+  missingCommitsCheck = error
 
 [rerere]
-	enabled = true
+  enabled = true
 
 [status]
-	branch = true
-	short = false
+  branch = true
+  short = false
   submodulesummary = true
 
 [submodule]
-	recurse = false
+  recurse = false
 
 [tag]
-	sort = version:refname
+  sort = version:refname
 
 [user]
-	useConfigOnly = true
+  useConfigOnly = true
 
 [include]
-	path = config.local
+  path = config.local
