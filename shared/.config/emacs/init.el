@@ -2,14 +2,6 @@
 
 ;;; Code:
 
-;; (setenv "LIBRARY_PATH"
-;; 	(mapconcat 'identity
-;; 	           '(
-;;                      "/opt/homebrew/opt/gcc/lib/gcc/current"
-;;                      "/opt/homebrew/opt/libgccjit/lib/gcc/current"
-;;                      "/opt/homebrew/opt/gcc/lib/gcc/current/gcc/aarch64-apple-darwin24/15")
-;;                    ":"))
-
 (require 'use-package)
 
 (defvar elpaca-installer-version 0.12)
@@ -87,7 +79,6 @@
 ;; Daemon mode starts its server after loading init.el.
 (unless (daemonp)
   (require 'server)
-  (unless (server-running-p)
-    (server-start)))
+  (unless (server-running-p) (server-start)))
 
 ;;; init.el ends here

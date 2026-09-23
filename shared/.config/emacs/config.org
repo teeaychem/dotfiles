@@ -1296,9 +1296,9 @@ To highlight indentations
   (indent-bars-treesit-support t)
   (indent-bars-ts-out-of-scope-color '(:face default :color "#808080"))
   (indent-bars-treesit-wrap '((python argument_list parameters
-				      list list_comprehension
-				      dictionary dictionary_comprehension
-				      parenthesized_expression subscript)
+                                      list list_comprehension
+                                      dictionary dictionary_comprehension
+                                      parenthesized_expression subscript)
                               (c argument_list parameter_list init_declarator
                                  parenthesized_expression)
                               (cpp argument_list parameter_list init_declarator
@@ -1306,7 +1306,7 @@ To highlight indentations
   (indent-bars-treesit-scope '((python function_definition
                                        class_definition
                                        for_statement
-				       if_statement
+                                       if_statement
                                        with_statement
                                        while_statement)
                                (cpp function_definition
