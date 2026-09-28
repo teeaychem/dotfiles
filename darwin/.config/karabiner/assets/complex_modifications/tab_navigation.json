@@ -1,12 +1,39 @@
 {
-  "title": "Mouse tab navigation",
+  "title": "Razer, Logitech MX, and Keychron M6 tab navigation",
   "rules": [
     {
-      "description": "Mouse side buttons: previous and next tab",
+      "description": "Razer, Logitech MX, and Keychron M6 side buttons: previous and next tab",
       "manipulators": [
         {
           "type": "basic",
           "from": { "pointing_button": "button5" },
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "vendor_id": 5426,
+                  "product_id": 156,
+                  "is_pointing_device": true
+                },
+                {
+                  "vendor_id": 13364,
+                  "product_id": 53311,
+                  "is_pointing_device": true
+                },
+                {
+                  "vendor_id": 1133,
+                  "product_id": 45109,
+                  "is_pointing_device": true
+                },
+                {
+                  "vendor_id": 1133,
+                  "product_id": 50504,
+                  "is_pointing_device": true
+                }
+              ]
+            }
+          ],
           "to": [
             {
               "key_code": "open_bracket",
@@ -17,6 +44,33 @@
         {
           "type": "basic",
           "from": { "pointing_button": "button4" },
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "vendor_id": 5426,
+                  "product_id": 156,
+                  "is_pointing_device": true
+                },
+                {
+                  "vendor_id": 13364,
+                  "product_id": 53311,
+                  "is_pointing_device": true
+                },
+                {
+                  "vendor_id": 1133,
+                  "product_id": 45109,
+                  "is_pointing_device": true
+                },
+                {
+                  "vendor_id": 1133,
+                  "product_id": 50504,
+                  "is_pointing_device": true
+                }
+              ]
+            }
+          ],
           "to": [
             {
               "key_code": "close_bracket",
