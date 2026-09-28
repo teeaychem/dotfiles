@@ -20,9 +20,9 @@ font-size = 14
 keybind = global:opt+super+space=toggle_quick_terminal
 keybind = opt+shift+super+p=toggle_command_palette
 
-keybind = super+0=unbind
-keybind = super++=unbind
-keybind = super+-=unbind
+keybind = super+0=reset_font_size
+keybind = super++=increase_font_size:1
+keybind = super+-=decrease_font_size:1
 keybind = super+==unbind
 
 # macOS owned
