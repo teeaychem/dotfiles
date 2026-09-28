@@ -1331,6 +1331,12 @@ To highlight indentations
   :demand t
 
   :config
+  (defun my/kkp-resync ()
+    "Re-negotiate KKP for the current terminal."
+    (interactive)
+    (kkp-disable-in-terminal)
+    (kkp-enable-in-terminal))
+
   (global-kkp-mode 1)
 
   ;; KKP preserves Shift on printable keys. Mirror the standard Meta
