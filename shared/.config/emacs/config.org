@@ -1710,14 +1710,26 @@ To highlight indentations
 
   (defun my/magit-diffstat-explicit-counts (original &rest args)
     "Display exact addition and deletion counts in Magit diffstats."
-    (let ((counts
-           (save-excursion
-             (cl-loop while (looking-at
-                             "^\\([-0-9]+\\)\t\\([-0-9]+\\)\t")
-                      collect (cons (match-string 1)
-                                    (match-string 2))
-                      do (forward-line 1))))
-          (beg (copy-marker (point))))
+    (let* ((counts
+            (save-excursion
+              (cl-loop while (looking-at "^\\([-0-9]+\\)\t\\([-0-9]+\\)\t")
+                       collect (cons (match-string 1) (match-string 2))
+                       do (forward-line 1))))
+           (added-width
+            (cl-loop for count in counts
+                     for added = (car count)
+                     when (string-match-p "\\`[0-9]+\\'" added)
+                     maximize (length added) into width
+                     finally return (or width 1)))
+           (removed-width
+            (cl-loop for count in counts
+                     for removed = (cdr count)
+                     when (string-match-p "\\`[0-9]+\\'" removed)
+                     maximize (length removed) into width
+                     finally return (or width 1)))
+           (added-format (format "+%%%ds" added-width))
+           (removed-format (format "-%%%ds" removed-width))
+           (beg (copy-marker (point))))
       (unwind-protect
           (prog1 (apply original args)
             (let ((end (copy-marker (point))))
@@ -1725,27 +1737,19 @@ To highlight indentations
                   (save-excursion
                     (goto-char beg)
                     (dolist (count counts)
-                      (when (re-search-forward
-                             magit-diff-statline-re end t)
+                      (when (re-search-forward magit-diff-statline-re end t)
                         ;; Keep Magit's normal representation for binary files.
                         (unless (member "-" (list (car count) (cdr count)))
-                          (delete-region (match-beginning 3)
-                                         (line-end-position))
+                          (delete-region (match-beginning 3) (line-end-position))
                           (insert
-                           (propertize (format "+%s" (car count))
-                                       'font-lock-face
-                                       'magit-diffstat-added)
+                           (propertize (format added-format (car count)) 'font-lock-face 'magit-diffstat-added)
                            " "
-                           (propertize (format "-%s" (cdr count))
-                                       'font-lock-face
-                                       'magit-diffstat-removed))))))
+                           (propertize (format removed-format (cdr count)) 'font-lock-face 'magit-diffstat-removed))))))
                 (set-marker end nil))))
         (set-marker beg nil))))
 
-  (unless (advice-member-p #'my/magit-diffstat-explicit-counts
-                           'magit-diff-wash-diffstat)
-    (advice-add 'magit-diff-wash-diffstat :around
-                #'my/magit-diffstat-explicit-counts))
+  (unless (advice-member-p #'my/magit-diffstat-explicit-counts 'magit-diff-wash-diffstat)
+    (advice-add 'magit-diff-wash-diffstat :around #'my/magit-diffstat-explicit-counts))
 
   (setf (alist-get 'recent magit-section-initial-visibility-alist) 'show)
   (magit-add-section-hook 'magit-status-sections-hook #'magit-insert-unpushed-to-upstream #'magit-insert-unpushed-to-upstream-or-recent 'replace)
