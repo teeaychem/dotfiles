@@ -1334,10 +1334,37 @@ To highlight indentations
   (defun my/kkp-resync ()
     "Re-negotiate KKP for the current terminal."
     (interactive)
-    (kkp-disable-in-terminal)
-    (kkp-enable-in-terminal))
+    (let ((terminal (kkp--selected-terminal)))
+      ;; Permit one further automatic recovery if this attempt fails.
+      (set-terminal-parameter terminal 'my/kkp-retry-attempted nil)
+      (kkp-disable-in-terminal)
+      (kkp-enable-in-terminal terminal)))
+
+  (defun my/kkp-retry-failed-setup (&rest _)
+    "Retry KKP once after an unsuccessful setup attempt."
+    (let* ((frame (selected-frame))
+           (terminal (frame-terminal frame))
+           (state (and (terminal-live-p terminal)
+                       (kkp--terminal-state terminal))))
+      (when (and global-kkp-mode
+                 state
+                 (not (display-graphic-p terminal))
+                 (frame-focus-state frame)
+                 (kkp--state-setup-visited state)
+                 (not (kkp--state-setup-started state))
+                 (not (kkp--state-enhancements state))
+                 (not (terminal-parameter
+                       terminal 'my/kkp-retry-attempted)))
+        (set-terminal-parameter terminal 'my/kkp-retry-attempted t)
+        (kkp-enable-in-terminal terminal))))
 
   (global-kkp-mode 1)
+
+  ;; Re-register by name so reloading this configuration remains idempotent.
+  (remove-function after-focus-change-function
+                   #'my/kkp-retry-failed-setup)
+  (add-function :after after-focus-change-function
+                #'my/kkp-retry-failed-setup)
 
   ;; KKP preserves Shift on printable keys. Mirror the standard Meta
   ;; punctuation bindings on their physical KKP events.
