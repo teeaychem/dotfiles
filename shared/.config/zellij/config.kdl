@@ -93,7 +93,7 @@ default_mode "locked"
 // Choose the path to the default shell that zellij will use for opening new panes
 // Default: $SHELL
 //
-// default_shell "fish"
+default_shell "zellij-shell"
 
 // The name of the default layout to load on startup
 default_layout "default"

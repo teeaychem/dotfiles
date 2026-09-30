@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if command -v fish >/dev/null 2>&1; then
+    exec fish -l "$@"
+fi
+
+if [ -n "${SHELL:-}" ] && [ -x "$SHELL" ]; then
+    exec "$SHELL" -l "$@"
+fi
+
+exec /bin/sh -l "$@"
