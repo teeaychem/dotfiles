@@ -1715,20 +1715,6 @@ To highlight indentations
               (cl-loop while (looking-at "^\\([-0-9]+\\)\t\\([-0-9]+\\)\t")
                        collect (cons (match-string 1) (match-string 2))
                        do (forward-line 1))))
-           (added-width
-            (cl-loop for count in counts
-                     for added = (car count)
-                     when (string-match-p "\\`[0-9]+\\'" added)
-                     maximize (length added) into width
-                     finally return (or width 1)))
-           (removed-width
-            (cl-loop for count in counts
-                     for removed = (cdr count)
-                     when (string-match-p "\\`[0-9]+\\'" removed)
-                     maximize (length removed) into width
-                     finally return (or width 1)))
-           (added-format (format "+%%%ds" added-width))
-           (removed-format (format "-%%%ds" removed-width))
            (beg (copy-marker (point))))
       (unwind-protect
           (prog1 (apply original args)
@@ -1742,9 +1728,9 @@ To highlight indentations
                         (unless (member "-" (list (car count) (cdr count)))
                           (delete-region (match-beginning 3) (line-end-position))
                           (insert
-                           (propertize (format added-format (car count)) 'font-lock-face 'magit-diffstat-added)
+                           (propertize (format "+%3s" (car count)) 'font-lock-face 'magit-diffstat-added)
                            " "
-                           (propertize (format removed-format (cdr count)) 'font-lock-face 'magit-diffstat-removed))))))
+                           (propertize (format "-%3s" (cdr count)) 'font-lock-face 'magit-diffstat-removed))))))
                 (set-marker end nil))))
         (set-marker beg nil))))
 
