@@ -182,7 +182,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :elpaca nil
 
   :bind (:prefix-map bookmark-prefix-map
-                     :prefix "C-c b")
+         :prefix "C-c b")
   (:map bookmark-prefix-map
         ("c" . consult-bookmark)
         ("d" . bookmark-delete)
@@ -1708,31 +1708,61 @@ To highlight indentations
            (window-width . 0.33)))
       (magit-display-buffer-traditional buffer)))
 
+  (defvar my/magit-diff-range-base nil)
+
+  (defun my/magit-diff-range-with-base (original &rest args)
+    "Call ORIGINAL with the current branch's configured base available."
+    (let* ((current (magit-get-current-branch))
+           (base (and current
+                      (or (magit-get-local-upstream-branch current)
+                          (magit-get-upstream-branch current))))
+           (my/magit-diff-range-base (unless (equal base current) base)))
+      (apply original args)))
+
+  (defun my/magit-diff-range-base-first (refs)
+    "Put the current branch's configured base first in diff range REF choices."
+    (if-let ((base (car (member my/magit-diff-range-base refs))))
+        (cons base (delete base refs))
+      refs))
+
+  (unless (advice-member-p #'my/magit-diff-range-with-base 'magit-diff-read-range-or-commit)
+    (advice-add 'magit-diff-read-range-or-commit :around #'my/magit-diff-range-with-base))
+
+  (unless (advice-member-p #'my/magit-diff-range-base-first 'magit-list-refnames)
+    (advice-add 'magit-list-refnames :filter-return #'my/magit-diff-range-base-first))
+
+  (defun my/magit-diffstat-counts ()
+    "Return addition and deletion counts from the numstat at point."
+    (save-excursion
+      (cl-loop while (looking-at "^\\([-0-9]+\\)\t\\([-0-9]+\\)\t")
+               collect (cons (match-string 1) (match-string 2))
+               do (forward-line 1))))
+
+  (defun my/magit-diffstat-rewrite-counts (counts beg end)
+    "Write COUNTS into rendered diffstat rows between BEG and END."
+    (save-excursion
+      (goto-char beg)
+      (dolist (count counts)
+        (when (re-search-forward magit-diff-statline-re end t)
+          (pcase-let ((`(,added . ,removed) count))
+            ;; Keep Magit's normal representation for binary files.
+            (unless (or (equal added "-") (equal removed "-"))
+              (delete-region (match-beginning 2) (line-end-position))
+              (insert
+               " | "
+               (propertize (format "+%3s" added) 'font-lock-face 'magit-diffstat-added)
+               " "
+               (propertize (format "-%3s" removed) 'font-lock-face 'magit-diffstat-removed))))))))
+
   (defun my/magit-diffstat-explicit-counts (original &rest args)
     "Display exact addition and deletion counts in Magit diffstats."
-    (let* ((counts
-            (save-excursion
-              (cl-loop while (looking-at "^\\([-0-9]+\\)\t\\([-0-9]+\\)\t")
-                       collect (cons (match-string 1) (match-string 2))
-                       do (forward-line 1))))
-           (beg (copy-marker (point))))
-      (unwind-protect
-          (prog1 (apply original args)
-            (let ((end (copy-marker (point))))
-              (unwind-protect
-                  (save-excursion
-                    (goto-char beg)
-                    (dolist (count counts)
-                      (when (re-search-forward magit-diff-statline-re end t)
-                        ;; Keep Magit's normal representation for binary files.
-                        (unless (member "-" (list (car count) (cdr count)))
-                          (delete-region (match-beginning 3) (line-end-position))
-                          (insert
-                           (propertize (format "+%3s" (car count)) 'font-lock-face 'magit-diffstat-added)
-                           " "
-                           (propertize (format "-%3s" (cdr count)) 'font-lock-face 'magit-diffstat-removed))))))
-                (set-marker end nil))))
-        (set-marker beg nil))))
+    (let ((counts (my/magit-diffstat-counts))
+          (beg (point)))
+      (prog1 (apply original args)
+        (let ((end (copy-marker (point))))
+          (unwind-protect
+              (my/magit-diffstat-rewrite-counts counts beg end)
+            (set-marker end nil))))))
 
   (unless (advice-member-p #'my/magit-diffstat-explicit-counts 'magit-diff-wash-diffstat)
     (advice-add 'magit-diff-wash-diffstat :around #'my/magit-diffstat-explicit-counts))
