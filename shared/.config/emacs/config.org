@@ -2950,6 +2950,7 @@ for rust dev
 
 #+begin_src emacs-lisp
 (use-package combobulate
+  :disabled
   :elpaca (:host github :repo "mickeynp/combobulate")
   :hook ((python-ts-mode
           json-ts-mode
