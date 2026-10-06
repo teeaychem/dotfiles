@@ -1879,12 +1879,29 @@ To highlight indentations
   (c-ts-mode-indent-style 'linux))
 #+end_src
 
+#+begin_src emacs-lisp
+(use-package cppinsights
+  :elpaca t
+  :commands cppinsights-run
+
+  :bind (:map c-family-prefix-map
+              ("i" . #'cppinsights-run)))
+#+end_src
+
 
 #+begin_src emacs-lisp
 (use-package cmake-ts-mode
   :elpaca nil
   :mode (("CMakeLists\\.txt\\'" . cmake-ts-mode)
          ("\\.cmake\\'" . cmake-ts-mode)))
+#+end_src
+
+*** forth
+
+#+begin_src emacs-lisp
+(use-package forth-mode
+  :elpaca t
+  :defer t)
 #+end_src
 
 *** lua
@@ -2827,6 +2844,7 @@ Both the symlink spelling and canonical path are included because compilation da
 
   (setf (alist-get '(c-ts-mode c++-ts-mode) eglot-server-programs nil nil #'equal) #'my/eglot-clangd)
 
+  (add-to-list 'eglot-server-programs '(fish-mode . ("fish-lsp" "start")))
   (add-to-list 'eglot-server-programs '(latex-mode . ("texlab")))
   (add-to-list 'eglot-server-programs '((cmake-ts-mode) . ("neocmakelsp" "stdio")))
   (add-to-list 'eglot-server-programs '((nix-mode nix-ts-mode) . ("nil")))
@@ -2975,7 +2993,6 @@ https://github.com/renzmann/treesit-auto
                         cpp
                         cmake
                         javascript
-                        jsdoc
                         json
                         lua
                         markdown

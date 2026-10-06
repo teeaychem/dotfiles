@@ -2,6 +2,8 @@
 # cask "feishin"
 
 
+brew "cppinsights"
+brew "fish-lsp"
 brew "llvm" # lldb-dap; keg-only, resolved by ~/.local/bin/lldb-dap
 brew "navidrome"
 brew "pass"
