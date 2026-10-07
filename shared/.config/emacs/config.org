@@ -2842,13 +2842,24 @@ Both the symlink spelling and canonical path are included because compilation da
                     "--fallback-style=None"
                     (concat "-j=" clangd-jobs)))))
 
+  (defun my/eglot-ty (&optional _interactive project)
+    "Return a project-aware ty command for Eglot.
+
+Run ty through uv when PROJECT belongs to a uv project, so each worktree uses its own project environment.
+Do not implicitly sync when starting Eglot."
+    (let ((default-directory (if project (project-root project) default-directory)))
+      (cond
+       ((and (executable-find "uv") (locate-dominating-file default-directory "uv.lock")) '("uv" "run" "--no-sync" "ty" "server"))
+       (t '("ty" "server")))))
+
+
   (setf (alist-get '(c-ts-mode c++-ts-mode) eglot-server-programs nil nil #'equal) #'my/eglot-clangd)
 
   (add-to-list 'eglot-server-programs '(fish-mode . ("fish-lsp" "start")))
   (add-to-list 'eglot-server-programs '(latex-mode . ("texlab")))
   (add-to-list 'eglot-server-programs '((cmake-ts-mode) . ("neocmakelsp" "stdio")))
   (add-to-list 'eglot-server-programs '((nix-mode nix-ts-mode) . ("nil")))
-  (add-to-list 'eglot-server-programs '((python-mode python-ts-mode) . ("ty" "server")))
+  (add-to-list 'eglot-server-programs '((python-base-mode :language-id "python") . my/eglot-ty))
   (add-to-list 'eglot-server-programs '(rust-ts-mode . ("rust-analyzer"
                                                         :initializationOptions (:check (:command "clippy")))))
   (add-to-list 'eglot-server-programs '((toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio")))
