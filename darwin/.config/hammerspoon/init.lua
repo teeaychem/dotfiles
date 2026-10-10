@@ -2,31 +2,38 @@
 -- ce.cancel_delay_seconds = 0.00125
 -- ce:start()
 
--- Hammerspoon's key-string map is not layout-aware for shifted punctuation.
-local tabShortcutKeyCodes = {
-  previous = 42,
-  next = 30,
-}
+local generatedShortcutTag = 0x48535441
+local eventUserData = hs.eventtap.event.properties.eventSourceUserData
 
-local function sendTabShortcut(direction)
-  local keyCode = tabShortcutKeyCodes[direction]
-  hs.eventtap.event.newKeyEvent({ "cmd", "shift" }, keyCode, true):post()
-  hs.eventtap.event.newKeyEvent({ "cmd", "shift" }, keyCode, false):post()
+-- Match the resulting character, including Shift, rather than a key position.
+local function sendCharacterShortcut(modifiers, character)
+  for keyCode = 0, 127 do
+    local down = hs.eventtap.event.newKeyEvent(modifiers, keyCode, true)
+    if down:getCharacters(true) == character then
+      local up = hs.eventtap.event.newKeyEvent(modifiers, keyCode, false)
+      down:setProperty(eventUserData, generatedShortcutTag):post()
+      up:setProperty(eventUserData, generatedShortcutTag):post()
+      return
+    end
+  end
 end
+
+local mouseShortcuts = {
+  [4] = { { "cmd", "shift" }, "}" },
+  [3] = { { "cmd", "shift" }, "{" },
+}
 
 mouseSideButtons = hs.eventtap.new({ hs.eventtap.event.types.otherMouseDown },
  function(e)
-   if e:getButtonState(4) then
-     sendTabShortcut("previous")
-     return true -- to supress original key
-   elseif e:getButtonState(3) then
-     sendTabShortcut("next")
-     return true -- to supress original key
+   for button, shortcut in pairs(mouseShortcuts) do
+     if e:getButtonState(button) then
+       sendCharacterShortcut(table.unpack(shortcut))
+       return true
+     end
    end
-
+   return false
  end
-)
-mouseSideButtons:start()
+):start()
 
 local function hasOnlyCommandModifier(e)
   local flags = e:getFlags()
@@ -35,6 +42,9 @@ end
 
 commandBracketRemap = hs.eventtap.new({ hs.eventtap.event.types.keyDown },
  function(e)
+   if e:getProperty(eventUserData) == generatedShortcutTag then
+     return false
+   end
    if not hasOnlyCommandModifier(e) then
      return false
    end
@@ -45,6 +55,24 @@ commandBracketRemap = hs.eventtap.new({ hs.eventtap.event.types.keyDown },
      return true
    elseif characters == "]" then
      hs.eventtap.keyStroke({ "shift" }, "9", 10)
+     return true
+   end
+
+   return false
+ end
+):start()
+
+-- Match the character produced by the source keyboard, retaining Shift's
+-- effect while checking the other modifiers separately.
+commandBraceRemap = hs.eventtap.new({ hs.eventtap.event.types.keyDown },
+ function(e)
+   if e:getProperty(eventUserData) == generatedShortcutTag then
+     return false
+   end
+   local flags = e:getFlags()
+   if flags.cmd and not (flags.ctrl or flags.alt or flags.fn)
+       and e:getCharacters(true) == "{" then
+     hs.eventtap.keyStrokes("(")
      return true
    end
 
