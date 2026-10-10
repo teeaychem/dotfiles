@@ -1244,9 +1244,6 @@ Supported values are `bottom' and `right'.")
 
 ** devdocs
 
-Install reference docsets with =C-c d i= (e.g. =cpp= and your Python version).
-=C-c d l= searches with the symbol at point prefilled; =C-u C-c d l= selects docsets.
-
 #+begin_src emacs-lisp
 (use-package devdocs
   :elpaca t
@@ -2068,6 +2065,64 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 *** llvm
 
 https://github.com/llvm/llvm-project.git
+
+**** lit tests
+
+#+begin_src emacs-lisp
+(use-package compile
+  :elpaca nil
+
+  :preface
+  (defvar-local my/lit-program "llvm-lit"
+    "Project lit runner, preferably the build's generated llvm-lit.
+Set an absolute executable path in .dir-locals.el when it is not on PATH.")
+
+  (defvar-local my/lit-test-directory nil
+    "Default lit suite directory for selection, remembered after each run.
+Set this in .dir-locals.el to suggest a directory outside the project build.")
+
+  (defun my/lit-select-test-directory (source-root)
+    "Choose a configured suite for SOURCE-ROOT, defaulting to the last choice."
+    (require 'project)
+    (let* ((project (project-current nil source-root))
+           (root (if project (project-root project) source-root))
+           (build (expand-file-name "build" root))
+           (configs (when (file-directory-p build)
+                      (directory-files-recursively build (rx string-start "lit.site.cfg.py" string-end))))
+           (directories (mapcar #'file-name-directory configs)))
+      (completing-read "Lit test directory: "
+                       (or directories (list source-root)) nil nil nil nil
+                       (or my/lit-test-directory (car directories) source-root))))
+
+  (defun my/lit-test-current-file (&optional choose-config)
+    "Save and run this lit test, displaying the input consumed by FileCheck.
+Choose a test directory each time.  With a prefix, also choose a different runner."
+    (interactive "P")
+    (unless buffer-file-name
+      (user-error "This buffer does not visit a test file"))
+    (let* ((source-root (or (locate-dominating-file buffer-file-name "lit.cfg.py") (user-error "No source lit.cfg.py found for this test")))
+           (runner (or (unless choose-config (executable-find my/lit-program)) (read-file-name "Project lit runner: " nil nil t)))
+           (test-directory (expand-file-name (my/lit-select-test-directory source-root)))
+           (test-path (expand-file-name (file-relative-name buffer-file-name source-root) test-directory)))
+      (setq runner (expand-file-name runner))
+      (setq-local my/lit-program runner
+                  my/lit-test-directory test-directory)
+      (save-buffer)
+      (compilation-start
+       (mapconcat #'shell-quote-argument (list runner "-a" "-j" "1" "-D" "FileCheck=FileCheck --dump-input=always --dump-input-filter=all" test-path) " ")
+       'compilation-mode
+       (lambda (_mode) "*lit*"))))
+
+  :bind ("C-c t l" . my/lit-test-current-file)
+
+  :hook
+  (compilation-mode . (lambda ()
+                        (when (equal (buffer-name) "*lit*")
+                          (require 'mlir-mode)
+                          (font-lock-add-keywords nil mlir-font-lock-keywords 'append)))))
+#+end_src
+
+**** modes and language servers
 
 Get the relevant package subdirectories from the llvm source
 
