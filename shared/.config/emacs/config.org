@@ -1241,6 +1241,43 @@ Supported values are `bottom' and `right'.")
   (helpful-max-buffers 7))
 #+end_src
 
+** devdocs
+
+Install reference docsets with =C-c d i= (e.g. =cpp= and your Python version).
+=C-c d l= searches with the symbol at point prefilled; =C-u C-c d l= selects docsets.
+
+#+begin_src emacs-lisp
+(use-package devdocs
+  :elpaca t
+
+  :preface
+  (defun my/devdocs-lookup (&optional ask-docs)
+    "Look up the symbol at point in installed language documentation.
+With a prefix argument, choose the docsets instead."
+    (interactive "P")
+    (require 'devdocs)
+    (unless (or ask-docs devdocs-current-docs)
+      (when-let* ((language (cond
+                            ((derived-mode-p 'python-base-mode) "python")
+                            ((derived-mode-p 'c++-mode 'c++-ts-mode) "cpp"))))
+        (setq-local devdocs-current-docs
+                    (seq-keep
+                     (lambda (doc)
+                       (let ((slug (alist-get 'slug doc)))
+                         (when (string-match-p (concat "\\`" language "\\(?:~.*\\)?\\'") slug)
+                           slug)))
+                     (devdocs--installed-docs)))))
+    (devdocs-lookup ask-docs (thing-at-point 'symbol t)))
+
+  :custom
+  (devdocs-window-select t)
+
+  :bind (:map eldoc-prefix-map
+              ("l" . my/devdocs-lookup)
+              ("i" . devdocs-install)
+              ("u" . devdocs-update-all)))
+#+end_src
+
 ** highlight indentation
 
 To highlight indentations
