@@ -2489,19 +2489,31 @@ Get the relevant package subdirectories from the llvm source
   :elpaca t
   :demand t
 
-  :init
-  ;; Configure the register formatting. This improves the register preview for `consult-register', etc. and the emacs built-ins.
-  (setq register-preview-delay 0.5)
-  (setq register-preview-function #'consult-register-format)
+  :preface
+  (defun my/consult-type (type &optional directory)
+    "Search ripgrep TYPE files in DIRECTORY with Consult."
+    (let ((consult-ripgrep-args (append (consult--build-args consult-ripgrep-args) (list (concat "--type=" type)))))
+      (consult-ripgrep directory)))
 
+  (defun my/consult-glob (glob &optional directory)
+    "Search files matching GLOB in DIRECTORY with Consult."
+    (let ((consult-ripgrep-args (append (consult--build-args consult-ripgrep-args) (list (concat "--glob=" glob)))))
+      (consult-ripgrep directory)))
+
+  :custom
+  (register-preview-delay 0.5)
+  (register-preview-function #'consult-register-format)
+  (xref-show-xrefs-function #'consult-xref)
+  (xref-show-definitions-function #'consult-xref)
+  (consult-preview-key '(:debounce 0.1 any))
+  (consult-narrow-key "<")
+
+  :init
   ;; Tweak the register preview window. This adds thin lines, sorting and hides the mode line of the window.
   (advice-add #'register-preview :override #'consult-register-window)
 
-  ;; Use Consult to select xref locations with preview
-  (setq xref-show-xrefs-function #'consult-xref)
-  (setq xref-show-definitions-function #'consult-xref)
-
   (define-prefix-command 'consult-register-prefix-map)
+  (define-prefix-command 'consult-filter-prefix-map)
 
   (bind-keys :prefix-map consult-prefix-map :prefix "C-c c")
 
@@ -2527,20 +2539,28 @@ Get the relevant package subdirectories from the llvm source
        ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
        ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
 
-   :map minibuffer-local-map
-       ("M-s" . consult-history)                 ;; orig. next-matching-history-element
-       ("M-r" . consult-history)                 ;; orig. previous-matching-history-element
-
    :map search-prefix-map
         ("d" . consult-fd) ;; Alternative: consult-find
         ("c" . consult-locate)
         ("G" . consult-grep)
         ("g" . consult-git-grep)
         ("r" . consult-ripgrep)
+        ("l" . consult-filter-prefix-map)
         ("s" . consult-line)
         ("L" . consult-line-multi)
         ("k" . consult-keep-lines)
         ("u" . consult-focus-lines)
+
+   :map consult-filter-prefix-map
+        ("." . (lambda (directory)
+                 (interactive "P")
+                 (let ((consult-ripgrep-args (append (consult--build-args consult-ripgrep-args) '("--hidden" "--glob=**/.*" "--glob=**/.*/**"))))
+                   (consult-ripgrep directory))))
+        ("p" . (lambda (directory) (interactive "P") (my/consult-type "py" directory)))
+        ("c" . (lambda (directory) (interactive "P") (my/consult-type "c" directory)))
+        ("C" . (lambda (directory) (interactive "P") (my/consult-type "cpp" directory)))
+        ("t" . (lambda (directory) (interactive "P") (my/consult-glob "*.td" directory)))
+        ("m" . (lambda (directory) (interactive "P") (my/consult-glob "*.mlir" directory)))
 
     :map goto-prefix-map
         ("a" . consult-org-agenda)
@@ -2565,11 +2585,7 @@ Get the relevant package subdirectories from the llvm source
     :map consult-register-prefix-map
         ("l" . consult-register-load)
         ("s" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
-        ("x" . consult-register))
-
-  :config
-  (setq consult-preview-key '(:debounce 0.1 any))
-  (setq consult-narrow-key "<"))
+        ("x" . consult-register)))
 #+end_src
 
 *** buffer sources
@@ -2578,17 +2594,17 @@ These buffers can be seen by using space.
 
 #+begin_src emacs-lisp
 (with-eval-after-load 'consult
-  (dolist (regex '("\\*Async-native-compile"
-                   "\\*EGLOT"
-                   "\\*Flymake"
-                   "\\*apheleia"
-                   "\\*envrc"
-                   "\\*elpaca"
-                   "clangd"
-                   "lsp"
-                   "magit"))
-    (add-to-list 'recentf-exclude regex)
-    (add-to-list 'consult-buffer-filter regex))
+  (add-to-list 'consult-buffer-filter
+               (rx string-start
+                   (or (seq "*" (or "Async-native-compile"
+                                    "EGLOT"
+                                    "Flymake"
+                                    "apheleia"
+                                    "envrc"
+                                    "elpaca"
+                                    "clangd"
+                                    "lsp"))
+                       (seq (optional "*") "magit" (any "-: ")))))
 
   (defvar my/consult-mode-buffer-sources nil)
 
