@@ -1,25 +1,53 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env -S fish --no-config
 
-# Homebrew keeps LLVM keg-only, so its adapter is not normally on PATH.
-if (( $+commands[brew] )); then
-    llvm_prefix=$(brew --prefix llvm 2>/dev/null)
-    if [[ -x $llvm_prefix/bin/lldb-dap ]]; then
-        exec "$llvm_prefix/bin/lldb-dap" "$@"
-    fi
-fi
+function try_adapter
+    # -ef compares file identity, including through symlinks to this wrapper.
+    if test -f "$argv[1]"; and test -x "$argv[1]"; and not test "$argv[1]" -ef (status filename)
+        exec $argv
+    end
+end
 
-for candidate in ${(f)"$(whence -pa lldb-dap)"}; do
-    [[ ${candidate:A} == ${0:A} ]] || exec "$candidate" "$@"
-done
+# Respect PATH first, skipping this wrapper wherever it appears.
+for directory in $PATH
+    try_adapter "$directory/lldb-dap" $argv
+end
 
-# Ubuntu installs versioned adapter names. LLVM renamed lldb-vscode in 18.
-for name in ${(On)${(k)commands[(I)lldb-dap-*]}}; do
-    exec "$commands[$name]" "$@"
-done
+switch (uname)
+    case Darwin
+        # Homebrew LLVM is keg-only; Apple's adapter is located via xcrun.
+        if command -q brew
+            set -l prefix (brew --prefix llvm 2>/dev/null)
+            if test -n "$prefix"
+                try_adapter "$prefix/bin/lldb-dap" $argv
+            end
+        end
+        if command -q xcrun
+            set -l adapter (xcrun --find lldb-dap 2>/dev/null)
+            if test -n "$adapter"
+                try_adapter "$adapter" $argv
+            end
+        end
 
-for name in ${(On)${(k)commands[(I)lldb-vscode-*]}}; do
-    exec "$commands[$name]" "$@"
-done
+    case Linux
+        # Distribution packages may expose only versioned names.
+        set -l best_version -1
+        set -l best_adapter
+        for directory in $PATH
+            for adapter in "$directory"/lldb-dap-*
+                test -f "$adapter"; and test -x "$adapter"; or continue
+                test "$adapter" -ef (status filename); and continue
+                set -l version (string replace -r '^.*/lldb-dap-' '' -- "$adapter")
+                string match -qr '^[0-9]+$' -- "$version"; or continue
+                if test "$version" -gt "$best_version"
+                    set best_version "$version"
+                    set best_adapter "$adapter"
+                end
+            end
+        end
+        if test -n "$best_adapter"
+            try_adapter "$best_adapter" $argv
+        end
+end
 
-print -u2 'lldb-dap: no LLDB debug adapter is available'
+echo 'lldb-dap: no LLDB debug adapter is available' >&2
 exit 127

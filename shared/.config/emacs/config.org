@@ -619,6 +619,7 @@ Supported values are `bottom' and `right'.")
      mark-ring global-mark-ring
      register-alist                   ; macros
      search-ring regexp-search-ring
+     dape-history
      compile-command))
   (savehist-autosave-interval 600)
 
@@ -3103,6 +3104,23 @@ https://github.com/renzmann/treesit-auto
 
 * dape
 
+Start with =C-c C-d d= (or =M-x dape=), then enter e.g.
+=lldb-dap :program "build/debug/app" :args []=.
+Launch history supplies subsequent defaults.
+
+For a project-specific launch/build, set =dape-command= in =.dir-locals.el=, e.g:
+
+#+begin_src emacs-lisp :tangle no
+((nil . ((dape-command . (lldb-dap
+                         :program "build/debug/app"
+                         :args []
+                         compile "cmake --build build/debug")))))
+#+end_src
+
+Paths are relative to the project root.
+Build with debug symbols (e.g. =-g -O0=).
+Dape launches only after a successful build when =compile= is supplied.
+
 #+begin_src emacs-lisp
 (use-package dape
   :after eglot
@@ -3114,6 +3132,12 @@ https://github.com/renzmann/treesit-auto
   ;; If you do not want to use any prefix, set it to nil.
   (setq dape-key-prefix "\C-c\C-d")
 
+  :custom
+  (dape-buffer-window-arrangement 'right)
+  (dape-info-variable-table-aligned t)
+  (dape-history-add 'expanded)
+  (dape-inlay-hints t)
+
   :hook
   ;; Save breakpoints on quit
   (kill-emacs . dape-breakpoint-save)
@@ -3121,14 +3145,11 @@ https://github.com/renzmann/treesit-auto
   :config
   (dape-breakpoint-load)  ;; Restore these during startup, before a debugging session is requested.
   (dape-breakpoint-global-mode 1)  ;; Turn on global bindings for setting breakpoints with mouse
-  ;; (setq dape-buffer-window-arrangement 'right)  ;; Info buffers to the right
-  ;; (setq dape-buffer-window-arrangement 'gud)  ;; Info buffers like gud (gdb-mi)
-  ;; (setq dape-info-hide-mode-line nil)
-  ;; (add-hook 'dape-display-source-hook 'pulse-momentary-highlight-one-line)  ;; Pulse source line (performance hit)
 
-  (add-hook 'dape-start-hook (lambda () (save-some-buffers t t)))  ;; Save modified file buffers before starting a debug session.
-  ;; (add-hook 'dape-compile-hook 'kill-buffer)  ;; Kill compile buffer on build success
-  (setq dape-inlay-hints t))
+  (add-hook 'dape-display-source-hook #'pulse-momentary-highlight-one-line)
+
+  ;; Save modified file buffers before starting a debug session.
+  (add-hook 'dape-start-hook (lambda () (save-some-buffers t t))))
 #+end_src
 
 
