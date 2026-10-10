@@ -9,6 +9,16 @@ grep="grep --color=auto"
 ll="ls -lh"
 treea="tree -a --gitignore -I .git"
 
+# Git
+g="git"
+gs="git status --short --branch"
+gd="git diff"
+gds="git diff --staged"
+gl="git l"
+gb="git branch"
+gsw="git switch"
+gwt="git worktree"
+
 # Python
 py="python3"
 python="python3"
