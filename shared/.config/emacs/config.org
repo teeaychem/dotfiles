@@ -997,13 +997,9 @@ Supported values are `bottom' and `right'.")
                      (cleanup))))))
           ((error quit) (cleanup) (signal (car err) (cdr err)))))))
 
-  (defun my/python-apheleia-formatters ()
-    (if (executable-find "yapf")
-        '(yapf ruff-isort)
-      '(ruff-isort my-ruff)))
   (setf (alist-get 'my-ruff apheleia-formatters) '("ruff" "format" "--silent" "--line-length" "320" "--stdin-filename" filepath "-"))
-  (setf (alist-get 'python-mode apheleia-mode-alist) (my/python-apheleia-formatters))
-  (setf (alist-get 'python-ts-mode apheleia-mode-alist) (my/python-apheleia-formatters))
+  (setf (alist-get 'python-mode apheleia-mode-alist) '(ruff-isort my-ruff))
+  (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff-isort my-ruff))
   (setf (alist-get 'js-ts-mode apheleia-mode-alist) '(prettier))
   (setf (alist-get 'typescript-ts-mode apheleia-mode-alist) '(prettier))
   (setf (alist-get 'tsx-ts-mode apheleia-mode-alist) '(prettier))
@@ -1743,28 +1739,20 @@ To highlight indentations
            (window-width . 0.33)))
       (magit-display-buffer-traditional buffer)))
 
-  (defvar my/magit-diff-range-base nil)
-
   (defun my/magit-diff-range-with-base (original &rest args)
-    "Call ORIGINAL with the current branch's configured base available."
+    "Call ORIGINAL with the current branch's upstream first in ref choices."
     (let* ((current (magit-get-current-branch))
-           (base (and current
-                      (or (magit-get-local-upstream-branch current)
-                          (magit-get-upstream-branch current))))
-           (my/magit-diff-range-base (unless (equal base current) base)))
-      (apply original args)))
+           (base (and current (or (magit-get-local-upstream-branch current) (magit-get-upstream-branch current))))
+           (list-refnames (symbol-function 'magit-list-refnames)))
+      (cl-letf (((symbol-function 'magit-list-refnames)
+                 (lambda (&rest ref-args)
+                   (let* ((refs (apply list-refnames ref-args))
+                          (preferred (unless (equal base current) (car (member base refs)))))
+                     (cond (preferred (cons preferred (remove preferred refs)))
+                           (t refs))))))
+        (apply original args))))
 
-  (defun my/magit-diff-range-base-first (refs)
-    "Put the current branch's configured base first in diff range REF choices."
-    (if-let ((base (car (member my/magit-diff-range-base refs))))
-        (cons base (delete base refs))
-      refs))
-
-  (unless (advice-member-p #'my/magit-diff-range-with-base 'magit-diff-read-range-or-commit)
-    (advice-add 'magit-diff-read-range-or-commit :around #'my/magit-diff-range-with-base))
-
-  (unless (advice-member-p #'my/magit-diff-range-base-first 'magit-list-refnames)
-    (advice-add 'magit-list-refnames :filter-return #'my/magit-diff-range-base-first))
+  (advice-add 'magit-diff-read-range-or-commit :around #'my/magit-diff-range-with-base)
 
   (defun my/magit-diffstat-counts ()
     "Return addition and deletion counts from the numstat at point."
@@ -1773,12 +1761,12 @@ To highlight indentations
                collect (cons (match-string 1) (match-string 2))
                do (forward-line 1))))
 
-  (defun my/magit-diffstat-rewrite-counts (counts beg end)
-    "Write COUNTS into rendered diffstat rows between BEG and END."
+  (defun my/magit-diffstat-rewrite-counts (counts)
+    "Write COUNTS into rendered diffstat rows in the accessible region."
     (save-excursion
-      (goto-char beg)
+      (goto-char (point-min))
       (dolist (count counts)
-        (when (re-search-forward magit-diff-statline-re end t)
+        (when (re-search-forward magit-diff-statline-re nil t)
           (pcase-let ((`(,added . ,removed) count))
             ;; Keep Magit's normal representation for binary files.
             (unless (or (equal added "-") (equal removed "-"))
@@ -1794,13 +1782,11 @@ To highlight indentations
     (let ((counts (my/magit-diffstat-counts))
           (beg (point)))
       (prog1 (apply original args)
-        (let ((end (copy-marker (point))))
-          (unwind-protect
-              (my/magit-diffstat-rewrite-counts counts beg end)
-            (set-marker end nil))))))
+        (save-restriction
+          (narrow-to-region beg (point))
+          (my/magit-diffstat-rewrite-counts counts)))))
 
-  (unless (advice-member-p #'my/magit-diffstat-explicit-counts 'magit-diff-wash-diffstat)
-    (advice-add 'magit-diff-wash-diffstat :around #'my/magit-diffstat-explicit-counts))
+  (advice-add 'magit-diff-wash-diffstat :around #'my/magit-diffstat-explicit-counts)
 
   (setf (alist-get 'recent magit-section-initial-visibility-alist) 'show)
   (magit-add-section-hook 'magit-status-sections-hook #'magit-insert-unpushed-to-upstream #'magit-insert-unpushed-to-upstream-or-recent 'replace)
@@ -1883,11 +1869,6 @@ To highlight indentations
          ("\\.\\(?:cc\\|cpp\\|cxx\\|h\\|hh\\|hpp\\|hxx\\)\\.inc\\'" . c++-ts-mode)
          ("\\.inc\\'" . c++-ts-mode)
          ("\\.def\\'" . c++-ts-mode))
-
-  :bind (:map c-ts-base-mode-map
-              :prefix-map c-family-prefix-map
-              :prefix "C-c m"
-              ("=" . #'apheleia-format-buffer))
 
   :bind (:map c-family-prefix-map
               :prefix-map c-family-build-prefix-map
@@ -2324,6 +2305,15 @@ Get the relevant package subdirectories from the llvm source
 (use-package pet
   :elpaca t
 
+  :preface
+  (defun my/python-apheleia-setup ()
+    "Use PATH-based formatters rather than PET's executable overrides."
+    (require 'apheleia)
+    (kill-local-variable 'apheleia-formatters)
+    (setq-local apheleia-formatter
+                (cond ((executable-find "yapf") '(yapf ruff-isort))
+                      (t '(ruff-isort my-ruff)))))
+
   :custom
   (python-shell-interpreter "python")
   ;; PET can parse pyproject.toml/pixi.toml/hatch.toml and YAML config files with external tools such as dasel, or optional Elisp parsers.
@@ -2340,6 +2330,7 @@ Get the relevant package subdirectories from the llvm source
               ("v" . pet-verify-setup))
 
   :init
+  (add-hook 'pet-after-buffer-local-vars-setup #'my/python-apheleia-setup)
   (add-hook 'python-base-mode-hook #'pet-mode -10))
 #+end_src
 
@@ -2731,31 +2722,17 @@ These buffers can be seen by using space.
   ;; (corfu-on-exact-match nil)
 
   :config
-  (require 'cl-lib)
-
-  (defun my/corfu-add-tty-child-frame-terminal (params)
-    "Add an explicit terminal to Corfu tty child frame PARAMS.
-This avoids stale `tty' frame parameters on emacsclient frames causing
-Corfu's child frame and minibuffer window to be created on different
-terminals."
-    (let ((parent (cdr (assq 'parent-frame params))))
-      (if (and parent
-               (frame-live-p parent)
-               (not (display-graphic-p parent))
-               (not (assq 'terminal params))
-               (not (assq 'tty params)))
-          (cons (cons 'terminal (frame-terminal parent)) params)
-        params)))
-
   (defun my/corfu-make-frame-with-explicit-tty-terminal (orig &rest args)
-    "Call ORIG with Corfu tty child frames pinned to their parent terminal."
-    (let ((make-frame-function (symbol-function #'make-frame)))
-      (cl-letf (((symbol-function #'make-frame)
-                 (lambda (&optional params) (funcall make-frame-function (my/corfu-add-tty-child-frame-terminal params)))))
-        (apply orig args))))
+    "Call ORIG with Corfu tty child frames pinned to their parent terminal.
+An explicit terminal avoids stale `tty' parameters on emacsclient frames."
+    (let* ((parent (window-frame))
+           (corfu--frame-parameters
+            (if (display-graphic-p parent)
+                corfu--frame-parameters
+              (cons (cons 'terminal (frame-terminal parent)) corfu--frame-parameters))))
+      (apply orig args)))
 
-  (advice-remove #'corfu--make-frame #'my/corfu-make-frame-with-explicit-tty-terminal)
-  (advice-add    #'corfu--make-frame :around #'my/corfu-make-frame-with-explicit-tty-terminal)
+  (advice-add #'corfu--make-frame :around #'my/corfu-make-frame-with-explicit-tty-terminal)
 
   (global-corfu-mode 1))
 #+end_src
@@ -2827,11 +2804,15 @@ terminals."
   (let ((name (file-name-nondirectory (directory-file-name candidate))))
     (and (string-prefix-p "." name) (not (member name '("." ".."))))))
 
-(defun my/vertico-sort-dotfiles-last (candidates)
-  (let (regular dotfiles)
-    (dolist (candidate (vertico-sort-alpha candidates))
-      (if (my/vertico-dotfile-p candidate) (push candidate dotfiles) (push candidate regular)))
-    (nconc (nreverse regular) (nreverse dotfiles))))
+(defun my/vertico-sort-dotfiles-last (sorter candidates)
+  "Run SORTER on CANDIDATES, then move dotfiles last without reordering either group."
+  (let ((groups (seq-group-by #'my/vertico-dotfile-p (funcall (or sorter #'identity) candidates))))
+    (append (alist-get nil groups) (alist-get t groups))))
+
+(defun my/vertico-file-sort-function (sorter)
+  "Decorate SORTER with dotfiles-last ordering only for file completion."
+  (cond ((eq (vertico--metadata-get 'category) 'file) (apply-partially #'my/vertico-sort-dotfiles-last sorter))
+        (t sorter)))
 
 (use-package vertico
   :elpaca t
@@ -2842,9 +2823,9 @@ terminals."
   (vertico-count 16) ;; Show more candidates
   (vertico-resize t) ;; Grow and shrink the Vertico minibuffer
   (vertico-cycle nil)
-  (vertico-multiform-categories '((file (vertico-sort-function . my/vertico-sort-dotfiles-last))))
 
   :config
+  (advice-add 'vertico--sort-function :filter-return #'my/vertico-file-sort-function)
   (vertico-mode 1)
   (vertico-multiform-mode 1))
 #+end_src
