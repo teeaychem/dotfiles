@@ -51,10 +51,10 @@ commandBracketRemap = hs.eventtap.new({ hs.eventtap.event.types.keyDown },
 
    local characters = e:getCharacters()
    if characters == "[" then
-     hs.eventtap.keyStroke({ "shift" }, "8", 10)
+     hs.eventtap.keyStrokes("(")
      return true
    elseif characters == "]" then
-     hs.eventtap.keyStroke({ "shift" }, "9", 10)
+     hs.eventtap.keyStrokes(")")
      return true
    end
 
@@ -79,9 +79,6 @@ commandBraceRemap = hs.eventtap.new({ hs.eventtap.event.types.keyDown },
    return false
  end
 ):start()
-
--- hs.hotkey.bind({'cmd'}, "[", hs.eventtap.keyStroke({"shift"}, "8"), nil, hs.eventtap.keyStroke({"shift"}, "8"))
-
 
 -- Use to figure out key
 -- local inspect = require('inspect')
