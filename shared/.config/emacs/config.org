@@ -1870,15 +1870,9 @@ To highlight indentations
          ("\\.inc\\'" . c++-ts-mode)
          ("\\.def\\'" . c++-ts-mode))
 
-  :bind (:map c-family-prefix-map
-              :prefix-map c-family-build-prefix-map
-              :prefix "b"
-              ("c" . #'compile)
-              ("p" . #'project-compile)
-              ("r" . #'recompile))
-
-  :bind (:map c-family-prefix-map
-              ("l" . #'my/c-set-fill-column-from-clang-format))
+  :bind (:map c-ts-base-mode-map
+            :prefix-map c-family-prefix-map
+            :prefix "C-c m")
 
   :bind (:map c-family-prefix-map
               :prefix-map c-family-file-prefix-map
