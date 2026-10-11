@@ -1,0 +1,61 @@
+#!/bin/sh
+# Show changes since this branch diverged from its original base.
+set -eu
+
+case "${1:-}" in
+    -h|--help)
+        echo 'Usage: git diff-base [base] [diff options]'
+        echo 'Infers the base from creation/checkout reflogs, then falls back to origin/HEAD.'
+        exit 0
+        ;;
+esac
+
+base=
+if [ "$#" -gt 0 ]; then
+    case "$1" in
+        -*) ;;
+        *) base=$1; shift ;;
+    esac
+fi
+
+if [ -z "$base" ]; then
+    branch=$(git symbolic-ref --quiet --short HEAD) || {
+        echo 'Detached HEAD: specify a base with git diff-base <base>.' >&2
+        exit 1
+    }
+
+    # Keep the oldest creation entry, not later resets or checkouts.
+    creation=$(git reflog show --date=unix --format='%gs%x09%gD' "refs/heads/$branch" |
+        awk -F '\t' '$1 ~ /^branch: Created from / { entry = $0 } END { print entry }')
+    if [ -n "$creation" ]; then
+        base=$(printf '%s\n' "$creation" | awk -F '\t' '{ sub(/^branch: Created from /, "", $1); print $1 }')
+        if [ "$base" = HEAD ]; then
+            created=${creation##*@\{}
+            created=${created%\}}
+            base=$(git reflog show --date=unix --format='%gD%x09%gs' HEAD |
+                awk -F '\t' -v created="$created" -v branch="$branch" '
+                    $1 == "HEAD@{" created "}" && $2 ~ /^checkout: moving from / {
+                        source = $2
+                        sub(/^checkout: moving from /, "", source)
+                        suffix = " to " branch
+                        if (substr(source, length(source) - length(suffix) + 1) == suffix) {
+                            base = substr(source, 1, length(source) - length(suffix))
+                        }
+                    }
+                    END { print base }')
+        fi
+    fi
+
+    # The original branch may have been deleted, or its reflog expired.
+    if [ -z "$base" ] || ! git rev-parse --verify --quiet "$base^{commit}" >/dev/null; then
+        base=$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD) || base=
+        if [ -z "$base" ]; then
+            echo 'Cannot infer a base: specify one with git diff-base <base>.' >&2
+            exit 1
+        fi
+        echo "Creation base unavailable; using remote default: $base" >&2
+    fi
+fi
+
+echo "Diff base: $base" >&2
+git diff "$@" "$base...HEAD"
