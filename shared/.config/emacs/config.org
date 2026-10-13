@@ -569,6 +569,7 @@ Supported values are `bottom' and `right'.")
 
   :custom
   (recentf-auto-cleanup 300) ;; Removes duplicates, excluded paths, and files that no longer exist.
+  (recentf-show-messages nil)
   (recentf-max-saved-items 200)
   (recentf-exclude `(,(regexp-quote (expand-file-name package-user-dir))
                      ":" ;; tramp
