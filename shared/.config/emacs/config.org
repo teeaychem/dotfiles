@@ -1311,8 +1311,12 @@ To highlight indentations
 
   :config
   (defun my/safe-enable-indent-bars ()
-    "Safely activate indent-bars only in active code buffers."
-    (when (derived-mode-p 'prog-mode) (indent-bars-mode 1)))
+    "Activate indent-bars in code buffers, excluding internal helper buffers."
+    ;; Org reuses hidden buffers to fontify source blocks.
+    ;; Enabling indent-bars there can leave font-lock-fontified set after erasing the contents.
+    ;; This leads to subsequent font-lock-ensure calls doing nothing.
+    (when (and (derived-mode-p 'prog-mode) (not (string-prefix-p " " (buffer-name))))
+      (indent-bars-mode 1)))
 
   (add-hook 'tty-setup-hook (lambda () (dolist (buf (buffer-list)) (with-current-buffer buf (my/safe-enable-indent-bars)))))
 
@@ -1361,7 +1365,7 @@ To highlight indentations
   (indent-bars-treesit-scope-selector 'outermost)
   (indent-bars-treesit-scope-min-lines 3)
 
-  :hook (prog-mode . indent-bars-mode))
+  :hook (prog-mode . my/safe-enable-indent-bars))
 #+end_src
 
 ** kkp
@@ -2407,7 +2411,6 @@ Get the relevant package subdirectories from the llvm source
 
   (org-adapt-indentation nil) ;; prevent demoting heading also shifting text inside sections
   (org-catch-invisible-edits 'show-and-error) ;; if editing in an invisible region, complain.
-  (org-confirm-babel-evaluate t) ;; ask when evaluating every src block
 
   (org-default-notes-file (expand-file-name "org_capture.org" org-directory))
 
@@ -2442,12 +2445,28 @@ Get the relevant package subdirectories from the llvm source
   (org-insert-heading-respect-content t)
 
   :config
+  (dolist (lang '("C++" "cpp"))
+    (setf (alist-get lang org-src-lang-modes nil nil #'equal) 'c++-ts))
+  (keymap-unset org-mode-map "<backtab>" 'remove))
+#+end_src
+
+** org-babel
+
+#+begin_src emacs-lisp
+(use-package ob
+  :elpaca nil
+  :after org
+
+  :custom
+  (org-confirm-babel-evaluate t) ;; ask when evaluating every src block
+  (org-babel-C++-compiler "clang++")
+
+  :config
   (org-babel-do-load-languages 'org-babel-load-languages
                                '((C . t)
                                  (emacs-lisp . t)
                                  (org . t)
-                                 (scheme . t)))
-  (keymap-unset org-mode-map "<backtab>" 'remove))
+                                 (scheme . t))))
 #+end_src
 
 ** vulpea
