@@ -1273,8 +1273,25 @@ With a prefix argument, choose the docsets instead."
                      (devdocs--installed-docs)))))
     (devdocs-lookup ask-docs (thing-at-point 'symbol t)))
 
+  (defun my/devdocs-render-setup ()
+    "Use theme colours, bounded text width and visible table borders."
+    (setq-local shr-use-colors nil
+                shr-width nil
+                shr-max-width 100
+                shr-table-horizontal-line ?─
+                shr-table-vertical-line ?│
+                shr-table-corner ?┼)
+    (face-remap-add-relative
+     'shr-code '(:inherit font-lock-constant-face :background "#181825")))
+
   :custom
   (devdocs-window-select t)
+
+  :hook
+  (devdocs-mode . my/devdocs-render-setup)
+
+  :custom-face
+  (devdocs-code-block ((t (:background "#181825" :extend t))))
 
   :bind (:map eldoc-prefix-map
               ("l" . my/devdocs-lookup)
