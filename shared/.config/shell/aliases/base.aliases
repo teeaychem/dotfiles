@@ -24,3 +24,9 @@ py="python3"
 python="python3"
 pyfind='find . -name "*.py"'
 pygrep='rg -g "*.py" -g "!**/site-packages/"'
+
+# C++
+cxx20="clang++ -std=c++20 -Wall -Wextra"
+cxx23="clang++ -std=c++23 -Wall -Wextra"
+cxx20dbg="clang++ -std=c++20 -Wall -Wextra -g -O0"
+cxx23dbg="clang++ -std=c++23 -Wall -Wextra -g -O0"
