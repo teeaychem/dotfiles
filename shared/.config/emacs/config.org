@@ -3231,6 +3231,8 @@ Dape launches only after a successful build when =compile= is supplied.
   (dape-inlay-hints t)
 
   :hook
+  ;; Close the successful build buffer before arranging debugger windows.
+  (dape-compile . kill-buffer)
   ;; Save breakpoints on quit
   (kill-emacs . dape-breakpoint-save)
 
