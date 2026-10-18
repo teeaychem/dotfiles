@@ -1,0 +1,37 @@
+#!/usr/bin/env fish
+
+# Build a CMake target and run the executable with the same filename.
+# Runs from the caller's working directory; CMake must already be configured.
+
+argparse --stop-nonopt 'B/build-dir=' -- $argv
+or exit 2
+
+set -l target $argv[1]
+set -l program_args $argv[2..-1]
+
+if not set -q target[1]
+    echo 'Usage: cmake-run [-B BUILD_DIR] TARGET [PROGRAM_ARGS...]' >&2
+    exit 2
+end
+
+set -l build_dir build
+if set -q _flag_build_dir
+    set build_dir "$_flag_build_dir"
+end
+
+cmake --build "$build_dir" --parallel --target "$target"
+or exit
+
+set -l executables (find "$build_dir" -type f -name "$target" -perm -u+x -print0 | string split0)
+
+switch (count $executables)
+    case 0
+        echo "cmake-run: no executable named '$target' found in '$build_dir'." >&2
+        exit 1
+    case 1
+        exec "$executables[1]" $program_args
+    case '*'
+        echo "cmake-run: multiple executables named '$target'; use -B to narrow the search:" >&2
+        printf '  %s\n' $executables >&2
+        exit 1
+end
