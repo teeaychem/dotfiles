@@ -2344,6 +2344,18 @@ Get the relevant package subdirectories from the llvm source
   (add-to-list 'auto-mode-alist '("\\.jinja\\'" . my/poly-c++-jinja-mode)))
 #+end_src
 
+*** nix
+
+#+begin_src emacs-lisp
+(use-package nix-ts-mode
+  :elpaca (:host github :repo "nix-community/nix-ts-mode")
+  :mode ("\\.nix\\'" . nix-ts-mode)
+
+  :init
+  (add-to-list 'treesit-language-source-alist
+               '(nix "https://github.com/nix-community/tree-sitter-nix")))
+#+end_src
+
 *** python
 **** pet
 
@@ -3179,6 +3191,7 @@ Restart Emacs afterwards to load the rebuilt grammars."
                         json
                         lua
                         markdown
+                        nix
                         python
                         rust
                         toml
