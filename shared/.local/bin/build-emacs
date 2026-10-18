@@ -39,8 +39,14 @@ set prefix $HOME/.local
 set jobs (getconf _NPROCESSORS_ONLN); or exit
 set native_compilation aot # Alternatives: yes, no
 
-# Use the same compiler to choose Ubuntu's libgccjit package and build Emacs.
+# Use system dependencies on Linux, keeping Homebrew tools out of discovery.
 if test (uname -s) = Linux
+    if command -q brew
+        set -l brew_prefix (brew --prefix); or exit
+        set -gx PATH (string match --invert -- "$brew_prefix/*" $PATH)
+    end
+
+    # Use the same compiler for dependency selection and the build.
     if not set -q CC[1]; or test -z "$CC"
         set -gx CC gcc
     end
@@ -68,8 +74,6 @@ if set -q _flag_install_dependencies
                 echo 'Automatic dependency installation supports Ubuntu only.' >&2
                 exit 1
             end
-
-            set -gx PKG_CONFIG /usr/bin/pkg-config
 
             sudo apt-get update; or exit
 
