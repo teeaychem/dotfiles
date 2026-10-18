@@ -1558,13 +1558,34 @@ To highlight indentations
 (use-package multiple-cursors
   :elpaca t
 
+  :bind (:prefix-map my/edit-prefix-map
+         :prefix "C-c e")
+
+  :bind (:map my/edit-prefix-map
+         :prefix-map my/mc-prefix-map
+         :prefix "c")
+
+  :bind (:repeat-map my/mc-prefix-map
+         ("n" . mc/mark-next-like-this)
+         ("p" . mc/mark-previous-like-this)
+         ("s" . mc/skip-to-next-like-this)
+         ("u" . mc/unmark-next-like-this)
+         ("a" . mc/mark-all-like-this)
+         ("l" . mc/edit-lines)
+         :exit
+         ("e" . mc/mark-more-like-this-extended))
+
   :bind (("C-S-." . mc/mark-next-like-this)
          ("C-S-," . mc/mark-previous-like-this)
          ("C-S-;" . mc/skip-to-next-like-this)
          ("C-S-:" . mc/unmark-next-like-this)
          ("C-c C-S-." . mc/mark-all-like-this)
          ("C-c C-SPC" . mc/edit-lines)
-         ("M-<M-down-mouse-1>" . mc/add-cursor-on-click)))
+         ("M-<M-down-mouse-1>" . mc/add-cursor-on-click))
+
+  :config
+  ;; Repeat mode's C-g exits via `ignore'; don't prompt to replay it.
+  (add-to-list 'mc/cmds-to-run-once 'ignore))
 #+end_src
 
 ** no-littering
