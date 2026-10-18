@@ -40,6 +40,12 @@ brew "comrak" # GFM(arkdown)
 brew "taplo"
 
 
+# typst
+brew "typst"
+brew "tinymist" # language server
+brew "typstyle" # formatter
+
+
 # tools
 brew "neocmakelsp" # CMake language server
 brew "z3"

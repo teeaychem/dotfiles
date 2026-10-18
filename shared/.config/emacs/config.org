@@ -2411,6 +2411,17 @@ Get the relevant package subdirectories from the llvm source
 #+end_src
 
 ** external
+*** typst
+
+#+begin_src emacs-lisp
+(use-package typst-ts-mode
+  :elpaca (:repo "https://codeberg.org/meow_king/typst-ts-mode.git")
+  :mode ("\\.typ\\'" . typst-ts-mode)
+
+  :init
+  (add-to-list 'treesit-language-source-alist
+               '(typst "https://github.com/uben0/tree-sitter-typst" "master" "src")))
+#+end_src
 
 
 * org
@@ -2987,6 +2998,7 @@ Do not implicitly sync when starting Eglot."
 
   (add-to-list 'eglot-server-programs '(fish-mode . ("fish-lsp" "start")))
   (add-to-list 'eglot-server-programs '(latex-mode . ("texlab")))
+  (add-to-list 'eglot-server-programs '(typst-ts-mode . ("tinymist")))
   (add-to-list 'eglot-server-programs '((cmake-ts-mode) . ("neocmakelsp" "stdio")))
   (add-to-list 'eglot-server-programs '((nix-mode nix-ts-mode) . ("nil")))
   (add-to-list 'eglot-server-programs '((python-base-mode :language-id "python") . my/eglot-ty))
@@ -3140,6 +3152,7 @@ https://github.com/renzmann/treesit-auto
                         python
                         rust
                         toml
+                        typst
                         yaml))
 
   :init
