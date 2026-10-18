@@ -3139,6 +3139,15 @@ https://github.com/renzmann/treesit-auto
 (use-package treesit-auto
   :elpaca t
 
+  :preface
+  (defun my/treesit-update-grammars ()
+    "Rebuild all grammars in `treesit-language-source-alist'.
+Restart Emacs afterwards to load the rebuilt grammars."
+    (interactive)
+    (require 'treesit)
+    (dolist (recipe treesit-language-source-alist)
+      (treesit-install-language-grammar (car recipe))))
+
   :custom
   (treesit-auto-install 'prompt)
   (treesit-auto-langs '(bash
