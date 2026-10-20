@@ -38,6 +38,22 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
   :demand t)
 #+end_src
 
+** no-littering
+
+#+begin_src emacs-lisp
+(use-package no-littering
+  :elpaca (:wait t)
+  :demand t
+
+  :config
+  ;; Persist's standard location, to be explicit about things.
+  (setq persist--directory-location (expand-file-name "persist/" user-emacs-directory))
+
+  (setq auto-save-file-name-transforms `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+
+  (setq create-lockfiles nil))
+#+end_src
+
 
 * general
 
@@ -933,6 +949,30 @@ Supported values are `bottom' and `right'.")
 
 
 * external, etc.
+** activities
+
+#+begin_src emacs-lisp
+(use-package activities
+  :elpaca t
+  :demand t
+
+  :bind (:prefix-map my/activities-prefix-map
+         :prefix "C-c w A"
+         ("n" . activities-new)
+         ("d" . activities-define)
+         ("r" . activities-resume)
+         ("s" . activities-suspend)
+         ("g" . activities-revert)
+         ("b" . activities-switch-buffer)
+         ("l" . activities-list))
+
+  :config
+  (require 'activities-tabs)
+  (activities-mode 1)
+  (activities-tabs-mode 1)
+  (tab-bar-mode 1))
+#+end_src
+
 ** apheleia
 
 #+begin_src emacs-lisp
@@ -1586,19 +1626,6 @@ To highlight indentations
   :config
   ;; Repeat mode's C-g exits via `ignore'; don't prompt to replay it.
   (add-to-list 'mc/cmds-to-run-once 'ignore))
-#+end_src
-
-** no-littering
-
-#+begin_src emacs-lisp
-(use-package no-littering
-  :elpaca t
-  :demand t
-
-  :config
-  (setq auto-save-file-name-transforms `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
-
-  (setq create-lockfiles nil))
 #+end_src
 
 ** rainbow delimiters
