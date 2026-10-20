@@ -3,7 +3,7 @@ services:
     image: codeberg.org/readeck/readeck:latest
     container_name: readeck
     ports:
-      - "127.0.0.1:7323:8000"
+      - "7323:8000"
     volumes:
       - ${XDG_DATA_HOME:?}/readeck:/readeck
     restart: unless-stopped
