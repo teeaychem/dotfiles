@@ -23,3 +23,4 @@
 "~/.config/shell" = { source = "../dotconfig/shell", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/.luarc.json" = { source = "../dotconfig/.luarc.json", mode = "symlink" }
 "~/.config/pycodestyle" = { source = "../dotconfig/pycodestyle", mode = "symlink" }
+"~/.config/mise" = { source = "../dotconfig/mise", mode = "symlink-each", exclude = [".DS_Store"] }
