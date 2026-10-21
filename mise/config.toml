@@ -10,3 +10,6 @@
 "~/.config/espanso" = { source = "../dotconfig/espanso", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/git" = { source = "../dotconfig/git", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/hunspell" = { source = "../dotconfig/hunspell", mode = "symlink-each", exclude = [".DS_Store"] }
+"~/.config/latexmk" = { source = "../dotconfig/latexmk", mode = "symlink-each", exclude = [".DS_Store"] }
+"~/.config/nvim" = { source = "../dotconfig/nvim", mode = "symlink-each", exclude = [".DS_Store"] }
+"~/.config/vim" = { source = "../dotconfig/vim", mode = "symlink-each", exclude = [".DS_Store"] }
