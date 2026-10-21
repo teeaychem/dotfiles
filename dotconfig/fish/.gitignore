@@ -1,0 +1,13 @@
+/fish_variables
+/local.fish
+
+# Fisher and plugins listed in fish_plugins.
+/completions/fisher.fish
+/conf.d/abbr_tips.fish
+/conf.d/autopair.fish
+/conf.d/done.fish
+/functions/fisher.fish
+/functions/_autopair_*.fish
+/functions/__abbr_tips_*.fish
+
+/conf.d/rustup.fish
