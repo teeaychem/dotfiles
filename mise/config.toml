@@ -18,3 +18,5 @@
 "~/.config/zellij" = { source = "../dotconfig/zellij", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/zsh" = { source = "../dotconfig/zsh", mode = "symlink-each", exclude = [".DS_Store", ".homedir"] }
 "~/.config/shell" = { source = "../dotconfig/shell", mode = "symlink-each", exclude = [".DS_Store"] }
+"~/.config/.luarc.json" = { source = "../dotconfig/.luarc.json", mode = "symlink" }
+"~/.config/pycodestyle" = { source = "../dotconfig/pycodestyle", mode = "symlink" }
