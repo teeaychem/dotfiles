@@ -3045,11 +3045,12 @@ Both the symlink spelling and canonical path are included because compilation da
   (defun my/eglot-ty (&optional _interactive project)
     "Return a project-aware ty command for Eglot.
 
-Run ty through uv when PROJECT belongs to a uv project, so each worktree uses its own project environment.
+Run ty through uv when PROJECT belongs to a uv project, preferring
+VIRTUAL_ENV from the buffer environment over the project's default environment.
 Do not implicitly sync when starting Eglot."
     (let ((default-directory (if project (project-root project) default-directory)))
       (cond
-       ((and (executable-find "uv") (locate-dominating-file default-directory "uv.lock")) '("uv" "run" "--no-sync" "ty" "server"))
+       ((and (executable-find "uv") (locate-dominating-file default-directory "uv.lock")) '("uv" "run" "--active" "--no-sync" "ty" "server"))
        (t '("ty" "server")))))
 
 
