@@ -1,0 +1,13 @@
+# Initial, deliberately small Espanso probe. All triggers use a semicolon
+# prefix to avoid accidental expansion in normal prose.
+matches:
+  - trigger: ";shrug"
+    replace: '¯\_(ツ)_/¯'
+
+  - trigger: ";today"
+    replace: "{{date}}"
+    vars:
+      - name: date
+        type: date
+        params:
+          format: "%Y-%m-%d"
