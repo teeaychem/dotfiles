@@ -21,6 +21,7 @@ FD_OPTIONS = "--hidden --follow"
 FZF_DEFAULT_COMMAND = "fd --type f --hidden --follow --exclude .git"
 
 OPAMROOT = "{{xdg_data_home}}/opam"
+GFORTHHIST = "{{xdg_state_home}}/gforth/history"
 
 PYTHONPYCACHEPREFIX = "{{xdg_cache_home}}/python_cache"
 PYTHON_HISTORY = "{{xdg_state_home}}/python/history"
