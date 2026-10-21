@@ -1,30 +1,32 @@
 [dotfiles]
-"~/.config/mise/miserc.toml" = { source = "../.miserc.toml", mode = "symlink" }
-"~/.zshenv" = { source = "../dotconfig/zsh/.homedir/.zshenv", mode = "symlink" }
+# Home-level files.
 "~/.gdbearlyinit" = { source = "../homedir/.gdbearlyinit", mode = "symlink" }
 "~/.gdbinit" = { source = "../homedir/.gdbinit", mode = "symlink" }
 "~/.lldbinit" = { source = "../homedir/.lldbinit", mode = "symlink" }
+"~/.zshenv" = { source = "../dotconfig/zsh/.homedir/.zshenv", mode = "symlink" }
 
+# Application configuration.
 # Link source files individually so generated state stays outside the checkout.
-"~/.config/emacs" = { source = "../dotconfig/emacs", mode = "symlink-each", exclude = [".DS_Store"] }
-"~/.config/fish" = { source = "../dotconfig/fish", mode = "symlink-each", exclude = [".DS_Store"] }
+"~/.config/.luarc.json" = { source = "../dotconfig/.luarc.json", mode = "symlink" }
 "~/.config/alacritty.toml" = { source = "../dotconfig/alacritty.toml", mode = "symlink" }
 "~/.config/bat" = { source = "../dotconfig/bat", mode = "symlink-each", exclude = [".DS_Store"] }
+"~/.config/emacs" = { source = "../dotconfig/emacs", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/espanso" = { source = "../dotconfig/espanso", mode = "symlink-each", exclude = [".DS_Store"] }
+"~/.config/fish" = { source = "../dotconfig/fish", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/git" = { source = "../dotconfig/git", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/hunspell" = { source = "../dotconfig/hunspell", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/latexmk" = { source = "../dotconfig/latexmk", mode = "symlink-each", exclude = [".DS_Store"] }
+"~/.config/mise" = { source = "../dotconfig/mise", mode = "symlink-each", exclude = [".DS_Store"] }
+"~/.config/mise/miserc.toml" = { source = "../.miserc.toml", mode = "symlink" }
 "~/.config/nvim" = { source = "../dotconfig/nvim", mode = "symlink-each", exclude = [".DS_Store"] }
+"~/.config/pycodestyle" = { source = "../dotconfig/pycodestyle", mode = "symlink" }
+"~/.config/shell" = { source = "../dotconfig/shell", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/tmux" = { source = "../dotconfig/tmux", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/vim" = { source = "../dotconfig/vim", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/zellij" = { source = "../dotconfig/zellij", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/zsh" = { source = "../dotconfig/zsh", mode = "symlink-each", exclude = [".DS_Store", ".homedir"] }
-"~/.config/shell" = { source = "../dotconfig/shell", mode = "symlink-each", exclude = [".DS_Store"] }
-"~/.config/.luarc.json" = { source = "../dotconfig/.luarc.json", mode = "symlink" }
-"~/.config/pycodestyle" = { source = "../dotconfig/pycodestyle", mode = "symlink" }
-"~/.config/mise" = { source = "../dotconfig/mise", mode = "symlink-each", exclude = [".DS_Store"] }
 
-# Group roots resolve from the checkout, relative to this config file.
+# Script groups. Resolve group roots from the checkout.
 [settings.dotfiles]
 root = ".."
 
