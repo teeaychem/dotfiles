@@ -1879,7 +1879,16 @@ To highlight indentations
 (use-package magit-delta
   :elpaca t
   :after magit
-  :hook (magit-mode . magit-delta-mode))
+  :hook (magit-mode . magit-delta-mode)
+
+  :config
+  (defun my/magit-delta-unless-large (original &rest args)
+    "Skip Delta when the raw diff exceeds 200 KiB."
+    (when (<= (- (position-bytes (point-max)) (position-bytes (point-min))) (* 200 1024))
+      (apply original args)))
+
+  (advice-add 'magit-delta-call-delta-and-convert-ansi-escape-sequences
+              :around #'my/magit-delta-unless-large))
 #+end_src
 
 ** magit-prime
