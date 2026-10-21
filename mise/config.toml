@@ -9,3 +9,4 @@
 "~/.config/bat" = { source = "../dotconfig/bat", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/espanso" = { source = "../dotconfig/espanso", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/git" = { source = "../dotconfig/git", mode = "symlink-each", exclude = [".DS_Store"] }
+"~/.config/hunspell" = { source = "../dotconfig/hunspell", mode = "symlink-each", exclude = [".DS_Store"] }
