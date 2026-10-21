@@ -15,4 +15,5 @@
 "~/.config/nvim" = { source = "../dotconfig/nvim", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/tmux" = { source = "../dotconfig/tmux", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/vim" = { source = "../dotconfig/vim", mode = "symlink-each", exclude = [".DS_Store"] }
+"~/.config/zellij" = { source = "../dotconfig/zellij", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/zsh" = { source = "../dotconfig/zsh", mode = "symlink-each", exclude = [".DS_Store", ".homedir"] }
