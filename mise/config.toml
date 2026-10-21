@@ -1,6 +1,7 @@
 [dotfiles]
 "~" = { source = "../shared", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/mise/miserc.toml" = { source = "../.miserc.toml", mode = "symlink" }
+"~/.zshenv" = { source = "../dotconfig/zsh/.homedir/.zshenv", mode = "symlink" }
 
 # Link source files individually so generated state stays outside the checkout.
 "~/.config/emacs" = { source = "../dotconfig/emacs", mode = "symlink-each", exclude = [".DS_Store"] }
@@ -13,3 +14,4 @@
 "~/.config/latexmk" = { source = "../dotconfig/latexmk", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/nvim" = { source = "../dotconfig/nvim", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/vim" = { source = "../dotconfig/vim", mode = "symlink-each", exclude = [".DS_Store"] }
+"~/.config/zsh" = { source = "../dotconfig/zsh", mode = "symlink-each", exclude = [".DS_Store", ".homedir"] }
