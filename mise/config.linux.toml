@@ -1,2 +1,5 @@
-[dotfiles]
-"~/.local/bin" = { source = "../linux/.local/bin", mode = "symlink-each", exclude = [".DS_Store"] }
+[dotfile_groups.scripts-linux]
+root = "scripts/linux"
+target = "~/.local/bin"
+mode = "symlink-each"
+exclude = [".DS_Store"]

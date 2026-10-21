@@ -1,5 +1,4 @@
 [dotfiles]
-"~" = { source = "../shared", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/mise/miserc.toml" = { source = "../.miserc.toml", mode = "symlink" }
 "~/.zshenv" = { source = "../dotconfig/zsh/.homedir/.zshenv", mode = "symlink" }
 "~/.gdbearlyinit" = { source = "../homedir/.gdbearlyinit", mode = "symlink" }
@@ -24,3 +23,13 @@
 "~/.config/.luarc.json" = { source = "../dotconfig/.luarc.json", mode = "symlink" }
 "~/.config/pycodestyle" = { source = "../dotconfig/pycodestyle", mode = "symlink" }
 "~/.config/mise" = { source = "../dotconfig/mise", mode = "symlink-each", exclude = [".DS_Store"] }
+
+# Group roots resolve from the checkout, relative to this config file.
+[settings.dotfiles]
+root = ".."
+
+[dotfile_groups.scripts-common]
+root = "scripts/common"
+target = "~/.local/bin"
+mode = "symlink-each"
+exclude = [".DS_Store"]

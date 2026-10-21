@@ -1,6 +1,6 @@
 # dotfiles
 
-mise applys configurations to `$HOME` and loads the shared / platform-specific environments.
+mise deploys configurations to `$HOME` and loads platform-specific environments.
 
 ```sh
 mise trust mise/config.toml
@@ -25,6 +25,11 @@ fish_plugins_sync
 ssh -t HOST '/home/linuxbrew/.linuxbrew/bin/fish -l'
 ```
 
+## scripts
+
+`scripts/common/` and the current platform's `scripts/darwin/` or `scripts/linux/`
+are deployed together to `~/.local/bin/` through mise dotfile groups.
+
 ## packages
 
 ```sh
@@ -34,7 +39,7 @@ brew bundle --file ~/dotfiles/brew/Brewfile.core
 ```
 
 ```sh
-~/dotfiles/linux/.local/bin/install-apt-packages ~/dotfiles/shared/.config/apt/packages
+~/dotfiles/scripts/linux/install-apt-packages /path/to/packages
 
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
