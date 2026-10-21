@@ -7,3 +7,4 @@
 "~/.config/fish" = { source = "../dotconfig/fish", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/alacritty.toml" = { source = "../dotconfig/alacritty.toml", mode = "symlink" }
 "~/.config/bat" = { source = "../dotconfig/bat", mode = "symlink-each", exclude = [".DS_Store"] }
+"~/.config/espanso" = { source = "../dotconfig/espanso", mode = "symlink-each", exclude = [".DS_Store"] }
