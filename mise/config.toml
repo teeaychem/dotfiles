@@ -5,3 +5,4 @@
 # Link source files individually so generated state stays outside the checkout.
 "~/.config/emacs" = { source = "../dotconfig/emacs", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/fish" = { source = "../dotconfig/fish", mode = "symlink-each", exclude = [".DS_Store"] }
+"~/.config/alacritty.toml" = { source = "../dotconfig/alacritty.toml", mode = "symlink" }
