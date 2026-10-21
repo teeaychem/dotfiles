@@ -1201,13 +1201,12 @@ Supported values are `bottom' and `right'.")
 #+begin_src emacs-lisp
 (use-package envrc
   :elpaca t
-  :disabled
+  :after exec-path-from-shell
+  ;; Enable after package setup so project environments precede other mode hooks.
+  :hook (elpaca-after-init . envrc-global-mode)
 
   :custom
-  (envrc-show-summary-in-minibuffer nil)
-
-  :config
-  (envrc-global-mode 1))
+  (envrc-show-summary-in-minibuffer nil))
 #+end_src
 
 ** exec-path-from-shell
