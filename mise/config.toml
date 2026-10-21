@@ -2,6 +2,9 @@
 "~" = { source = "../shared", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/mise/miserc.toml" = { source = "../.miserc.toml", mode = "symlink" }
 "~/.zshenv" = { source = "../dotconfig/zsh/.homedir/.zshenv", mode = "symlink" }
+"~/.gdbearlyinit" = { source = "../homedir/.gdbearlyinit", mode = "symlink" }
+"~/.gdbinit" = { source = "../homedir/.gdbinit", mode = "symlink" }
+"~/.lldbinit" = { source = "../homedir/.lldbinit", mode = "symlink" }
 
 # Link source files individually so generated state stays outside the checkout.
 "~/.config/emacs" = { source = "../dotconfig/emacs", mode = "symlink-each", exclude = [".DS_Store"] }
