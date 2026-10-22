@@ -1,26 +1,18 @@
-@default_files = ('master.tex');
+@default_files = ('main.tex');
 
 $pdf_mode = 4;
 # 4 for lualatex
 # 5 for xelatex
 
 $lualatex = 'lualatex -interaction=nonstopmode -shell-escape -synctex=1 -file-line-error %O %S';
-$lualatex .= ' && cp %D %B.pdf' ;
-$lualatex .= ' && cp %D %Z%B.synctex.gz .';
-#$lualatex .= ' && -pv';
 
 $xelatex = 'xelatex -interaction=nonstopmode -shell-escape -synctex=1 -file-line-error %O %S';
-$xelatex .= ' && cp %D %B.pdf';
-$xelatex .= ' && cp %D %Z%B.synctex.gz .';
-# xelatex creates some other file before getting the final PDF, and with this setup a dodgy
-# PDF is copied. I've no idea how to fix this.
-
 
 $pdflatex = 'pdflatex -interaction=nonstopmode -shell-escape -synctex=1 -file-line-error %O %S';
-$pdflatex .= ' && cp %D %B.pdf';
-$pdflatex .= ' && cp %D %Z%B.synctex.gz .';
 
-$out_dir = '/private/tmp/Tex';
+$out_dir = 'build';
+$aux_dir = $out_dir;
+$out2_dir = '.';
 
 $preview_mode = 0;
 $postscript_mode = 0;
@@ -30,8 +22,6 @@ $pdf_previewer = 'open -a skim';
 
 #$pdf_update_method = 4;
 #$pdf_update_command = 'open -a skim' # "sleep 0.5;" #;-a Skim";
-
-$aux_dir = '/private/tmp/Tex';
 
 # For Skim preferences
 # /Applications/Emacs.app/Contents/MacOS/bin/emacsclient
