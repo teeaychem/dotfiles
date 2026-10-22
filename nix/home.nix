@@ -21,6 +21,7 @@ let
     "nvim"
     "pycodestyle"
     "shell"
+    "tex-fmt"
     "tmux"
     "vim"
     "zellij"
@@ -134,6 +135,7 @@ in
       ".zshenv".source = lib.mkDefault (
         config.lib.file.mkOutOfStoreSymlink "${cfg.checkout}/dotconfig/zsh/.homedir/.zshenv"
       );
+
     };
     xdg.configFile = fileDefaults (configLinks // directConfigLinks);
   };

@@ -1054,11 +1054,16 @@ Supported values are `bottom' and `right'.")
   (setf (alist-get 'typescript-ts-mode apheleia-mode-alist) '(prettier))
   (setf (alist-get 'tsx-ts-mode apheleia-mode-alist) '(prettier))
 
-  (setf (alist-get 'clang-format apheleia-formatters) '("clang-format"
-                                                        "-assume-filename"
-                                                        (or (apheleia-formatters-local-buffer-file-name)
-                                                            (apheleia-formatters-mode-extension)
-                                                            ".cpp")))
+  (let ((config-file (expand-file-name "tex-fmt/tex-fmt.toml" (getenv "XDG_CONFIG_HOME"))))
+    (setf (alist-get 'tex-fmt apheleia-formatters) `("tex-fmt" "--stdin" "--config" ,config-file)))
+
+  (dolist (mode '(latex-mode LaTeX-mode TeX-latex-mode TeX-mode))
+    (setf (alist-get mode apheleia-mode-alist) 'tex-fmt))
+
+  (setf (alist-get 'clang-format apheleia-formatters)
+        '("clang-format"
+          (let ((filename (or (apheleia-formatters-local-buffer-file-name) (apheleia-formatters-mode-extension) ".cpp")))
+            (list "-assume-filename" filename))))
 
   (defun my/gersemi-config-arguments ()
     "Return arguments for the nearest project-local Gersemi configuration."

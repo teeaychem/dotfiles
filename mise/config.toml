@@ -21,6 +21,7 @@
 "~/.config/nvim" = { source = "../dotconfig/nvim", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/pycodestyle" = { source = "../dotconfig/pycodestyle", mode = "symlink" }
 "~/.config/shell" = { source = "../dotconfig/shell", mode = "symlink-each", exclude = [".DS_Store"] }
+"~/.config/tex-fmt" = { source = "../dotconfig/tex-fmt", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/tmux" = { source = "../dotconfig/tmux", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/vim" = { source = "../dotconfig/vim", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/zellij" = { source = "../dotconfig/zellij", mode = "symlink-each", exclude = [".DS_Store"] }
