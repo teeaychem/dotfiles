@@ -8,6 +8,7 @@ config-file = ?config.local
 auto-update = off
 
 cursor-style = block
+drag-handle = never
 
 font-family = "M+1Code Nerd Font Mono"
 
