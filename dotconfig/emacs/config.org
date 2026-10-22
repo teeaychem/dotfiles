@@ -2979,6 +2979,8 @@ maybe: https://github.com/casouri/eldoc-box
   (eglot-code-action-indications nil)
 
   :config
+  (add-hook 'eglot-managed-mode-hook (lambda () (eglot-inlay-hints-mode -1)))
+
   (add-hook 'eglot-managed-mode-hook
             (lambda ()
               (when-let* (((derived-mode-p 'mlir-mode)) (provider (eglot-server-capable :completionProvider))
