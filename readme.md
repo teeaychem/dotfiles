@@ -15,6 +15,19 @@ mise trust mise/config.toml && mise bootstrap dotfiles apply
 mise --env personal bootstrap dotfiles apply # `--env personal` selects the opt-in personal overlay
 ```
 
+## Nix / Home Manager
+
+From the checkout root, with Nix and Fish available:
+
+```sh
+./hm-setup build             # Build without changing home links.
+./hm-setup                   # Apply for the current user and checkout.
+./hm-setup --personal        # Include the optional personal layer.
+```
+
+Config files remain editable in the checkout. See [the Home Manager notes](nix/README.md)
+for linking behavior and configuration options.
+
 ## fish
 
 ```sh
