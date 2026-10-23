@@ -1995,7 +1995,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
                   (with-temp-buffer
                     (setq-local process-environment env)
                     (setq-local exec-path path)
-                    (let ((retcode (process-file "cargo" nil (list (current-buffer) nil) nil "metadata" "--format-version" "1")))
+                    (let ((retcode (process-file "cargo" nil (list (current-buffer) nil) nil "metadata" "--format-version" "1" "--no-deps" "--frozen")))
                       (when (/= retcode 0) (error "Cargo metadata --format-version 1 returned %s: %s" retcode (buffer-string)))
                       (goto-char 0)
                       (let ((metadata (json-parse-buffer :object-type 'alist :array-type 'list)))
