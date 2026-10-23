@@ -1966,16 +1966,6 @@ To highlight indentations
 #+end_src
 
 #+begin_src emacs-lisp
-(use-package cppinsights
-  :elpaca t
-  :commands cppinsights-run
-
-  :bind (:map c-family-prefix-map
-              ("i" . #'cppinsights-run)))
-#+end_src
-
-
-#+begin_src emacs-lisp
 (use-package cmake-ts-mode
   :elpaca nil
   :mode (("CMakeLists\\.txt\\'" . cmake-ts-mode)
