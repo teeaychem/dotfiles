@@ -1,5 +1,6 @@
 
-((nil
+((auto-mode-alist . (("\\.custom\\'" . mlir-mode)))
+ (nil
   . ((my/llvm-source-root . "/path/to/llvm-project")
      (my/mlir-lsp-server-bin . "/path/to/build/bin/mlir-lsp-server")
      (my/mlir-pdll-lsp-server-bin . "/path/to/build/bin/mlir-pdll-lsp-server")

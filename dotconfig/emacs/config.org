@@ -1149,6 +1149,16 @@ Supported values are `bottom' and `right'.")
 
   :config
   (require 'dirvish-fd)
+
+  (defun my/dirvish-select-project-mode ()
+    "Select the preview mode using project-local rules."
+    (when buffer-file-name
+      (let ((enable-dir-local-variables t)
+            (enable-local-variables :safe))
+        (set-auto-mode t))
+      (font-lock-ensure)))
+
+  (add-hook 'dirvish-preview-setup-hook #'my/dirvish-select-project-mode)
   (dirvish-override-dired-mode 1)
   (dirvish-peek-mode 1)
   (setq dirvish-peek-key '(:debounce 0.5 any))
@@ -2888,6 +2898,27 @@ maybe: https://github.com/casouri/eldoc-box
 
   :config
   (add-hook 'eglot-managed-mode-hook (lambda () (eglot-inlay-hints-mode -1)))
+
+  (add-hook 'eglot-managed-mode-hook
+            (lambda ()
+              (when-let* (((derived-mode-p 'mlir-mode)) (provider (eglot-server-capable :completionProvider))
+                          ((listp provider))            (triggers (plist-get provider :triggerCharacters)))
+		(setf (plist-get provider :triggerCharacters) (vconcat (remove " " (append triggers nil)))))))
+
+  (defun my/mlir-eglot-completion-at-point ()
+    "Complete MLIR operation names after the final dot."
+    (when-let* ((capf (eglot-completion-at-point)))
+      (pcase-let ((`(,beg ,end ,table . ,props) capf))
+	(let ((new-beg beg))
+          (save-excursion (goto-char (point)) (when (search-backward "." beg t) (setq new-beg (1+ (point)))))
+          `(,new-beg ,end ,table ,@props)))))
+
+  (defun my/mlir-eglot-capf-setup ()
+    "Use MLIR-aware Eglot completion bounds in MLIR buffers."
+    (when (derived-mode-p 'mlir-mode)
+      (setq-local completion-at-point-functions (cons #'my/mlir-eglot-completion-at-point (remove #'eglot-completion-at-point completion-at-point-functions)))))
+
+  (add-hook 'eglot-managed-mode-hook #'my/mlir-eglot-capf-setup)
 
 
   ;; (add-to-list 'eglot-stay-out-of 'flymake)
