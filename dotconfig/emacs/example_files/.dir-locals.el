@@ -1,12 +1,11 @@
 
 ((auto-mode-alist . (("\\.custom\\'" . mlir-mode)))
  (nil
-  . ((my/llvm-source-root . "/path/to/llvm-project")
-     (my/mlir-lsp-server-bin . "/path/to/build/bin/mlir-lsp-server")
-     (my/mlir-pdll-lsp-server-bin . "/path/to/build/bin/mlir-pdll-lsp-server")
-     (my/pdll-compilation-database . "/path/to/build/tools/mlir/tools/pdll/pdll_compile_commands.yml")
-     (my/tablegen-lsp-server-bin . "/path/to/build/bin/tblgen-lsp-server")
-     (my/tablegen-compilation-database . "/path/to/build/tablegen_compile_commands.yml")))
+  . ((llvm-tools-mlir-lsp-server-bin . "/path/to/build/bin/mlir-lsp-server")
+     (llvm-tools-mlir-pdll-lsp-server-bin . "/path/to/build/bin/mlir-pdll-lsp-server")
+     (llvm-tools-pdll-compilation-database . "/path/to/build/tools/mlir/tools/pdll/pdll_compile_commands.yml")
+     (llvm-tools-tablegen-lsp-server-bin . "/path/to/build/bin/tblgen-lsp-server")
+     (llvm-tools-tablegen-compilation-database . "/path/to/build/tablegen_compile_commands.yml")))
  (python-base-mode
   . ((eglot-workspace-configuration ;; https://github.com/python-lsp/python-lsp-server/blob/develop/CONFIGURATION.md
       . (:pylsp (:plugins (:jedi (:environment "./.venv/")

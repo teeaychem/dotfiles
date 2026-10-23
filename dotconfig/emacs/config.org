@@ -2087,61 +2087,6 @@ https://github.com/llvm/llvm-project.git
   :demand t
   :bind ("C-c t l" . llvm-tools-lit-test-current-file))
 
-(defvar-local my/mlir-pdll-lsp-server-bin      nil               "PDLL language server executable for this buffer or project.")
-
-(defvar-local my/mlir-lsp-server-bin           "mlir-lsp-server" "MLIR language server executable for this buffer or project.")
-
-(defvar-local my/pdll-compilation-database     nil                "PDLL compilation database for this buffer or project.")
-
-(defvar-local my/tablegen-lsp-server-bin       nil                "TableGen language server executable for this buffer or project.")
-
-(defvar-local my/tablegen-compilation-database nil                "TableGen compilation database for this buffer or project.")
-
-(dolist (variable '(my/llvm-source-root
-                    my/mlir-lsp-server-bin
-                    my/mlir-pdll-lsp-server-bin
-                    my/pdll-compilation-database
-                    my/tablegen-lsp-server-bin
-                    my/tablegen-compilation-database))
-  (put variable 'safe-local-variable #'stringp))
-
-(defun my/llvm-file-executable-p (path)
-  "Return non-nil when PATH names an executable file."
-  (and (stringp path) (not (string= path "")) (file-executable-p path)))
-
-(defun my/llvm-file-readable-p (path)
-  "Return non-nil when PATH names a readable file."
-  (and (stringp path) (not (string= path "")) (file-readable-p path)))
-
-(defun my/llvm-lsp-server-path (setting path fallback interactive)
-  "Return explicit PATH, or FALLBACK from `exec-path' when INTERACTIVE. Signal a user error when neither names an executable."
-  (cond
-   ((my/llvm-file-executable-p path) path)
-   ((and interactive (executable-find fallback)))
-   (t (user-error "Eglot aborted: %s is invalid (%s)" setting (or path "Unset")))))
-
-(defun my/mlir-lsp-server-path (&optional interactive)
-  "Return the MLIR language-server path for the current buffer."
-  (my/llvm-lsp-server-path 'my/mlir-lsp-server-bin my/mlir-lsp-server-bin "mlir-lsp-server" interactive))
-
-(defun my-eglot-strict-mlir (&optional interactive _project)
-  "Return the MLIR language-server command for the current buffer."
-  (let ((server-path (my/mlir-lsp-server-path interactive))) (list server-path)))
-
-(defun my-eglot-strict-pdll (&optional interactive _project)
-  "Return the PDLL language-server command for the current buffer."
-  (let ((server-path (my/llvm-lsp-server-path 'my/mlir-pdll-lsp-server-bin my/mlir-pdll-lsp-server-bin "mlir-pdll-lsp-server" interactive))
-        (db-path my/pdll-compilation-database))
-    (unless (my/llvm-file-readable-p db-path) (user-error "Eglot aborted: PDLL compilation database setting is invalid (%s)" (or db-path "Unset")))
-    (list server-path (format "--pdll-compilation-database=%s" db-path))))
-
-(defun my-eglot-strict-tablegen (&optional interactive _project)
-  "Return the TableGen language-server command for the current buffer."
-  (let ((server-path (my/llvm-lsp-server-path 'my/tablegen-lsp-server-bin my/tablegen-lsp-server-bin "tblgen-lsp-server" interactive))
-        (db-path my/tablegen-compilation-database))
-    (unless (my/llvm-file-readable-p db-path) (user-error "Eglot aborted: TableGen compilation database setting is invalid (%s)" (or db-path "Unset")))
-    (list server-path (format "--tablegen-compilation-database=%s" db-path))))
-
 (defconst my/llvm-elisp-sparse-paths
   '("llvm/utils/emacs" "mlir/utils/emacs")
   "LLVM repository paths needed for Emacs Lisp modes.")
@@ -2907,9 +2852,9 @@ Do not implicitly sync when starting Eglot."
   (add-to-list 'eglot-server-programs '((toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio")))
 
 
-  (add-to-list 'eglot-server-programs `((mlir-mode :language-id "mlir") . my-eglot-strict-mlir))
-  (add-to-list 'eglot-server-programs `((pdll-mode :language-id "pdll") . my-eglot-strict-pdll))
-  (add-to-list 'eglot-server-programs `((tablegen-mode :language-id "tablegen") . my-eglot-strict-tablegen))
+  (add-to-list 'eglot-server-programs `((mlir-mode :language-id "mlir") . llvm-tools-eglot-mlir))
+  (add-to-list 'eglot-server-programs `((pdll-mode :language-id "pdll") . llvm-tools-eglot-pdll))
+  (add-to-list 'eglot-server-programs `((tablegen-mode :language-id "tablegen") . llvm-tools-eglot-tablegen))
 
   (set-face-attribute 'eglot-highlight-symbol-face nil
                       :weight 'normal
