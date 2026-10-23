@@ -979,12 +979,9 @@ Supported values are `bottom' and `right'.")
 (use-package apheleia
   :elpaca t
 
-  :init
-  (defvar-local my/mlir-opt-bin "mlir-opt")
-
   :config
   (defconst my/apheleia-region-context-variables
-    '(process-environment exec-path apheleia-formatter my/mlir-opt-bin)
+    '(process-environment exec-path apheleia-formatter llvm-tools-mlir-opt-bin)
     "Buffer-local values a temporary region formatter must inherit.")
 
   (defun my/apheleia-copy-local-variables (variables buffer)
@@ -1076,8 +1073,8 @@ Supported values are `bottom' and `right'.")
   (push '(taplo . ("taplo" "format")) apheleia-formatters)
   (setf (alist-get 'toml-ts-mode apheleia-mode-alist) '(taplo))
   (setf (alist-get 'tablegen-mode apheleia-mode-alist) '(clang-format))
-  (push '(my-mlir-opt . (my/mlir-opt-bin)) apheleia-formatters)
-  (setf (alist-get 'mlir-mode apheleia-mode-alist) '(my-mlir-opt))
+  (setf (alist-get 'llvm-tools-mlir-opt apheleia-formatters) '(llvm-tools-mlir-opt-bin))
+  (setf (alist-get 'mlir-mode apheleia-mode-alist) '(llvm-tools-mlir-opt))
 
   ;; https://github.com/radian-software/apheleia/issues/278
   (setf (alist-get 'rustfmt apheleia-formatters)
@@ -2133,67 +2130,13 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 
 https://github.com/llvm/llvm-project.git
 
-**** lit tests
-
 #+begin_src emacs-lisp
-(use-package compile
+(use-package llvm-tools
   :elpaca nil
+  :load-path "local-packages"
+  :demand t
+  :bind ("C-c t l" . llvm-tools-lit-test-current-file))
 
-  :preface
-  (defvar-local my/lit-program "llvm-lit"
-    "Project lit runner, preferably the build's generated llvm-lit.
-Set an absolute executable path in .dir-locals.el when it is not on PATH.")
-
-  (defvar-local my/lit-test-directory nil
-    "Default lit suite directory for selection, remembered after each run.
-Set this in .dir-locals.el to suggest a directory outside the project build.")
-
-  (defun my/lit-select-test-directory (source-root)
-    "Choose a configured suite for SOURCE-ROOT, defaulting to the last choice."
-    (require 'project)
-    (let* ((project (project-current nil source-root))
-           (root (if project (project-root project) source-root))
-           (build (expand-file-name "build" root))
-           (configs (when (file-directory-p build)
-                      (directory-files-recursively build (rx string-start "lit.site.cfg.py" string-end))))
-           (directories (mapcar #'file-name-directory configs)))
-      (completing-read "Lit test directory: "
-                       (or directories (list source-root)) nil nil nil nil
-                       (or my/lit-test-directory (car directories) source-root))))
-
-  (defun my/lit-test-current-file (&optional choose-config)
-    "Save and run this lit test, displaying the input consumed by FileCheck.
-Choose a test directory each time.  With a prefix, also choose a different runner."
-    (interactive "P")
-    (unless buffer-file-name
-      (user-error "This buffer does not visit a test file"))
-    (let* ((source-root (or (locate-dominating-file buffer-file-name "lit.cfg.py") (user-error "No source lit.cfg.py found for this test")))
-           (runner (or (unless choose-config (executable-find my/lit-program)) (read-file-name "Project lit runner: " nil nil t)))
-           (test-directory (expand-file-name (my/lit-select-test-directory source-root)))
-           (test-path (expand-file-name (file-relative-name buffer-file-name source-root) test-directory)))
-      (setq runner (expand-file-name runner))
-      (setq-local my/lit-program runner
-                  my/lit-test-directory test-directory)
-      (save-buffer)
-      (compilation-start
-       (mapconcat #'shell-quote-argument (list runner "-a" "-j" "1" "-D" "FileCheck=FileCheck --dump-input=always --dump-input-filter=all" test-path) " ")
-       'compilation-mode
-       (lambda (_mode) "*lit*"))))
-
-  :bind ("C-c t l" . my/lit-test-current-file)
-
-  :hook
-  (compilation-mode . (lambda ()
-                        (when (equal (buffer-name) "*lit*")
-                          (require 'mlir-mode)
-                          (font-lock-add-keywords nil mlir-font-lock-keywords 'append)))))
-#+end_src
-
-**** modes and language servers
-
-Get the relevant package subdirectories from the llvm source
-
-#+begin_src emacs-lisp
 (defvar-local my/mlir-pdll-lsp-server-bin      nil               "PDLL language server executable for this buffer or project.")
 
 (defvar-local my/mlir-lsp-server-bin           "mlir-lsp-server" "MLIR language server executable for this buffer or project.")
@@ -2204,43 +2147,13 @@ Get the relevant package subdirectories from the llvm source
 
 (defvar-local my/tablegen-compilation-database nil                "TableGen compilation database for this buffer or project.")
 
-(defvar-local my/mlir-extra-extensions         nil                "Project-local file extensions that should use `mlir-mode'.")
-
-(defvar-local my/mlir-extra-extension-applying nil                "Non-nil while applying project-local `mlir-mode' extension rules.")
-
 (dolist (variable '(my/llvm-source-root
-                    my/mlir-opt-bin
                     my/mlir-lsp-server-bin
                     my/mlir-pdll-lsp-server-bin
                     my/pdll-compilation-database
                     my/tablegen-lsp-server-bin
                     my/tablegen-compilation-database))
   (put variable 'safe-local-variable #'stringp))
-
-(put 'my/mlir-extra-extensions 'safe-local-variable (lambda (value) (and (listp value) (seq-every-p #'stringp value))))
-
-(defun my/mlir-mode-for-extra-extension ()
-  "Use `mlir-mode' for project-local IR extensions."
-  (when-let* ((file buffer-file-name)
-              (extensions my/mlir-extra-extensions)
-              (extension (file-name-extension file)))
-    (when (and (not my/mlir-extra-extension-applying) (not (derived-mode-p 'mlir-mode)) (member extension extensions))
-      (let ((my/mlir-extra-extension-applying t))
-        (mlir-mode)))))
-
-(add-hook 'hack-local-variables-hook #'my/mlir-mode-for-extra-extension)
-
-(defun my/dirvish-apply-mlir-dir-locals ()
-  "Apply safe project-local MLIR extension rules to a Dirvish preview."
-  (when buffer-file-name
-    (let ((enable-dir-local-variables t)
-          (enable-local-variables :safe))
-      (hack-dir-local-variables))
-    (my/mlir-mode-for-extra-extension)
-    (when (derived-mode-p 'mlir-mode) (font-lock-ensure))))
-
-(with-eval-after-load 'dirvish
-  (add-hook 'dirvish-preview-setup-hook #'my/dirvish-apply-mlir-dir-locals))
 
 (defun my/llvm-file-executable-p (path)
   "Return non-nil when PATH names an executable file."
@@ -2260,6 +2173,24 @@ Get the relevant package subdirectories from the llvm source
 (defun my/mlir-lsp-server-path (&optional interactive)
   "Return the MLIR language-server path for the current buffer."
   (my/llvm-lsp-server-path 'my/mlir-lsp-server-bin my/mlir-lsp-server-bin "mlir-lsp-server" interactive))
+
+(defun my-eglot-strict-mlir (&optional interactive _project)
+  "Return the MLIR language-server command for the current buffer."
+  (let ((server-path (my/mlir-lsp-server-path interactive))) (list server-path)))
+
+(defun my-eglot-strict-pdll (&optional interactive _project)
+  "Return the PDLL language-server command for the current buffer."
+  (let ((server-path (my/llvm-lsp-server-path 'my/mlir-pdll-lsp-server-bin my/mlir-pdll-lsp-server-bin "mlir-pdll-lsp-server" interactive))
+        (db-path my/pdll-compilation-database))
+    (unless (my/llvm-file-readable-p db-path) (user-error "Eglot aborted: PDLL compilation database setting is invalid (%s)" (or db-path "Unset")))
+    (list server-path (format "--pdll-compilation-database=%s" db-path))))
+
+(defun my-eglot-strict-tablegen (&optional interactive _project)
+  "Return the TableGen language-server command for the current buffer."
+  (let ((server-path (my/llvm-lsp-server-path 'my/tablegen-lsp-server-bin my/tablegen-lsp-server-bin "tblgen-lsp-server" interactive))
+        (db-path my/tablegen-compilation-database))
+    (unless (my/llvm-file-readable-p db-path) (user-error "Eglot aborted: TableGen compilation database setting is invalid (%s)" (or db-path "Unset")))
+    (list server-path (format "--tablegen-compilation-database=%s" db-path))))
 
 (defconst my/llvm-elisp-sparse-paths
   '("llvm/utils/emacs" "mlir/utils/emacs")
@@ -2304,34 +2235,11 @@ Get the relevant package subdirectories from the llvm source
   (use-package mlir-mode
     :elpaca nil
     :mode (("\\.mlir\\'" . mlir-mode)
-           ("\\.pdll\\'" . pdll-mode))
-
-    :init
-    (defun my-eglot-strict-mlir (&optional interactive _project)
-      "Return the MLIR language-server command for the current buffer."
-      (let ((server-path (my/mlir-lsp-server-path interactive))) (list server-path)))
-
-    (defun my-eglot-strict-pdll (&optional interactive _project)
-      "Return the PDLL language-server command for the current buffer."
-      (let ((server-path (my/llvm-lsp-server-path 'my/mlir-pdll-lsp-server-bin my/mlir-pdll-lsp-server-bin "mlir-pdll-lsp-server" interactive))
-            (db-path my/pdll-compilation-database))
-        (unless (my/llvm-file-readable-p db-path) (user-error "Eglot aborted: PDLL compilation database setting is invalid (%s)" (or db-path "Unset")))
-        (list server-path (format "--pdll-compilation-database=%s" db-path))))
-
-    :config
-    (define-derived-mode pdll-mode mlir-mode "PDLL"))
+           ("\\.pdll\\'" . pdll-mode)))
 
   (use-package tablegen-mode
     :elpaca nil
-    :mode "\\.td\\'"
-
-    :init
-    (defun my-eglot-strict-tablegen (&optional interactive _project)
-      "Return the TableGen language-server command for the current buffer."
-      (let ((server-path (my/llvm-lsp-server-path 'my/tablegen-lsp-server-bin my/tablegen-lsp-server-bin "tblgen-lsp-server" interactive))
-            (db-path my/tablegen-compilation-database))
-        (unless (my/llvm-file-readable-p db-path) (user-error "Eglot aborted: TableGen compilation database setting is invalid (%s)" (or db-path "Unset")))
-        (list server-path (format "--tablegen-compilation-database=%s" db-path)))))
+    :mode "\\.td\\'")
 
   (use-package llvm-mode
     :elpaca nil
@@ -2981,26 +2889,6 @@ maybe: https://github.com/casouri/eldoc-box
   :config
   (add-hook 'eglot-managed-mode-hook (lambda () (eglot-inlay-hints-mode -1)))
 
-  (add-hook 'eglot-managed-mode-hook
-            (lambda ()
-              (when-let* (((derived-mode-p 'mlir-mode)) (provider (eglot-server-capable :completionProvider))
-                          ((listp provider))            (triggers (plist-get provider :triggerCharacters)))
-                (setf (plist-get provider :triggerCharacters) (vconcat (remove " " (append triggers nil)))))))
-
-  (defun my/mlir-eglot-completion-at-point ()
-    "Complete MLIR operation names after the final dot."
-    (when-let* ((capf (eglot-completion-at-point)))
-      (pcase-let ((`(,beg ,end ,table . ,props) capf))
-        (let ((new-beg beg))
-          (save-excursion (goto-char (point)) (when (search-backward "." beg t) (setq new-beg (1+ (point)))))
-          `(,new-beg ,end ,table ,@props)))))
-
-  (defun my/mlir-eglot-capf-setup ()
-    "Use MLIR-aware Eglot completion bounds in MLIR buffers."
-    (when (derived-mode-p 'mlir-mode)
-      (setq-local completion-at-point-functions (cons #'my/mlir-eglot-completion-at-point (remove #'eglot-completion-at-point completion-at-point-functions)))))
-
-  (add-hook 'eglot-managed-mode-hook #'my/mlir-eglot-capf-setup)
 
   ;; (add-to-list 'eglot-stay-out-of 'flymake)
   (defun my/clangd--path-variants (path)
@@ -3081,6 +2969,7 @@ Do not implicitly sync when starting Eglot."
   (add-to-list 'eglot-server-programs '(rust-ts-mode . ("rust-analyzer"
                                                         :initializationOptions (:check (:command "clippy")))))
   (add-to-list 'eglot-server-programs '((toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio")))
+
 
   (add-to-list 'eglot-server-programs `((mlir-mode :language-id "mlir") . my-eglot-strict-mlir))
   (add-to-list 'eglot-server-programs `((pdll-mode :language-id "pdll") . my-eglot-strict-pdll))
