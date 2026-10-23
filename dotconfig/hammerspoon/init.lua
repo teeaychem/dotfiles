@@ -35,9 +35,9 @@ mouseSideButtons = hs.eventtap.new({ hs.eventtap.event.types.otherMouseDown },
  end
 ):start()
 
-local function hasOnlyCommandModifier(e)
+local function hasCommandOptionModifiers(e)
   local flags = e:getFlags()
-  return flags.cmd and not (flags.alt or flags.ctrl or flags.fn or flags.shift)
+  return flags.cmd and flags.alt and not (flags.ctrl or flags.fn or flags.shift)
 end
 
 commandBracketRemap = hs.eventtap.new({ hs.eventtap.event.types.keyDown },
@@ -45,34 +45,16 @@ commandBracketRemap = hs.eventtap.new({ hs.eventtap.event.types.keyDown },
    if e:getProperty(eventUserData) == generatedShortcutTag then
      return false
    end
-   if not hasOnlyCommandModifier(e) then
+   if not hasCommandOptionModifiers(e) then
      return false
    end
 
-   local characters = e:getCharacters()
+   local characters = e:getCharacters(true)
    if characters == "[" then
      hs.eventtap.keyStrokes("(")
      return true
    elseif characters == "]" then
      hs.eventtap.keyStrokes(")")
-     return true
-   end
-
-   return false
- end
-):start()
-
--- Match the character produced by the source keyboard, retaining Shift's
--- effect while checking the other modifiers separately.
-commandBraceRemap = hs.eventtap.new({ hs.eventtap.event.types.keyDown },
- function(e)
-   if e:getProperty(eventUserData) == generatedShortcutTag then
-     return false
-   end
-   local flags = e:getFlags()
-   if flags.cmd and not (flags.ctrl or flags.alt or flags.fn)
-       and e:getCharacters(true) == "{" then
-     hs.eventtap.keyStrokes("(")
      return true
    end
 
