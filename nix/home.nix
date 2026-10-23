@@ -1,3 +1,4 @@
+{ mapDirFilewise }:
 {
   config,
   lib,
@@ -37,33 +38,49 @@ let
 
   configs = commonConfigs ++ (platformConfigs.${platform} or [ ]);
 
-  fileByFileConfigs = [
-    # Runtime-generated files stay outside the checkout.
-    "emacs"
-    "zsh"
-
-    # Existing local additions stay alongside the managed files.
-    "shell"
-  ];
-
-  linkDirectories =
-    { directory, sources }:
+  # Return a (path: type: bool) predicate from root/.gitignore.
+  # Interpret patterns relative to root; a missing file permits all paths.
+  gitignoreFilterFor =
+    root:
     let
-      mapDirFilewise = import ./map-dir-filewise.nix { inherit lib directory; };
+      ignoreFile = root + "/.gitignore";
+      rules = lib.optionalString (builtins.pathExists ignoreFile) (builtins.readFile ignoreFile);
     in
+    pkgs.nix-gitignore.gitignoreFilter rules root;
+
+  repositoryFilter = gitignoreFilterFor (/. + cfg.checkout);
+
+  # Return a map of destination filenames to absolute source paths.
+  # Each sources entry has a checkout-relative source and an absolute target beneath directory.
+  # Returned destination names are relative to directory.
+  # For a directory source, include its files beneath target, preserving their layout and applying both ignore filters.
+  # For a file, use target as its name.
+  linkSources =
+    { directory, sources }:
     lib.mergeAttrsList (
       map (
         { source, ... }@args:
-        mapDirFilewise (
-          args
-          // {
-            source = /. + "${cfg.checkout}/${source}";
-          }
-        )
+        let
+          sourcePath = /. + "${cfg.checkout}/${source}";
+        in
+        if builtins.readFileType sourcePath == "directory" then
+          mapDirFilewise (
+            args
+            // {
+              inherit directory;
+              source = sourcePath;
+              filters = [
+                repositoryFilter
+                (gitignoreFilterFor sourcePath)
+              ];
+            }
+          )
+        else
+          { ${lib.removePrefix "${directory}/" args.target} = toString sourcePath; }
       ) sources
     );
 
-  homeDirectories = [
+  homeSources = [
     {
       source = "homedir";
       target = config.home.homeDirectory;
@@ -82,22 +99,19 @@ let
     target = config.home.homeDirectory;
   };
 
-  configDirectories = map (name: {
+  configSources = map (name: {
     source = "dotconfig/${name}";
     target = "${config.xdg.configHome}/${name}";
-  }) (lib.intersectLists fileByFileConfigs configs);
+  }) configs;
 
-  homeLinks = linkDirectories {
+  homeLinks = linkSources {
     directory = config.home.homeDirectory;
-    sources = homeDirectories;
+    sources = homeSources;
   };
-  configLinks = linkDirectories {
+  configLinks = linkSources {
     directory = config.xdg.configHome;
-    sources = configDirectories;
+    sources = configSources;
   };
-  directConfigLinks = lib.genAttrs (lib.subtractLists fileByFileConfigs configs) (
-    name: "${cfg.checkout}/dotconfig/${name}"
-  );
   fileDefaults = lib.mapAttrs (
     _: source: {
       source = lib.mkDefault (config.lib.file.mkOutOfStoreSymlink source);
@@ -135,8 +149,7 @@ in
       ".zshenv".source = lib.mkDefault (
         config.lib.file.mkOutOfStoreSymlink "${cfg.checkout}/dotconfig/zsh/.homedir/.zshenv"
       );
-
     };
-    xdg.configFile = fileDefaults (configLinks // directConfigLinks);
+    xdg.configFile = fileDefaults configLinks;
   };
 }

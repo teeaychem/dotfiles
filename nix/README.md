@@ -15,16 +15,13 @@ and checkout.
 
 ## Linking
 
-Links point into the editable checkout.
-Most configs use directory links; Emacs, Zsh, and Shell use individual file links via `map-dir-filewise.nix`.
-The helper also maps home files and scripts, excluding exclusions.
-
 Existing file edits apply immediately.
-Rerun setup after Nix changes or adding or removing individually linked files.
+Rerun setup after Nix or ignore-rule changes, or adding or removing managed files.
 Filewise discovery reads the live checkout, so new files need no `git add`.
 
 ## Configuration
 
+- `flake.nix`: inputs, profiles, and the `lib.mapDirFilewise` lambda.
 - `home.nix`: config lists, platform selection, and link declarations.
 - `dotfiles.checkout`: source checkout; defaults to `~/dotfiles` when imported.
 - `dotfiles.personal`: opt-in personal layer.

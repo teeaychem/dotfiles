@@ -19,6 +19,30 @@
         "x86_64-linux"
         "aarch64-linux"
       ];
+      # Return target names relative to directory, mapped to paths beneath source.
+      # Preserve source-relative layout beneath target. Every (path: type: bool)
+      # filter must allow an entry; rejected directories are not traversed.
+      # Discovery does not copy file contents into the store.
+      mapDirFilewise =
+        { directory, source, target, filters ? [ ] }:
+        let
+          inherit (nixpkgs) lib;
+          sourcePrefix = "${toString source}/";
+          targetPrefix = lib.removePrefix "${directory}/" "${target}/";
+          files = lib.fileset.toList (
+            lib.fileset.fromSource (lib.cleanSourceWith {
+              src = /. + toString source;
+              filter = path: type: lib.all (filter: filter path type) filters;
+            })
+          );
+        in
+        lib.listToAttrs (
+          map (file: {
+            name = targetPrefix + lib.removePrefix sourcePrefix (toString file);
+            value = toString file;
+          }) files
+        );
+
       current = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.${builtins.currentSystem};
         modules = [
@@ -32,7 +56,8 @@
       };
     in
     {
-      homeModules.default = import ./nix/home.nix;
+      lib.mapDirFilewise = mapDirFilewise;
+      homeModules.default = import ./nix/home.nix { inherit mapDirFilewise; };
 
       homeConfigurations = {
         inherit current;
