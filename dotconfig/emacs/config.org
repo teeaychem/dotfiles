@@ -1911,35 +1911,6 @@ To highlight indentations
 (use-package c-ts-mode
   :elpaca nil
 
-  :preface
-  (defun my/clang-format-column-limit ()
-    "Return the effective clang-format ColumnLimit for the current buffer."
-    (when-let* ((clang-format (executable-find "clang-format"))
-                (filename buffer-file-name))
-      (with-temp-buffer
-        (let ((status
-               (process-file clang-format nil `(t nil) nil
-                             "-style=file"
-                             "-assume-filename" filename
-                             "-dump-config")))
-          (when (zerop status)
-            (goto-char (point-min))
-            (when (re-search-forward "^ColumnLimit:[[:space:]]*\\([0-9]+\\)" nil t)
-              (string-to-number (match-string 1))))))))
-
-  (defun my/c-set-fill-column-from-clang-format ()
-    "Set `fill-column' from clang-format's effective ColumnLimit."
-    (interactive)
-    (if-let ((column-limit (my/clang-format-column-limit)))
-        (if (> column-limit 0)
-            (progn
-              (setq-local fill-column column-limit)
-              (display-fill-column-indicator-mode 1)
-              (when (called-interactively-p 'interactive)
-                (message "fill-column set to %d from clang-format" column-limit)))
-          (user-error "clang-format ColumnLimit is 0"))
-      (user-error "Could not determine clang-format ColumnLimit")))
-
   :mode (("\\.c\\'" . c-ts-mode)
          ("\\.\\(?:H\\|cc\\|hh\\|cpp\\|hpp\\|cxx\\|hxx\\|c\\+\\+\\|h\\+\\+\\|ipp\\|ixx\\|cppm\\)\\'" . c++-ts-mode)
          ("\\.\\(?:cc\\|cpp\\|cxx\\|h\\|hh\\|hpp\\|hxx\\)\\.inc\\'" . c++-ts-mode)
