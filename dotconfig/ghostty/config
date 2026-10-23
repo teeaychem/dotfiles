@@ -7,10 +7,9 @@ config-file = ?config.local
 
 auto-update = off
 
-command = fish
 
 cursor-style = block
-drag-handle = never
+# drag-handle = never
 
 font-family = "M+1Code Nerd Font Mono"
 
