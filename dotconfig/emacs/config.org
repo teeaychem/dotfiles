@@ -925,29 +925,6 @@ Supported values are `bottom' and `right'.")
 #+end_src
 
 
-* developed
-** named desktop
-
-#+begin_src emacs-lisp
-(use-package named-desktop
-  :elpaca (named-desktop
-           :host codeberg
-           :repo "teeaychem/named-desktop"
-           :files ("*.el"))
-
-  :custom
-  (named-desktop-directory (expand-file-name "var/desktops/" user-emacs-directory))
-
-  :bind (:prefix-map desktop-prefix-map
-                     :prefix "C-c D"
-                     ("d" . named-desktop-delete)
-                     ("l" . named-desktop-list)
-                     ("r" . named-desktop-read)
-                     ("s" . named-desktop-save)
-                     ("S" . named-desktop-save-as)))
-#+end_src
-
-
 * external, etc.
 ** activities
 
