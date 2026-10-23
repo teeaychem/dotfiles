@@ -2879,6 +2879,11 @@ An explicit terminal avoids stale `tty' parameters on emacsclient frames."
 maybe: https://github.com/casouri/eldoc-box
 
 #+begin_src emacs-lisp
+(use-package clangd-tools
+  :elpaca nil
+  :load-path "local-packages"
+  :commands clangd-tools-query-drivers)
+
 (use-package eglot
   :elpaca nil
   ;; :pin manual
@@ -2922,50 +2927,10 @@ maybe: https://github.com/casouri/eldoc-box
 
 
   ;; (add-to-list 'eglot-stay-out-of 'flymake)
-  (defun my/clangd--path-variants (path)
-    "Return PATH and its canonical path when PATH is executable."
-    (when (and path (file-executable-p path)) (delete-dups (list (expand-file-name path) (file-truename path)))))
-
-  (defun my/clangd--find-executables (names directories)
-    "Find executable NAMES in DIRECTORIES and on `exec-path'."
-    (let (paths)
-      (dolist (directory directories)
-        (dolist (name names)
-          (let ((path (expand-file-name name directory)))
-            (when (file-executable-p path) (push path paths)))))
-      (dolist (name names)
-        (let ((path (executable-find name)))
-          (when path (push path paths))))
-      (delete-dups (nreverse paths))))
-
-  (defun my/clangd--compiler-names (clangd)
-    "Return standard compiler names matching CLANGD's version, if any."
-    (let ((compilers '("clang" "clang++")) versioned)
-      (dolist (path (my/clangd--path-variants clangd))
-        (let ((basename (file-name-nondirectory path)))
-          (when (string-match "\\`clangd\\(.+\\)\\'" basename)
-            (let ((suffix (match-string 1 basename)))
-              (dolist (compiler compilers)
-                (push (concat compiler suffix) versioned))))))
-      (delete-dups (nconc compilers (nreverse versioned)))))
-
-  (defun my/clangd-query-drivers (clangd)
-    "Return trusted Clang driver paths associated with CLANGD.
-
-Both the symlink spelling and canonical path are included because compilation databases may use either.
-`cc' and `c++' are included only when they resolve to one of the discovered Clang drivers."
-    (let* ((clangd-paths (my/clangd--path-variants clangd))
-           (directories (delete-dups (mapcar #'file-name-directory clangd-paths)))
-           (drivers (my/clangd--find-executables (my/clangd--compiler-names clangd) directories))
-           (canonical-drivers (delete-dups (mapcar #'file-truename drivers)))
-           (aliases (delq nil (mapcar (lambda (path) (when (member (file-truename path) canonical-drivers) path))
-                                      (my/clangd--find-executables '("cc" "c++") directories)))))
-      (delete-dups (apply #'append (mapcar #'my/clangd--path-variants (append drivers aliases))))))
-
   (defun my/eglot-clangd (&optional _interactive _project)
     "Return the generic, cross-platform clangd command for Eglot."
     (let* ((clangd (or (executable-find "clangd") "clangd"))
-           (drivers (and (file-executable-p clangd) (my/clangd-query-drivers clangd)))
+           (drivers (and (file-executable-p clangd) (clangd-tools-query-drivers clangd)))
            (clangd-jobs (or (getenv "CLANGD_JOBS") "8")))
       (append (list clangd)
               ;; `--query-driver' causes clangd to execute argv[0] from a compile command, so allow only explicit local Clang paths.
