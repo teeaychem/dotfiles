@@ -2032,7 +2032,9 @@ https://robert.kra.hn/posts/rust-emacs-setup/
   :custom
   (TeX-electric-math (cons "\\(" "\\)"))
   (TeX-electric-sub-and-superscript t)
-  (TeX-master 'dwin)
+  (TeX-engine 'luatex)
+  (TeX-master 'dwim)
+  (TeX-output-dir "build") ;; Match latexmkrc
   (TeX-parse-self t)
   (TeX-save-query nil)
   (TeX-source-correlate-method-active 'synctex)
