@@ -1,15 +1,13 @@
-{ linkSources }:
 {
   config,
   lib,
+  linkFiles,
   pkgs,
   ...
 }:
 let
   cfg = config.dotfiles;
   platform = pkgs.stdenv.hostPlatform.parsed.kernel.name;
-
-  linkFiles = linkSources { inherit config lib pkgs; };
 
   /*nixfmt:disable*/
   configLinks = map (source: linkFiles {

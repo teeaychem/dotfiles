@@ -1,8 +1,4 @@
-{ linkSources }:
-{ config, lib, pkgs, ... }:
-let
-  linkFiles = linkSources { inherit config lib pkgs; };
-in
+{ config, linkFiles, ... }:
 {
   home.file = linkFiles {
     source = "personal";

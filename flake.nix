@@ -19,7 +19,6 @@
         "x86_64-linux"
         "aarch64-linux"
       ];
-      linkSources = import ./nix/link-sources.nix;
 
       # Assemble a configuration with a shared compatibility baseline.
       # Default to the running system; read user and checkout paths at evaluation.
@@ -44,12 +43,15 @@
         };
     in
     {
-      homeModules.default = import ./nix/home.nix { inherit linkSources; };
+      homeModules.default = { config, lib, pkgs, ... }: {
+        imports = [ ./nix/home.nix ];
+        _module.args.linkFiles = import ./nix/link-sources.nix { inherit config lib pkgs; };
+      };
 
       homeConfigurations = {
         mbp = mkHome {
           system = "aarch64-darwin";
-          modules = [ (import ./nix/personal.nix { inherit linkSources; }) ];
+          modules = [ ./nix/personal.nix ];
         };
 
         # A generic entry.
