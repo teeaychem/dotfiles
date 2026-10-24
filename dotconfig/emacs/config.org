@@ -1575,9 +1575,10 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package mise
-    :elpaca t
-    :config
-    (global-mise-mode 1))
+  :disabled
+  :elpaca t
+  :config
+  (global-mise-mode 1))
 #+end_src
 
 ** multiple cursors

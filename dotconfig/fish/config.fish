@@ -96,7 +96,7 @@ load_aliases "$XDG_CONFIG_HOME/shell/aliases/base.aliases"
 
 load_history_ignore "$XDG_CONFIG_HOME/shell/history/ignore"
 
-mise activate fish | source
+# mise activate fish | source
 
 switch (uname)
     case Darwin
