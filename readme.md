@@ -17,12 +17,12 @@ mise --env personal bootstrap dotfiles apply # `--env personal` selects the opt-
 
 ## Nix / Home Manager
 
-From the checkout root, with Nix and Fish available:
+From the checkout root, with Nix and its `nix-command` and `flakes` features enabled:
 
 ```sh
-./hm-setup build             # Build without changing home links.
-./hm-setup                   # Apply for the current user and checkout.
-./hm-setup --personal        # Include the optional personal layer.
+nix run .#home-manager -- build --flake .#portable --impure
+nix run .#home-manager -- switch --flake .#portable --impure
+nix run .#home-manager -- switch --flake .#mbp --impure
 ```
 
 Config files remain editable in the checkout. See [the Home Manager notes](nix/README.md)

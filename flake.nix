@@ -19,55 +19,47 @@
         "x86_64-linux"
         "aarch64-linux"
       ];
-      # Return target names relative to directory, mapped to paths beneath source.
-      # Preserve source-relative layout beneath target. Every (path: type: bool)
-      # filter must allow an entry; rejected directories are not traversed.
-      # Discovery does not copy file contents into the store.
-      mapDirFilewise =
-        { directory, source, target, filters ? [ ] }:
-        let
-          inherit (nixpkgs) lib;
-          sourcePrefix = "${toString source}/";
-          targetPrefix = lib.removePrefix "${directory}/" "${target}/";
-          files = lib.fileset.toList (
-            lib.fileset.fromSource (lib.cleanSourceWith {
-              src = /. + toString source;
-              filter = path: type: lib.all (filter: filter path type) filters;
-            })
-          );
-        in
-        lib.listToAttrs (
-          map (file: {
-            name = targetPrefix + lib.removePrefix sourcePrefix (toString file);
-            value = toString file;
-          }) files
-        );
+      linkSources = import ./nix/link-sources.nix;
 
-      current = home-manager.lib.homeManagerConfiguration {
-        pkgs = nixpkgs.legacyPackages.${builtins.currentSystem};
-        modules = [
-          self.homeModules.default
-          {
-            home.username = builtins.getEnv "USER";
-            home.homeDirectory = builtins.getEnv "HOME";
-            dotfiles.checkout = builtins.getEnv "PWD";
-          }
-        ];
-      };
+      # Assemble a configuration with a shared compatibility baseline.
+      # Default to the running system; read user and checkout paths at evaluation.
+      mkHome =
+        {
+          system ? builtins.currentSystem,
+          stateVersion ? "26.05",
+          modules ? [ ],
+        }:
+        home-manager.lib.homeManagerConfiguration {
+          pkgs = nixpkgs.legacyPackages.${system};
+          modules = [
+            self.homeModules.default
+            {
+              home.username = builtins.getEnv "USER";
+              home.homeDirectory = builtins.getEnv "HOME";
+              home.stateVersion = stateVersion;
+              dotfiles.checkout = builtins.getEnv "PWD";
+            }
+          ]
+          ++ modules;
+        };
     in
     {
-      lib.mapDirFilewise = mapDirFilewise;
-      homeModules.default = import ./nix/home.nix { inherit mapDirFilewise; };
+      homeModules.default = import ./nix/home.nix { inherit linkSources; };
 
       homeConfigurations = {
-        inherit current;
-        current-personal = current.extendModules {
-          modules = [ { dotfiles.personal = true; } ];
+        mbp = mkHome {
+          system = "aarch64-darwin";
+          modules = [ (import ./nix/personal.nix { inherit linkSources; }) ];
         };
+
+        # A generic entry.
+        portable = mkHome { };
       };
 
       apps = nixpkgs.lib.genAttrs systems (system: {
+
         home-manager = {
+          # Expose home manager through `nix run .#home-manager`.
           type = "app";
           program = "${home-manager.packages.${system}.home-manager}/bin/home-manager";
         };

@@ -18,6 +18,7 @@
 "~/.config/latexmk" = { source = "../dotconfig/latexmk", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/mise" = { source = "../dotconfig/mise", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/mise/miserc.toml" = { source = "../.miserc.toml", mode = "symlink" }
+"~/.config/nix" = { source = "../dotconfig/nix", mode = "symlink-each", exclude = [".DS_Store", "nix.local.conf"] }
 "~/.config/nvim" = { source = "../dotconfig/nvim", mode = "symlink-each", exclude = [".DS_Store"] }
 "~/.config/pycodestyle" = { source = "../dotconfig/pycodestyle", mode = "symlink" }
 "~/.config/shell" = { source = "../dotconfig/shell", mode = "symlink-each", exclude = [".DS_Store"] }
