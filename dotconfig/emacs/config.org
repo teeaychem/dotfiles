@@ -1985,7 +1985,7 @@ Keep existing cursors and avoid duplicate positions."
 
 #+begin_src emacs-lisp
 (use-package forth-mode
-  :elpaca t
+  :elpaca nil
   :defer t)
 #+end_src
 
