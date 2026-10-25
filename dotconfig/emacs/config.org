@@ -737,31 +737,6 @@ Preserve point and match data, and retain Isearch's visibility filtering."
    ("RET" . #'newline)))
 #+end_src
 
-** skeleton
-
-#+begin_src emacs-lisp
-(use-package skeleton
-  :elpaca nil
-
-  :init
-  (defconst slash-escaped-pairs
-    '((?\( . ?\))
-      (?\[ . ?\])
-      (?\{ . ?\})))
-
-  (defun insert-pair-or-slash-escaped-pair (arg)
-    "Insert ARG copies of the typed character, pairing slash-escaped delimiters."
-    (interactive "p")
-    (let ((closing-char (alist-get last-command-event slash-escaped-pairs)))
-      (if (and closing-char (eq (char-before) ?\\))
-          (skeleton-insert `(nil ,last-command-event _ ,(string ?\\ closing-char)) nil)
-        (self-insert-command arg))))
-
-  :config
-  (dolist (opening-char (mapcar #'car slash-escaped-pairs))
-    (keymap-global-set (string opening-char) #'insert-pair-or-slash-escaped-pair)))
-#+end_src
-
 ** subword
 
 #+begin_src emacs-lisp
@@ -1641,7 +1616,8 @@ To highlight indentations
          ("a" . mc/mark-all-like-this)
          ("l" . mc/edit-lines)
          :exit
-         ("e" . mc/mark-more-like-this-extended))
+         ("e" . mc/mark-more-like-this-extended)
+         ("p" . my/mc-mark-pair))
 
   :bind (("C-S-." . mc/mark-next-like-this)
          ("C-S-," . mc/mark-previous-like-this)
@@ -1652,6 +1628,28 @@ To highlight indentations
          ("M-<M-down-mouse-1>" . mc/add-cursor-on-click))
 
   :config
+  (defun my/mc-mark-pair ()
+    "Add cursors before both delimiters of a pair.
+Use the pair at point, or the innermost enclosing pair.
+Keep existing cursors and avoid duplicate positions."
+    (interactive)
+    (let* ((beg (save-excursion
+                  (unless (eq (char-syntax (or (char-after) 0)) ?\()
+                    (backward-up-list 1))
+                  (point)))
+           (end (scan-sexps beg 1)))
+      (goto-char beg)
+      (when-let* ((cursor (mc/fake-cursor-at-point)))
+        (mc/pop-state-from-overlay cursor))
+      (deactivate-mark)
+      (mc/save-excursion
+        (goto-char (1- end))
+        (unless (mc/fake-cursor-at-point)
+          (mc/create-fake-cursor-at-point)))
+      (mc/maybe-multiple-cursors-mode)))
+
+  (add-to-list 'mc/cmds-to-run-once 'my/mc-mark-pair)
+
   ;; Repeat mode's C-g exits via `ignore'; don't prompt to replay it.
   (add-to-list 'mc/cmds-to-run-once 'ignore))
 #+end_src
