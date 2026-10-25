@@ -494,6 +494,42 @@ Supported values are `bottom' and `right'.")
   (setq lazy-count-suffix-format nil)
   (setq search-whitespace-regexp ".*?")
 
+  (defun my/isearch-with-predicate (predicate)
+    "Run regexp Isearch, filtering matches with PREDICATE.
+PREDICATE receives the match's start and end positions.
+Preserve point and match data, and retain Isearch's visibility filtering."
+    (let ((isearch-filter-predicate
+           (lambda (beg end)
+             (save-match-data
+               (save-excursion
+                 (and (isearch-filter-visible beg end)
+                      (funcall predicate beg end)))))))
+      (isearch-forward-regexp)))
+
+  (defun my/word-not-symbol-p (beg end)
+    "Return non-nil if BEG..END spans a whole word but not a whole symbol."
+    (goto-char beg)
+    (let ((bounds (cons beg end)))
+      (and (equal bounds (bounds-of-thing-at-point 'word))
+           (not (equal bounds (bounds-of-thing-at-point 'symbol))))))
+
+  (defun my/symbol-not-word-p (beg end)
+    "Return non-nil if BEG..END spans a whole symbol but not a single word."
+    (goto-char beg)
+    (let ((bounds (cons beg end)))
+      (and (equal bounds (bounds-of-thing-at-point 'symbol))
+           (not (equal bounds (bounds-of-thing-at-point 'word))))))
+
+  (defun my/isearch-word-not-symbol ()
+    "Search a regexp for whole words that are not whole symbols."
+    (interactive)
+    (my/isearch-with-predicate #'my/word-not-symbol-p))
+
+  (defun my/isearch-symbol-not-word ()
+    "Search a regexp for whole symbols that are not single words."
+    (interactive)
+    (my/isearch-with-predicate #'my/symbol-not-word-p))
+
   :bind (:map isearch-mode-map
               ("C-o" . isearch-occur)
               ("M-%" . isearch-query-replace)
