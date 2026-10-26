@@ -1221,7 +1221,6 @@ Preserve point and match data, and retain Isearch's visibility filtering."
   (exec-path-from-shell-variables
    '("PATH"
      "DICPATH"
-     "REPOS_DIR"
      "XDG_CONFIG_HOME"
      "OPENAI_API_KEY"
      "CODEX_API_KEY"

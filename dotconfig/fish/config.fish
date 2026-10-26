@@ -89,14 +89,14 @@ if test -x "$HOMEBREW_PREFIX/bin/brew"
     "$HOMEBREW_PREFIX/bin/brew" shellenv fish | source
 end
 
+test -r "$HOME/.nix-profile/etc/profile.d/hm-session-vars.fish"; and source "$HOME/.nix-profile/etc/profile.d/hm-session-vars.fish"
+
 # Usage inside config.fish:
 load_vars "$XDG_CONFIG_HOME/shell/vars/base.vars"
 
 load_aliases "$XDG_CONFIG_HOME/shell/aliases/base.aliases"
 
 load_history_ignore "$XDG_CONFIG_HOME/shell/history/ignore"
-
-# mise activate fish | source
 
 switch (uname)
     case Darwin
@@ -160,10 +160,6 @@ end
 
 if status is-interactive; and command -q zoxide
     zoxide init fish | source
-end
-
-if status is-interactive; and command -q mise
-    mise activate fish | source
 end
 
 if status is-interactive; and command -q direnv

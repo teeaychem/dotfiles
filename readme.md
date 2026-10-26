@@ -1,6 +1,5 @@
 # dotfiles
 
-mise deploys configurations to `$HOME` and loads platform-specific environments.
 
 ```sh
 mise trust mise/config.toml

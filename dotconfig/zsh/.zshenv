@@ -64,7 +64,9 @@ export SAVEHIST=10000                # Maximum events in history file
 
 typeset -gU path fpath # ensure path arrays do not contain duplicates.
 
-eval "$(mise activate zsh)"
+if [[ -r "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]]; then
+    source "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+fi
 
 # # gpg
 

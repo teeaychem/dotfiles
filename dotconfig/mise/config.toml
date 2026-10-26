@@ -34,10 +34,6 @@ LESSHISTFILE = "{{xdg_state_home}}/less/history"
 KERAS_HOME = "{{xdg_data_home}}/keras"
 ELAN_HOME = "{{env.HOME}}/.local/opt/elan"
 
-
-REPOS_DIR = "{{ (env.HOME ~ '/repos') if os() == 'macos' else '' }}"
-LLVM_SRC = "{{ (env.REPOS_DIR ~ '/llvm') if env.REPOS_DIR != '' else '' }}"
-
 [env._]
 path = [
   "{{env.HOME}}/.cargo/bin",
