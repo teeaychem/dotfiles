@@ -858,12 +858,12 @@ Preserve point and match data, and retain Isearch's visibility filtering."
          ("C-<down>"  . shrink-window)
          ("o"         . window-layout-rotate-clockwise)
          ("O"         . window-layout-rotate-anticlockwise)
+         ("q"         . delete-window)
          ("z"         . winner-undo)
          ("u"         . winner-undo)
          ("U"         . winner-redo)
 
          :exit
-         ("q"         . delete-window)
          ("f"         . delete-other-windows)
          ("e"         . split-window-below)
          ("r"         . split-window-right)
@@ -1503,6 +1503,16 @@ To highlight indentations
    '("k" . meow-prev)
    '("<escape>" . ignore))
 
+  (dolist (state '(normal motion))
+    (meow-define-keys state
+      '("H" . backward-sexp)
+      '("J" . forward-paragraph)
+      '("K" . backward-paragraph)
+      '("L" . forward-sexp)))
+
+  ;; Keep C-c bindings behind SPC c and allow native motion-state fallbacks.
+  (setf (alist-get 'leader meow-keymap-alist) (make-sparse-keymap))
+
   (meow-leader-define-key
    '("1" . meow-digit-argument)
    '("2" . meow-digit-argument)
@@ -1547,15 +1557,11 @@ To highlight indentations
    '("g" . meow-cancel-selection)
    '("G" . meow-grab)
    '("h" . meow-left)
-   '("H" . backward-sexp)
    '("i" . meow-insert)
    '("I" . meow-open-above)
    '("j" . meow-next)
-   '("J" . forward-paragraph)
    '("k" . meow-prev)
-   '("K" . backward-paragraph)
    '("l" . meow-right)
-   '("L" . forward-sexp)
    '("m" . meow-join)
    '("n" . meow-search)
    '("o" . meow-block)
