@@ -98,7 +98,19 @@ else if test -r "$HOME/.nix-profile/etc/profile.d/nix.fish"
     source "$HOME/.nix-profile/etc/profile.d/nix.fish"
 end
 
-test -r "$HOME/.nix-profile/etc/profile.d/hm-session-vars.fish"; and source "$HOME/.nix-profile/etc/profile.d/hm-session-vars.fish"
+# Search active profiles from highest priority, then standard user-profile locations.
+for nix_profile in (string split --no-empty ' ' -- "$NIX_PROFILES")[-1..1] "$XDG_STATE_HOME/nix/profile" "$HOME/.nix-profile"
+    if test -r "$nix_profile/etc/profile.d/hm-session-vars.fish"
+        source "$nix_profile/etc/profile.d/hm-session-vars.fish"
+        break
+    end
+end
+set -e nix_profile
+
+# GnuPG terminal prompts.
+if status is-interactive; and test -t 0
+    set -gx GPG_TTY (tty)
+end
 
 # Usage inside config.fish:
 load_vars "$XDG_CONFIG_HOME/shell/vars/base.vars"
