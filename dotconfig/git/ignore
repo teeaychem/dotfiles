@@ -1,6 +1,10 @@
 .codex
 AGENTS.md
+
+# direnv
 .direnv/
+.envrc
+.envrc.local
 
 # C/C++
 compile_commands.json
