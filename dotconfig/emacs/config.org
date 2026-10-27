@@ -1495,6 +1495,10 @@ To highlight indentations
   :elpaca t
   :demand t
 
+  ;; Native region deletion in insert state; inherit Meow's setting on exit.
+  :hook ((meow-insert-enter . (lambda () (setq-local delete-active-region t)))
+         (meow-insert-exit . (lambda () (kill-local-variable 'delete-active-region))))
+
   :config
   (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
 
