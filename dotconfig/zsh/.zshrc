@@ -10,6 +10,11 @@ antidote load
 fpath=("${XDG_CONFIG_HOME}/zsh/functions" $fpath)
 autoload -Uz fix-ssh-agent load_aliases venv-activate
 
+# GnuPG terminal prompts.
+if [[ -t 0 ]]; then
+    export GPG_TTY=$TTY
+fi
+
 case "$OSTYPE" in
     darwin*)
     if [[ -f ${XDG_CONFIG_HOME}/zsh/darwin.sh ]]; then
@@ -26,11 +31,11 @@ case "$OSTYPE" in
     ;;
 esac
 
+load_aliases "$XDG_CONFIG_HOME/shell/aliases/base.aliases"
+
 if [[ -f ${XDG_CONFIG_HOME}/zsh/local.zsh ]]; then
     source ${XDG_CONFIG_HOME}/zsh/local.zsh
 fi
-
-load_aliases "$XDG_CONFIG_HOME/shell/aliases/base.aliases"
 
 # options
 
@@ -58,43 +63,27 @@ setopt EXTENDED_HISTORY # record timestamp of command
 
 typeset -ga history_ignore_patterns
 history_ignore_patterns=()
-typeset -g pending_history_entry
 
 while IFS= read -r pattern || [[ -n "$pattern" ]]; do
     [[ "$pattern" =~ '^[[:space:]]*(#|$)' ]] && continue
     history_ignore_patterns+=("$pattern")
 done < "$XDG_CONFIG_HOME/shell/history/ignore"
 
-function _defer_history_entry() {
+function _filter_history_entry() {
     emulate -L zsh
 
     local command="${1%%$'\n'}"
     local pattern
 
-    pending_history_entry=
-
     for pattern in "${history_ignore_patterns[@]}"; do
         [[ "$command" =~ "$pattern" ]] && return 1
     done
 
-    pending_history_entry="$command"
-    return 1
-}
-
-function _save_successful_history() {
-    local exit_status=$?
-    local command="$pending_history_entry"
-
-    pending_history_entry=
-
-    if (( exit_status == 0 )) && [[ -n "$command" ]]; then
-        print -sr -- "$command"
-    fi
+    return 0
 }
 
 autoload -Uz add-zsh-hook
-add-zsh-hook zshaddhistory _defer_history_entry
-add-zsh-hook precmd _save_successful_history
+add-zsh-hook zshaddhistory _filter_history_entry
 
 # # # corrections
 # setopt CORRECT
@@ -129,16 +118,6 @@ setopt COMPLETE_IN_WORD # complete from both ends of a word
 setopt PATH_DIRS        # perform path search even on command names with slashes
 setopt NO_FLOW_CONTROL  # disable start/stop characters in shell editor
 setopt NO_MENU_COMPLETE # do not autoselect the first completion entry
-
-# # rust
-export CARGO_HOME="${HOME}/.cargo"
-if [[ -d $CARGO_HOME ]]; then
-    if [[ -f $CARGO_HOME/env && -r $CARGO_HOME/env ]]; then
-        source "${CARGO_HOME}/env"
-    else
-        echo "CARGO_HOME set, but CARGO_HOME/env unavailable"
-    fi
-fi
 
 # # OCaml
 [[ -r "$OPAMROOT/opam-init/init.zsh" ]] && source "$OPAMROOT/opam-init/init.zsh" >/dev/null 2>/dev/null

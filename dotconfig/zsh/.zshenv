@@ -62,22 +62,13 @@ export HISTFILE="$ZDOTDIR/.zhistory" # History filepath
 export HISTSIZE=10000                # Maximum events for internal history
 export SAVEHIST=10000                # Maximum events in history file
 
-# Languages, etc.
-
-
-
-# # OCaml
-# export OPAMROOT="${XDG_DATA_HOME}/opam"
-
-# # python
-
 typeset -gU path fpath # ensure path arrays do not contain duplicates.
 
-if [[ -r "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]]; then
-    source "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
-fi
-
-# # gpg
-
-# https://www.gnupg.org/(it)/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html
-export GPG_TTY=$(tty)
+# Search active profiles from highest priority, then standard user-profile locations.
+for nix_profile in ${(Oa)${=NIX_PROFILES}} "$XDG_STATE_HOME/nix/profile" "$HOME/.nix-profile"; do
+    if [[ -r "$nix_profile/etc/profile.d/hm-session-vars.sh" ]]; then
+        source "$nix_profile/etc/profile.d/hm-session-vars.sh"
+        break
+    fi
+done
+unset nix_profile
