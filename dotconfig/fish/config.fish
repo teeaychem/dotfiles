@@ -89,6 +89,15 @@ if test -x "$HOMEBREW_PREFIX/bin/brew"
     "$HOMEBREW_PREFIX/bin/brew" shellenv fish | source
 end
 
+# Nix initializes its profile paths independently of Homebrew.
+if test -r /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish
+    source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish
+else if test -r "$XDG_STATE_HOME/nix/profile/etc/profile.d/nix.fish"
+    source "$XDG_STATE_HOME/nix/profile/etc/profile.d/nix.fish"
+else if test -r "$HOME/.nix-profile/etc/profile.d/nix.fish"
+    source "$HOME/.nix-profile/etc/profile.d/nix.fish"
+end
+
 test -r "$HOME/.nix-profile/etc/profile.d/hm-session-vars.fish"; and source "$HOME/.nix-profile/etc/profile.d/hm-session-vars.fish"
 
 # Usage inside config.fish:

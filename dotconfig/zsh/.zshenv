@@ -21,6 +21,15 @@ if [[ -x "${HOMEBREW_PREFIX:-}/bin/brew" ]]; then
     eval "$("${HOMEBREW_PREFIX}/bin/brew" shellenv zsh)"
 fi
 
+# Nix initializes its profile paths independently of Homebrew.
+if [[ -r /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
+    source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+elif [[ -r "$XDG_STATE_HOME/nix/profile/etc/profile.d/nix.sh" ]]; then
+    source "$XDG_STATE_HOME/nix/profile/etc/profile.d/nix.sh"
+elif [[ -r "$HOME/.nix-profile/etc/profile.d/nix.sh" ]]; then
+    source "$HOME/.nix-profile/etc/profile.d/nix.sh"
+fi
+
 load_vars() {
   setopt local_options extended_glob
 
