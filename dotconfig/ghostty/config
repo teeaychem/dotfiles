@@ -9,7 +9,7 @@ auto-update = off
 
 
 cursor-style = block
-# drag-handle = never
+drag-handle = never
 
 font-family = "M+1Code Nerd Font Mono"
 
@@ -26,6 +26,7 @@ keybind = super+0=reset_font_size
 keybind = super++=increase_font_size:1
 keybind = super+-=decrease_font_size:1
 keybind = super+==unbind
+keybind = super+enter=unbind
 
 # macOS owned
 keybind = ctrl+tab=unbind
@@ -33,6 +34,7 @@ keybind = ctrl+shift+tab=unbind
 
 macos-option-as-alt = true
 macos-titlebar-proxy-icon = hidden
+macos-titlebar-style = tabs
 
 mouse-hide-while-typing = true
 
