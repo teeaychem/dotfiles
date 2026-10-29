@@ -1,8 +1,6 @@
 # tap "kgarner7/feishin"
 # cask "feishin"
 
-
-brew "cppinsights"
 brew "fish-lsp"
 brew "llvm" # lldb-dap; keg-only, resolved by ~/.local/bin/lldb-dap
 brew "navidrome"
@@ -17,7 +15,7 @@ cask "hammerspoon"
 cask "iina"
 cask "keepassxc"
 cask "keka"
-cask "rectangle"
+# cask "rectangle"
 cask "skim"
 cask "vlc"
 

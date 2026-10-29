@@ -18,7 +18,6 @@ brew "tree-sitter-cli"
 
 # git
 brew "git-filter-repo"
-brew "gitui"
 brew "lazygit"
 
 
