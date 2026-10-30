@@ -66,15 +66,26 @@
 
 (setq vc-follow-symlinks t)
 
-;; Load the tangle, regenerating it under `user-emacs-directory' when needed.
-;; `config.org' is deployed as a symlink into the dotfiles checkout; keep the
-;; generated `config.el' outside the repository.
-(require 'ob-tangle)
-(let ((config-org (expand-file-name "config.org" user-emacs-directory))
-      (config-el (expand-file-name "config.el" user-emacs-directory)))
-  (when (file-newer-than-file-p config-org config-el)
-    (org-babel-tangle-file config-org config-el "emacs-lisp"))
-  (load config-el nil 'nomessage))
+(defun my/load-literate-config (source target)
+  "Load TARGET, tangling SOURCE when its content changes.
+Keep the SHA-256 cache beside TARGET."
+  (let* ((cache (concat target ".sha256"))
+         (digest (with-temp-buffer
+                   (insert-file-contents-literally source)
+                   (secure-hash 'sha256 (current-buffer))))
+         (cached-digest (when (file-exists-p cache)
+                          (with-temp-buffer
+                            (insert-file-contents-literally cache)
+                            (buffer-string)))))
+    (unless (and (file-exists-p target) (equal digest cached-digest))
+      (require 'ob-tangle)
+      (org-babel-tangle-file source target "emacs-lisp")
+      (with-temp-file cache (insert digest)))
+    (load target nil 'nomessage)))
+
+(my/load-literate-config
+ (expand-file-name "config.org" user-emacs-directory)
+ (expand-file-name "config.el" user-emacs-directory))
 
 ;; Daemon mode starts its server after loading init.el.
 (unless (daemonp)

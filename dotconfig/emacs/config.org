@@ -892,12 +892,10 @@ Preserve point and match data, and retain Isearch's visibility filtering."
 #+begin_src emacs-lisp
 (defun load-config (name)
   (message (concat "Request to load config: " name))
-  (let* ((file-el (expand-file-name (concat name ".el") user-emacs-directory))
-         (file-org (expand-file-name (concat name ".org") user-emacs-directory)))
+  (let ((file-org (expand-file-name (concat name ".org") user-emacs-directory))
+        (file-el (expand-file-name (concat name ".el") user-emacs-directory)))
     (if (file-exists-p file-org)
-        (progn
-          (when (file-newer-than-file-p file-org file-el) (org-babel-tangle-file file-org file-el "emacs-lisp"))
-          (load file-el nil 'nomessage))
+        (my/load-literate-config file-org file-el)
       (message (concat "Did not find " file-org)))))
 #+end_src
 
