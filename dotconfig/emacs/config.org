@@ -1828,6 +1828,7 @@ Keep existing cursors and avoid duplicate positions."
          ("H" . magit-log-trace-definition)
          ("f" . magit-file-dispatch)
          ("d" . magit-diff)
+         ("u" . my/magit-diff-branch)
          ("r" . magit-refresh))
 
   :custom
@@ -1843,6 +1844,11 @@ Keep existing cursors and avoid duplicate positions."
   ;; (magit-commit-show-diff nil)
 
   :config
+  (defun my/magit-diff-branch (base)
+    "Show this branch's committed changes since it diverged from BASE."
+    (interactive (list (magit-read-branch "Compare branch against")))
+    (magit-diff-range (concat base "...HEAD")))
+
   (defun my/magit-display-buffer (buffer)
     "Display the Magit status buffer in a reusable right-side window."
     (if (eq (buffer-local-value 'major-mode buffer) 'magit-status-mode)
@@ -1853,21 +1859,6 @@ Keep existing cursors and avoid duplicate positions."
            (slot . 0)
            (window-width . 0.33)))
       (magit-display-buffer-traditional buffer)))
-
-  (defun my/magit-diff-range-with-base (original &rest args)
-    "Call ORIGINAL with the current branch's upstream first in ref choices."
-    (let* ((current (magit-get-current-branch))
-           (base (and current (or (magit-get-local-upstream-branch current) (magit-get-upstream-branch current))))
-           (list-refnames (symbol-function 'magit-list-refnames)))
-      (cl-letf (((symbol-function 'magit-list-refnames)
-                 (lambda (&rest ref-args)
-                   (let* ((refs (apply list-refnames ref-args))
-                          (preferred (unless (equal base current) (car (member base refs)))))
-                     (cond (preferred (cons preferred (remove preferred refs)))
-                           (t refs))))))
-        (apply original args))))
-
-  (advice-add 'magit-diff-read-range-or-commit :around #'my/magit-diff-range-with-base)
 
   (defun my/magit-diffstat-counts ()
     "Return addition and deletion counts from the numstat at point."
@@ -1945,6 +1936,7 @@ Keep existing cursors and avoid duplicate positions."
 (use-package magit-todos
   :elpaca t
   :after magit
+  :disabled
   :bind (:map magit-prefix-map
               ("t" . magit-todos-list)))
 #+end_src
