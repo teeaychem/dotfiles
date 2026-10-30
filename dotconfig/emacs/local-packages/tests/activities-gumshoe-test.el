@@ -1,0 +1,97 @@
+;;; activities-gumshoe-test.el --- Activity history checks -*- lexical-binding: t; -*-
+
+(require 'ert)
+(require 'cl-lib)
+(require 'activities-gumshoe)
+
+(defmacro activities-gumshoe-test--with-history (&rest body)
+  "Run BODY with an isolated history and a simulated current activity."
+  (declare (indent 0) (debug t))
+  `(with-temp-buffer
+     (insert "first line\nsecond line\n")
+     (goto-char (point-min))
+     (let* ((activity (make-activities-activity :name "A"))
+            (backlog (gumshoe--backlog-init 20))
+            (gumshoe-mode (gumshoe--mode))
+            (global-gumshoe-mode t)
+            (gumshoe-entry-type 'activities-gumshoe-context)
+            (gumshoe-ignore-predicates nil)
+            (gumshoe-show-footprints-p nil)
+            (gumshoe-auto-cancel-backtracking-p nil)
+            (inhibit-message t))
+       (oset gumshoe-mode backtracker (gumshoe--backtracker :backlog backlog))
+       (cl-letf (((symbol-function 'activities-current) (lambda () activity)))
+         ,@body))))
+
+(ert-deftest activities-gumshoe-records-shared-location-per-activity ()
+  (activities-gumshoe-test--with-history
+    (gumshoe--log-if-necessary backlog)
+    (gumshoe--log-if-necessary backlog)
+    (should (= 1 (length (gumshoe--construct-timeline backlog))))
+    (setq activity (make-activities-activity :name "B"))
+    (gumshoe--log-if-necessary backlog)
+    (let ((entries (gumshoe--construct-timeline backlog)))
+      (should (equal '("B" "A") (mapcar (lambda (e) (oref e activity)) entries)))
+      (should-not (gumshoe-context--equal (car entries) (cadr entries))))))
+
+(ert-deftest activities-gumshoe-filter-captures-activity-and-includes-markers ()
+  (activities-gumshoe-test--with-history
+    (gumshoe--log-if-necessary backlog)
+    (gumshoe--log backlog)
+    (let ((filter (activities-gumshoe--filter))
+          (old-entry (gumshoe-context)))
+      (setq activity (make-activities-activity :name "B"))
+      (gumshoe--log-if-necessary backlog)
+      (let* ((entries (gumshoe--construct-timeline backlog))
+             (filtered (seq-filter filter entries)))
+        (should (= 2 (length filtered)))
+        (should (equal "marker" (oref (car filtered) category)))
+        (should-not (funcall filter (car entries)))
+        (should-not (funcall filter old-entry))
+        (delete-overlay (oref (car filtered) overlay))
+        (should-not (funcall filter (car filtered)))))))
+
+(ert-deftest activities-gumshoe-backtracking-uses-filter-and-stays-active ()
+  (activities-gumshoe-test--with-history
+    (gumshoe--log-if-necessary backlog)
+    (setq activity (make-activities-activity :name "B"))
+    (gumshoe--log-if-necessary backlog)
+    (setq activity (make-activities-activity :name "A"))
+    (let ((this-command 'activities-gumshoe-backtrack)
+          (global-gumshoe-backtracking-mode nil))
+      (unwind-protect
+          (cl-letf (((symbol-function 'gumshoe--backtrack) (lambda (&rest _) nil)))
+            (activities-gumshoe-backtrack)
+            (let ((entries (oref (oref gumshoe-mode backtracker) filtered)))
+              (should (= 1 (length entries)))
+              (should (equal "A" (oref (car entries) activity))))
+            (should global-gumshoe-backtracking-mode)
+            (should (gumshoe--backtracking-p)))
+        (global-gumshoe-backtracking-mode -1)))))
+
+(ert-deftest activities-gumshoe-consult-shares-activity-filter ()
+  (require 'consult-gumshoe)
+  (activities-gumshoe-test--with-history
+    (gumshoe--log-if-necessary backlog)
+    (gumshoe--log backlog)
+    (setq activity (make-activities-activity :name "B"))
+    (gumshoe--log-if-necessary backlog)
+    (setq activity (make-activities-activity :name "A"))
+    (let (shown)
+      (cl-letf (((symbol-function 'consult-gumshoe--peruse)
+                 (lambda (entries _schema filter)
+                   (setq shown (seq-filter filter entries)))))
+        (activities-gumshoe-consult))
+      (should (= 2 (length shown)))
+      (should (seq-every-p (lambda (e) (equal "A" (oref e activity))) shown)))))
+
+(ert-deftest activities-gumshoe-requires-current-activity-and-tracking ()
+  (activities-gumshoe-test--with-history
+    (setq activity nil)
+    (should-error (activities-gumshoe--filter) :type 'user-error)
+    (setq activity (make-activities-activity :name "A"))
+    (let ((global-gumshoe-mode nil))
+      (should-error (activities-gumshoe-backtrack) :type 'user-error)
+      (should-error (activities-gumshoe-consult) :type 'user-error))))
+
+;;; activities-gumshoe-test.el ends here

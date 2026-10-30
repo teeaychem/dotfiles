@@ -1248,6 +1248,7 @@ Preserve point and match data, and retain Isearch's visibility filtering."
 #+begin_src emacs-lisp
 (use-package gumshoe
   :elpaca t
+  :demand t
 
   :bind (:map goto-prefix-map
               ("h" . gumshoe-backtrack)
@@ -1255,6 +1256,19 @@ Preserve point and match data, and retain Isearch's visibility filtering."
 
   :config
   (global-gumshoe-mode 1))
+
+(use-package activities-gumshoe
+  :elpaca nil
+  :load-path "local-packages"
+  :after (activities gumshoe)
+  :demand t
+
+  :bind (:map goto-prefix-map
+              ("j" . activities-gumshoe-backtrack)
+              ("J" . activities-gumshoe-consult))
+
+  :config
+  (setq gumshoe-entry-type 'activities-gumshoe-context))
 #+end_src
 
 #+begin_src emacs-lisp
