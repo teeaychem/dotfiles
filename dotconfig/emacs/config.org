@@ -364,7 +364,6 @@ Supported values are `bottom' and `right'.")
 
   (global-font-lock-mode 1)
   (global-hi-lock-mode 1)
-  (global-visual-wrap-prefix-mode 1)
 
   :bind (:prefix-map format-prefix-map
          :prefix "C-c f")
@@ -1363,6 +1362,8 @@ To highlight indentations
   :elpaca t
 
   :config
+  (global-visual-wrap-prefix-mode -1) ;; seesm to conflict with indent-bars
+
   (defun my/safe-enable-indent-bars ()
     "Activate indent-bars in code buffers, excluding internal helper buffers."
     ;; Org reuses hidden buffers to fontify source blocks.
@@ -1377,14 +1378,15 @@ To highlight indentations
   (indent-bars-no-stipple-char ?│)
   (indent-bars-starting-column 0)
   (indent-bars-color '(highlight :face-bg default :default "#ffffff"))
+  (indent-bars-color-by-depth nil)
   (indent-bars-highlight-current-depth '(:face default :color "#ffaa00"))
-  (indent-bars-color-by-depth '(:palette ("#7f5555"   ; Depth 1: Stormy Muted Red
-                                          "#7f6a55"   ; Depth 2: Overcast Ochre/Orange
-                                          "#7a7f55"   ; Depth 3: Sage/Muted Yellow-Green
-                                          "#557f6a"   ; Depth 4: Dark Seafoam / Cloudy Teal
-                                          "#556a7f"   ; Depth 5: Slate Blue / Rainy Sky
-                                          "#6a557f"   ; Depth 6: Muted Indigo / Shadow Purple
-                                          "#7f556a"))) ; Depth 7: Dusty Rose / Fading Violet
+  ;; (indent-bars-color-by-depth '(:palette ("#7f5555"   ; Depth 1: Stormy Muted Red
+  ;;                                         "#7f6a55"   ; Depth 2: Overcast Ochre/Orange
+  ;;                                         "#7a7f55"   ; Depth 3: Sage/Muted Yellow-Green
+  ;;                                         "#557f6a"   ; Depth 4: Dark Seafoam / Cloudy Teal
+  ;;                                         "#556a7f"   ; Depth 5: Slate Blue / Rainy Sky
+  ;;                                         "#6a557f"   ; Depth 6: Muted Indigo / Shadow Purple
+  ;;                                         "#7f556a"))) ; Depth 7: Dusty Rose / Fading Violet
   (indent-bars-width-frac 0.2)
   (indent-bars-pad-frac 0.1)
   (indent-bars-depth-update-delay 0.1)
@@ -1392,14 +1394,16 @@ To highlight indentations
 
   ;; tree-sit
   (indent-bars-treesit-support t)
-  (indent-bars-ts-out-of-scope-color '(:face default :color "#808080"))
+  (indent-bars-treesit-scope nil)
+  ;; (indent-bars-ts-color '("#808080" :blend 1))
   (indent-bars-treesit-wrap '((python argument_list parameters
                                       list list_comprehension
                                       dictionary dictionary_comprehension
                                       parenthesized_expression subscript)
                               (c argument_list parameter_list init_declarator
                                  parenthesized_expression)
-                              (cpp argument_list parameter_list init_declarator
+                              (cpp argument_list parameter_list
+                                   template_argument_list template_parameter_list
                                    parenthesized_expression)))
   (indent-bars-treesit-scope '((python function_definition
                                        class_definition
@@ -1409,13 +1413,19 @@ To highlight indentations
                                        while_statement)
                                (cpp function_definition
                                     class_specifier
+                                    struct_specifier
                                     namespace_definition
                                     for_statement
+                                    for_range_loop
                                     if_statement
-                                    while_statement)))
+                                    while_statement
+                                    do_statement
+                                    switch_statement
+                                    try_statement
+                                    catch_clause
+                                    lambda_expression)))
 
   (indent-bars-treesit-ignore-blank-lines-types '("module"))
-  (indent-bars-treesit-scope-selector 'outermost)
   (indent-bars-treesit-scope-min-lines 3)
 
   :hook (prog-mode . my/safe-enable-indent-bars))
@@ -1720,8 +1730,11 @@ Keep existing cursors and avoid duplicate positions."
   (setq undo-strong-limit (* 64 1024 1024))
   (setq undo-outer-limit (* 126 1024 1024))
 
+  :custom
+  (undo-fu-allow-undo-in-region t)
+
   :bind (("C-/" . undo-fu-only-undo)
-         ("C-?" . undo-fu-only-redo)))
+         ("C-S-/" . undo-fu-only-redo)))
 #+end_src
 
 ** undo-fu-session
@@ -3063,6 +3076,7 @@ Restart Emacs afterwards to load the rebuilt grammars."
 #+begin_src emacs-lisp
 (use-package treesit-fold
   :elpaca (:host github :repo "emacs-tree-sitter/treesit-fold")
+  :disabled
   :bind (:map prog-mode-map
               ("C-c TAB" . treesit-fold-toggle)))
 #+end_src
