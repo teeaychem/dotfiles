@@ -1826,6 +1826,9 @@ Keep existing cursors and avoid duplicate positions."
          ("S" . magit-status-here)
          ("b" . magit-blame)
          ("l" . magit-log)
+         ("h" . magit-log-buffer-file)
+         ("H" . magit-log-trace-definition)
+         ("f" . magit-file-dispatch)
          ("d" . magit-diff)
          ("r" . magit-refresh))
 
