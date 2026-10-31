@@ -2703,6 +2703,7 @@ These buffers can be seen by using space.
               ;; ("C-SPC" . corfu-insert-separator)
               ("RET" . nil) ;; Free the RET key for less intrusive behavior.
               ("C-<return>" . corfu-insert)
+              ("M-m" . my/corfu-move-to-minibuffer)
               ("M-_" . corfu-info-documentation)
               ("M-S--" . corfu-info-documentation))
 
@@ -2713,9 +2714,21 @@ These buffers can be seen by using space.
   (corfu-separator ?\s)
   ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
   (corfu-preselect 'directory) ;; Select the first candidate, except for directories
+  (corfu-preview-current nil)
   ;; (corfu-on-exact-match nil)
 
   :config
+  (defun my/corfu-move-to-minibuffer ()
+    "Transfer the current Corfu completion to the minibuffer."
+    (interactive)
+    (pcase completion-in-region--data
+      (`(,beg ,end ,table ,pred ,extras)
+       (let ((completion-extra-properties extras)
+             completion-cycle-threshold completion-cycling)
+         (consult-completion-in-region beg end table pred)))))
+
+  (add-to-list 'corfu-continue-commands #'my/corfu-move-to-minibuffer)
+
   (defun my/corfu-make-frame-with-explicit-tty-terminal (orig &rest args)
     "Call ORIG with Corfu tty child frames pinned to their parent terminal.
 An explicit terminal avoids stale `tty' parameters on emacsclient frames."
@@ -2731,6 +2744,18 @@ An explicit terminal avoids stale `tty' parameters on emacsclient frames."
   (global-corfu-mode 1))
 #+end_src
 
+*** corfu-history
+
+#+begin_src emacs-lisp
+(use-package corfu-history
+  :elpaca nil
+  :after corfu
+  :demand t
+
+  :config
+  (corfu-history-mode 1))
+#+end_src
+
 ** embark
 *** embark
 
@@ -2742,6 +2767,12 @@ An explicit terminal avoids stale `tty' parameters on emacsclient frames."
   :bind (("C-c a" . embark-act)       ;; pick some comfortable binding
          ("C-;" . embark-dwim)        ;; good alternative: M-.
          ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+
+  :custom
+  (embark-prompter #'embark-completing-read-prompter)
+  (embark-indicators '(embark-minimal-indicator
+                       embark-highlight-indicator
+                       embark-isearch-highlight-indicator))
 
   :config
   ;; Hide the mode line of the Embark live/completions buffers
@@ -2786,7 +2817,10 @@ An explicit terminal avoids stale `tty' parameters on emacsclient frames."
   :demand t
 
   :custom
-  (completion-styles '(orderless partial-completion basic))
+
+  (completion-styles '(orderless basic))
+  (completion-category-overrides
+   '((file (styles basic partial-completion))))
   (completion-category-defaults nil)
   (completion-category-overrides nil))
 #+end_src
@@ -2812,6 +2846,11 @@ An explicit terminal avoids stale `tty' parameters on emacsclient frames."
   :elpaca t
   :demand t
 
+  :bind (:map vertico-map
+              ("C-S-v" . vertico-scroll-down)
+              ("M-+" . my/vertico-grow)
+              ("M-S-=" . my/vertico-grow))
+
   :custom
   (vertico-scroll-margin 0) ;; Different scroll margin
   (vertico-count 16) ;; Show more candidates
@@ -2819,9 +2858,26 @@ An explicit terminal avoids stale `tty' parameters on emacsclient frames."
   (vertico-cycle nil)
 
   :config
+  (defun my/vertico-grow ()
+    "Show 10 more candidates in the current completion session."
+    (interactive)
+    (setq-local vertico-count (+ vertico-count 10)))
+
   (advice-add 'vertico--sort-function :filter-return #'my/vertico-file-sort-function)
   (vertico-mode 1)
   (vertico-multiform-mode 1))
+#+end_src
+
+*** vertico-mouse
+
+#+begin_src emacs-lisp
+(use-package vertico-mouse
+  :elpaca nil
+  :after vertico
+  :demand t
+
+  :config
+  (vertico-mouse-mode 1))
 #+end_src
 
 
@@ -2847,7 +2903,6 @@ maybe: https://github.com/casouri/eldoc-box
                                        :semanticTokensProvider))
   (eglot-report-progress nil)
   (eglot-extend-to-xref t)
-  (corfu-preview-current nil)
   (eglot-events-buffer-config '(:size 0 :format short))
   (jsonrpc-event-hook nil)
   (eglot-documentation-renderer t)
@@ -2871,9 +2926,12 @@ maybe: https://github.com/casouri/eldoc-box
           `(,new-beg ,end ,table ,@props)))))
 
   (defun my/mlir-eglot-capf-setup ()
-    "Use MLIR-aware Eglot completion bounds in MLIR buffers."
+    "Use MLIR-aware completion bounds only while Eglot manages the buffer."
     (when (derived-mode-p 'mlir-mode)
-      (setq-local completion-at-point-functions (cons #'my/mlir-eglot-completion-at-point (remove #'eglot-completion-at-point completion-at-point-functions)))))
+      (remove-hook 'completion-at-point-functions #'my/mlir-eglot-completion-at-point t)
+      (when (eglot-managed-p)
+        (remove-hook 'completion-at-point-functions #'eglot-completion-at-point t)
+        (add-hook 'completion-at-point-functions #'my/mlir-eglot-completion-at-point nil t))))
 
   (add-hook 'eglot-managed-mode-hook #'my/mlir-eglot-capf-setup)
 
