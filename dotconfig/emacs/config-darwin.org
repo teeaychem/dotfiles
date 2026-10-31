@@ -5,3 +5,29 @@
 #+begin_src emacs-lisp
 ;; -*- lexical-binding: t; -*-
 #+end_src
+
+#+begin_src emacs-lisp
+(use-package emacs
+  :if (eq system-type 'darwin)
+
+  :init
+  (menu-bar-mode 1)
+  (set-face-attribute 'default nil
+                      :family "M PLUS 1 Code"
+                      :height 150)
+
+  :config
+  (keymap-global-unset "s-w")
+  (keymap-global-unset "s-q")
+
+  :custom
+  (ns-command-modifier 'super)
+  (ns-control-modifier 'control)
+  (ns-option-modifier 'meta)
+  (ns-pass-command-to-system t)
+  (ns-right-option-modifier 'none)
+  (ns-pop-up-frames nil)
+  (ns-use-thin-smoothing t)
+  (ns-antialias-text t)
+  (trash-directory "~/.Trash/emacs"))
+#+end_src

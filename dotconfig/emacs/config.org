@@ -10,15 +10,6 @@
 (setq debug-on-error nil)
 #+end_src
 
-* COMMENT profiling-start
-
-#+begin_src emacs-lisp
-;; (setq use-package-compute-statistics t)
-
-;; (profiler-start 'cpu)
-#+end_src
-
-
 * notes
 
 https://www.emacswiki.org/emacs/GnusAuthinfo
@@ -127,36 +118,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 
-* system
-** darwin
-
-#+begin_src emacs-lisp
-(use-package emacs
-  :if (eq system-type 'darwin)
-
-  :init
-  (menu-bar-mode 1)
-  (set-face-attribute 'default nil
-                      :family "M PLUS 1 Code"
-                      :height 150)
-
-  :config
-  (keymap-global-unset "s-w")
-  (keymap-global-unset "s-q")
-
-  :custom
-  (ns-command-modifier 'super)
-  (ns-control-modifier 'control)
-  (ns-option-modifier 'meta)
-  (ns-pass-command-to-system t)
-  (ns-right-option-modifier 'none)
-  (ns-pop-up-frames nil)
-  (ns-use-thin-smoothing t)
-  (ns-antialias-text t)
-  (trash-directory "~/.Trash/emacs"))
-#+end_src
-
-
 * internal
 ** autorevert
 
@@ -242,9 +203,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (dired-omit-files (concat "\\`[.]\\'"
                             "\\|\\.\\(?:elc\\|a\\|o\\|pyc\\|pyo\\|swp\\|class\\)\\'"
                             "\\|^\\.DS_Store\\'"
-                            "\\|^\\.\\(?:svn\\|git\\)\\'"
-                            "\\|^__pycache__\\'"
-                            "\\|^flymake_.*"))
+                            "\\|^\\.\\(?:svn\\|git\\)\\'"))
 
   :hook
   (dired-mode . dired-omit-mode))
@@ -257,15 +216,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :elpaca nil
   :delight
 
-  :init
-  (defun my/editorconfig-display-fill-column-indicator (props)
-    "Show a fill-column indicator when PROPS set max_line_length."
-    (if (and (editorconfig-string-integer-p (gethash 'max_line_length props)) (> fill-column 0))
-        (display-fill-column-indicator-mode 1)
-      (display-fill-column-indicator-mode -1)))
-
   :config
-  (add-hook 'editorconfig-after-apply-functions #'my/editorconfig-display-fill-column-indicator)
   (editorconfig-mode 1))
 #+end_src
 
@@ -349,7 +300,25 @@ Supported values are `bottom' and `right'.")
 #+begin_src emacs-lisp
 (use-package emacs
   :preface
+  (defvar my/mode-line-tail-elements
+    '((vc-mode (" " vc-mode)))
+    "Mode-line elements to put last, in order, before trailing fill space.
+Use symbols or mode-line forms.  Each replaces existing top-level
+entries with the same symbol or leading symbol.")
 
+  (defun my/mode-line-with-tail (format elements)
+    "Return FORMAT with ELEMENTS moved to the end in the given order.
+Match entries by their symbol or leading symbol, and keep trailing
+fill space after the elements.  Do not modify FORMAT or ELEMENTS."
+    (let ((result (remove 'mode-line-end-spaces format)))
+      (dolist (element elements)
+        (let ((key (if (consp element) (car element) element)))
+          (setq result
+                (seq-remove
+                 (lambda (entry)
+                   (eq (if (consp entry) (car entry) entry) key))
+                 result))))
+      (append result elements '(mode-line-end-spaces))))
 
   :init
   ;; Redisplay optimizations from doom-start.el.
@@ -364,6 +333,10 @@ Supported values are `bottom' and `right'.")
 
   (global-font-lock-mode 1)
   (global-hi-lock-mode 1)
+
+  (setq-default mode-line-format
+                (my/mode-line-with-tail (default-value 'mode-line-format)
+                                        my/mode-line-tail-elements))
 
   :bind (:prefix-map format-prefix-map
          :prefix "C-c f")
@@ -411,10 +384,7 @@ Supported values are `bottom' and `right'.")
   :elpaca nil
 
   :init
-  (setq auto-mode-case-fold nil)
-
-  (dolist (extension '(".DS_Store"
-                       "__pycache__/"))
+  (dolist (extension '(".DS_Store"))
     (add-to-list 'completion-ignored-extensions extension))
 
   :bind
@@ -501,8 +471,7 @@ Preserve point and match data, and retain Isearch's visibility filtering."
            (lambda (beg end)
              (save-match-data
                (save-excursion
-                 (and (isearch-filter-visible beg end)
-                      (funcall predicate beg end)))))))
+                 (and (isearch-filter-visible beg end) (funcall predicate beg end)))))))
       (isearch-forward-regexp)))
 
   (defun my/word-not-symbol-p (beg end)
@@ -547,11 +516,10 @@ Preserve point and match data, and retain Isearch's visibility filtering."
   :custom
   (ispell-program-name "hunspell")
   (ispell-personal-dictionary (expand-file-name "hunspell/dictionaries/hunspell_personal" (getenv "XDG_CONFIG_HOME")))
-  (ispell-dictionary "en_GB")
+  (ispell-dictionary "en_GB"))
 
   ;; :hook
-  ;; (prog-mode . flyspell-prog-mode)
-  )
+  ;; (prog-mode . flyspell-prog-mode))
 #+end_src
 
 ** mouse
@@ -822,8 +790,7 @@ Preserve point and match data, and retain Isearch's visibility filtering."
   (which-key-max-display-columns nil)
 
   :config
-  (which-key-setup-minibuffer)
-  (set-face-attribute 'which-key-local-map-description-face nil :weight 'bold))
+  (which-key-setup-minibuffer))
 #+end_src
 
 ** window
@@ -1109,8 +1076,8 @@ Preserve point and match data, and retain Isearch's visibility filtering."
 (use-package breadcrumb
   :elpaca t
 
-  :hook
-  (prog-mode . breadcrumb-local-mode))
+  :config
+  (breadcrumb-mode 1))
 #+end_src
 
 ** crux
@@ -1346,27 +1313,6 @@ With a prefix argument, choose the docsets instead."
               ("l" . my/devdocs-lookup)
               ("i" . devdocs-install)
               ("u" . devdocs-update-all)))
-#+end_src
-
-** highlight indentation
-
-To highlight indentations
-  - Options are fill, column, and character
-  - There's no way to get indentation on empty lines as of now
-
-#+begin_src emacs-lisp
-(use-package highlight-indent-guides
-  :elpaca t
-  :disabled
-
-  :custom
-  (highlight-indent-guides-method 'character)
-  (highlight-indent-guides-auto-odd-face-perc 75)
-  (highlight-indent-guides-auto-even-face-perc 75)
-  (highlight-indent-guides-auto-character-face-perc 80)
-
-  :hook
-  (prog-mode . highlight-indent-guides-mode))
 #+end_src
 
 ** indent-bars
@@ -1616,16 +1562,6 @@ To highlight indentations
   (meow-setup-indicator))
 #+end_src
 
-** mise
-
-#+begin_src emacs-lisp
-(use-package mise
-  :disabled
-  :elpaca t
-  :config
-  (global-mise-mode 1))
-#+end_src
-
 ** multiple cursors
 
 #+begin_src emacs-lisp
@@ -1739,12 +1675,10 @@ Keep existing cursors and avoid duplicate positions."
 (use-package undo-fu
   :elpaca t
 
-  :init
-  (setq undo-limit (* 8 1024 1024))
-  (setq undo-strong-limit (* 64 1024 1024))
-  (setq undo-outer-limit (* 126 1024 1024))
-
   :custom
+  (undo-limit (* 8 1024 1024))
+  (undo-strong-limit (* 64 1024 1024))
+  (undo-outer-limit (* 126 1024 1024))
   (undo-fu-allow-undo-in-region t)
 
   :bind (("C-/" . undo-fu-only-undo)
@@ -1868,6 +1802,7 @@ Keep existing cursors and avoid duplicate positions."
   (magit-log-arguments '("--graph" "--decorate" "--color"))
   (magit-log-section-commit-count 30)
   (magit-refresh-status-buffer nil)
+  (magit-save-repository-buffers nil)
   ;; (magit-commit-show-diff nil)
 
   :config
@@ -2634,17 +2569,25 @@ These buffers can be seen by using space.
 
 #+begin_src emacs-lisp
 (with-eval-after-load 'consult
-  (add-to-list 'consult-buffer-filter
-               (rx string-start
-                   (or (seq "*" (or "Async-native-compile"
-                                    "EGLOT"
-                                    "Flymake"
-                                    "apheleia"
-                                    "envrc"
-                                    "elpaca"
-                                    "clangd"
-                                    "lsp"))
-                       (seq (optional "*") "magit" (any "-: ")))))
+
+  (with-eval-after-load 'consult
+    (dolist (prefix '("Async-native-compile"
+                      "EGLOT"
+                      "Embark"
+                      "Flymake"
+                      "Native-compile"
+                      "Occur"
+                      "Warnings"
+                      "apheleia"
+                      "clangd"
+                      "elpaca"
+                      "envrc"
+                      "lsp"))
+      (add-to-list 'consult-buffer-filter
+                   (concat "\\`\\*" (regexp-quote prefix))))
+
+    (add-to-list 'consult-buffer-filter
+                 (rx string-start (optional "*") "magit" (any "-: "))))
 
   (defvar my/consult-mode-buffer-sources nil)
 
@@ -2817,7 +2760,6 @@ An explicit terminal avoids stale `tty' parameters on emacsclient frames."
   :demand t
 
   :custom
-
   (completion-styles '(orderless basic))
   (completion-category-overrides
    '((file (styles basic partial-completion))))
@@ -3052,21 +2994,6 @@ Do not implicitly sync when starting Eglot."
               ("e" . #'eglot-format-buffer)))
 #+end_src
 
-** eglot-x
-
-https://github.com/nemethf/eglot-x#rust-analyzer-extensions
-for rust dev
-
-#+begin_src emacs-lisp
-(use-package eglot-x
-  :disabled
-  :elpaca (eglot-x :repo "https://github.com/nemethf/eglot-x")
-  :after eglot
-
-  :config
-  (eglot-x-setup))
-#+end_src
-
 ** eglot-tempel
 
 #+begin_src emacs-lisp
@@ -3094,6 +3021,7 @@ for rust dev
 (use-package combobulate
   :disabled
   :elpaca (:host github :repo "mickeynp/combobulate")
+
   :hook ((python-ts-mode
           json-ts-mode
           toml-ts-mode
@@ -3141,16 +3069,6 @@ Restart Emacs afterwards to load the rebuilt grammars."
 
   :config
   (treesit-auto-add-to-auto-mode-alist))
-#+end_src
-
-** treesit-fold
-
-#+begin_src emacs-lisp
-(use-package treesit-fold
-  :elpaca (:host github :repo "emacs-tree-sitter/treesit-fold")
-  :disabled
-  :bind (:map prog-mode-map
-              ("C-c TAB" . treesit-fold-toggle)))
 #+end_src
 
 
@@ -3254,12 +3172,4 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
   :bind
   ("M-w" . clipetty-kill-ring-save)
   ("s-c" . clipetty-kill-ring-save))
-#+end_src
-
-
-* COMMENT profiling-end
-
-#+begin_src emacs-lisp
-;; (add-hook 'emacs-startup-hook #'profiler-report)
-;; (add-hook 'emacs-startup-hook #'profiler-stop)
 #+end_src

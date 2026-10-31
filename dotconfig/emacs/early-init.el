@@ -1,5 +1,14 @@
 ;; -*- lexical-binding: t; -*-
 
+;; Start a fresh daemon with EMACS_PROFILE=1 to profile initialization.
+(when (getenv "EMACS_PROFILE")
+  (require 'profiler)
+  (profiler-start 'cpu)
+  (add-hook 'elpaca-after-init-hook ; native alternative: 'emacs-startup-hook.
+            (lambda ()
+              (profiler-stop)
+              (profiler-report))))
+
 (setq package-enable-at-startup nil) ;; don't make installed packages available before loading init.el.
 
 (setq load-prefer-newer t)
@@ -63,7 +72,3 @@
 ;;   (setup-macos-native-comp-library-paths))
 
 (advice-add 'display-startup-echo-area-message :override #'ignore)
-
-;; emacs-lsp-booster
-;; https://github.com/blahgeek/emacs-lsp-booster
-(setenv "LSP_USE_PLISTS" "true")
