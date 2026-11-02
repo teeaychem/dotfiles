@@ -3,8 +3,6 @@
 # ghostty +show-config --default --docs
 # https://ghostty.org/docs/config.
 
-config-file = ?config.local
-
 auto-update = off
 
 cursor-style = block
@@ -40,3 +38,14 @@ mouse-hide-while-typing = true
 shell-integration-features = no-cursor,sudo,title,ssh-env,ssh-terminfo,path
 
 unfocused-split-opacity = 0.66
+
+# Optional machine-local overrides; keep last.
+config-file = ?config.local
+
+# Set shell
+#
+# Homebrew on Apple Silicon:
+# command = /opt/homebrew/bin/fish --login
+#
+# Nix, with Fish in active profile, e.g:
+# command = /Users/YOUR_USER/.nix-profile/bin/fish --login
