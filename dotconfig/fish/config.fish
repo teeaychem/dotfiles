@@ -46,9 +46,6 @@ if status is-interactive; and test -t 0
     set -gx GPG_TTY (tty)
 end
 
-# Load shared shell settings.
-load_vars "$XDG_CONFIG_HOME/shell/vars/base.vars"
-
 source "$__fish_config_dir/aliases.fish"
 
 # History filtering and the patterns it uses stay together.

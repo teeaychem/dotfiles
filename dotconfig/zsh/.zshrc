@@ -1,8 +1,5 @@
 fpath=("${XDG_CONFIG_HOME}/zsh/functions" $fpath)
-autoload -Uz load_vars fix-ssh-agent venv-activate
-
-# Known variable names and history settings belong to each interactive shell.
-load_vars "$XDG_CONFIG_HOME/shell/vars/base.vars"
+autoload -Uz fix-ssh-agent venv-activate
 
 export HISTFILE="$ZDOTDIR/.zhistory" # History filepath
 export HISTSIZE=10000                # Maximum events for internal history
