@@ -1,78 +1,6 @@
 # https://wiki.archlinux.org/title/XDG_Base_Directory
 # https://specifications.freedesktop.org/basedir-spec/latest/
 
-function load_vars
-    set -l vars_file $argv[1]
-
-    if not test -f "$vars_file"
-        echo "Error: Variables file '$vars_file' does not exist or was not specified." >&2
-        return 1
-    end
-
-    while read -l line
-        set -l name (string trim -- "$line")
-        string match -q -r '^(#|$)' -- "$name"; and continue
-
-        if not string match -q -r '^[A-Za-z_][A-Za-z0-9_]*$' -- "$name"
-            echo "Warning: Ignoring malformed line in '$vars_file': $line" >&2
-            continue
-        end
-
-        set -q $name; or set -g $name ''
-    end < "$vars_file"
-end
-
-function load_aliases
-    set -l aliases_file $argv[1]
-
-    if not test -f "$aliases_file"
-        echo "Error: Aliases file '$aliases_file' does not exist or was not specified." >&2
-        return 1
-    end
-
-    while read -l line
-        string match -q -r '^\s*(#|$)' -- "$line"; and continue
-
-        if not string match -q '*=*' -- "$line"
-            echo "Warning: Ignoring malformed line in '$aliases_file': $line" >&2
-            continue
-        end
-
-        set -l parts (string split -m 1 '=' -- "$line")
-        set -l name (string trim -- "$parts[1]")
-        set -l expansion (string trim -- "$parts[2]")
-        set -l first (string sub -s 1 -l 1 -- "$expansion")
-        set -l last (string sub -s -1 -l 1 -- "$expansion")
-
-        if test "$first" = "$last"; and contains -- "$first" "'" '"'
-            set expansion (string sub -s 2 -l (math (string length -- "$expansion") - 2) -- "$expansion")
-        end
-
-        if not string match -q -r '^[A-Za-z0-9_.-]+$' -- "$name"
-            echo "Warning: Ignoring invalid alias name in '$aliases_file': $name" >&2
-            continue
-        end
-
-        abbr --add "$name" -- "$expansion"
-    end < "$aliases_file"
-end
-
-function load_history_ignore
-    set -l ignore_file $argv[1]
-
-    if not test -f "$ignore_file"
-        echo "Error: History ignore file '$ignore_file' does not exist or was not specified." >&2
-        return 1
-    end
-
-    set -g history_ignore_patterns
-
-    while read -l line
-        string match -q -r '^\s*(#|$)' -- "$line"; and continue
-        set -a history_ignore_patterns "$line"
-    end < "$ignore_file"
-end
-
 set -gx XDG_CONFIG_HOME $HOME/.config
 set -gx XDG_STATE_HOME $HOME/.local/state
 set -gx XDG_DATA_HOME $HOME/.local/share
@@ -98,6 +26,12 @@ else if test -r "$HOME/.nix-profile/etc/profile.d/nix.fish"
     source "$HOME/.nix-profile/etc/profile.d/nix.fish"
 end
 
+# Nix may have initialized before brew shellenv, or in a parent shell.
+# Restore profile precedence even when its initialization guard skips setup.
+for nix_profile in (string split --no-empty ' ' -- "$NIX_PROFILES")
+    fish_add_path --prepend --move --path "$nix_profile/bin"
+end
+
 # Search active profiles from highest priority, then standard user-profile locations.
 for nix_profile in (string split --no-empty ' ' -- "$NIX_PROFILES")[-1..1] "$XDG_STATE_HOME/nix/profile" "$HOME/.nix-profile"
     if test -r "$nix_profile/etc/profile.d/hm-session-vars.fish"
@@ -112,12 +46,31 @@ if status is-interactive; and test -t 0
     set -gx GPG_TTY (tty)
 end
 
-# Usage inside config.fish:
+# Load shared shell settings.
 load_vars "$XDG_CONFIG_HOME/shell/vars/base.vars"
 
-load_aliases "$XDG_CONFIG_HOME/shell/aliases/base.aliases"
+source "$__fish_config_dir/aliases.fish"
 
-load_history_ignore "$XDG_CONFIG_HOME/shell/history/ignore"
+# History filtering and the patterns it uses stay together.
+if test -f "$XDG_CONFIG_HOME/shell/history/ignore"
+    set -g history_ignore_patterns
+    while read -l line
+        string match -q -r '^\s*(#|$)' -- "$line"; and continue
+        set -a history_ignore_patterns "$line"
+    end <"$XDG_CONFIG_HOME/shell/history/ignore"
+else
+    echo "Error: History ignore file '$XDG_CONFIG_HOME/shell/history/ignore' does not exist." >&2
+end
+
+function fish_should_add_to_history
+    string match -qr '^\s' -- "$argv[1]"; and return 1
+
+    for pattern in $history_ignore_patterns
+        string match -qr -- "$pattern" "$argv[1]"; and return 1
+    end
+
+    return 0
+end
 
 switch (uname)
     case Darwin
@@ -141,16 +94,6 @@ function last_history_item
     echo $history[1]
 end
 abbr -a !! --position anywhere --function last_history_item
-
-function fish_should_add_to_history
-    string match -qr '^\s' -- "$argv[1]"; and return 1
-
-    for pattern in $history_ignore_patterns
-        string match -qr -- "$pattern" "$argv[1]"; and return 1
-    end
-
-    return 0
-end
 
 # fzf
 if status is-interactive; and command -q fzf

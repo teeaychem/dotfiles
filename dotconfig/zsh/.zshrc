@@ -1,3 +1,13 @@
+fpath=("${XDG_CONFIG_HOME}/zsh/functions" $fpath)
+autoload -Uz load_vars fix-ssh-agent venv-activate
+
+# Known variable names and history settings belong to each interactive shell.
+load_vars "$XDG_CONFIG_HOME/shell/vars/base.vars"
+
+export HISTFILE="$ZDOTDIR/.zhistory" # History filepath
+export HISTSIZE=10000                # Maximum events for internal history
+export SAVEHIST=10000                # Maximum events in history file
+
 # # https://getantidote.github.io/usage
 
 if [[ ! -d ${ZDOTDIR:-$HOME}/.antidote ]]; then
@@ -6,9 +16,6 @@ fi
 
 source ${ZDOTDIR:-$HOME}/.antidote/antidote.zsh
 antidote load
-
-fpath=("${XDG_CONFIG_HOME}/zsh/functions" $fpath)
-autoload -Uz fix-ssh-agent load_aliases venv-activate
 
 # GnuPG terminal prompts.
 if [[ -t 0 ]]; then
@@ -31,7 +38,7 @@ case "$OSTYPE" in
     ;;
 esac
 
-load_aliases "$XDG_CONFIG_HOME/shell/aliases/base.aliases"
+source "$ZDOTDIR/aliases.zsh"
 
 if [[ -f ${XDG_CONFIG_HOME}/zsh/local.zsh ]]; then
     source ${XDG_CONFIG_HOME}/zsh/local.zsh
@@ -140,7 +147,6 @@ fi
 if [[ -o interactive ]] && (( $+commands[direnv] )); then
     eval "$(direnv hook zsh)"
 fi
-
 
 # closing
 autoload -Uz compinit
