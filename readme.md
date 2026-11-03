@@ -1,19 +1,5 @@
 # dotfiles
 
-
-```sh
-mise trust mise/config.toml
-mise bootstrap dotfiles status
-mise bootstrap dotfiles apply --dry-run
-
-# One line apply
-mise trust mise/config.toml && mise bootstrap dotfiles apply
-```
-
-```sh
-mise --env personal bootstrap dotfiles apply # `--env personal` selects the opt-in personal overlay
-```
-
 ## Nix / Home Manager
 
 From the checkout root, with Nix and its `nix-command` and `flakes` features enabled:
@@ -40,7 +26,7 @@ ssh -t HOST '/home/linuxbrew/.linuxbrew/bin/fish -l'
 ## scripts
 
 `scripts/common/` and the current platform's `scripts/darwin/` or `scripts/linux/`
-are deployed together to `~/.local/bin/` through mise dotfile groups.
+are installed together in `~/.local/bin/` by Home Manager.
 
 ## packages
 
@@ -55,13 +41,6 @@ brew bundle --file ~/dotfiles/brew/Brewfile.core
 
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
-
-## mise
-
-Deployment is idempotent and uses individual symlinks, so a managed directory can also contain machine-local files.
-
-Untracked values go in the highest-priority layer: `~/.config/mise/config.local.toml`
-
 
 ## debugging tools
 

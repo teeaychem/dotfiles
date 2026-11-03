@@ -1,9 +1,0 @@
-[dotfiles]
-"~/.config/hammerspoon" = { source = "../dotconfig/hammerspoon", mode = "symlink-each", exclude = [".DS_Store"] }
-"~/.config/ghostty" = { source = "../dotconfig/ghostty", mode = "symlink-each", exclude = [".DS_Store"] }
-
-[dotfile_groups.scripts-darwin]
-root = "scripts/darwin"
-target = "~/.local/bin"
-mode = "symlink-each"
-exclude = [".DS_Store"]
