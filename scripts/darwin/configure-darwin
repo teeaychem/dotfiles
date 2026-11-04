@@ -1,8 +1,7 @@
 #!/usr/bin/env fish
 
 # Apply preferred macOS user defaults.
-# Finder, Dock, and SystemUIServer are restarted afterward so changes take
-# effect immediately.
+# Finder, Dock, and SystemUIServer are restarted afterward so changes take effect immediately.
 #
 # Notes:
 #   - If accessibility defaults fail, grant terminal Full Disk Access under System Settings > Privacy & Security, then restart the terminal.
@@ -58,7 +57,7 @@ set_default write com.apple.desktopservices DSDontWriteNetworkStores -bool true 
 set_default write com.apple.desktopservices DSDontWriteUSBStores -bool true # no USB .DS_Store
 
 # Restore the system quarantine policy; use dq for explicit exceptions.
-defaults delete com.apple.LaunchServices LSQuarantine 2>/dev/null; or true
+# defaults delete com.apple.LaunchServices LSQuarantine 2>/dev/null; or true
 
 # Restarts.
 killall Finder 2>/dev/null; or true

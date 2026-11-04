@@ -32,10 +32,12 @@ let
   scriptLinks = map (source: linkFiles {
     inherit source;
     directory = "${config.home.homeDirectory}/.local/bin";
-  }) [
-    "scripts/common"
-    "scripts/${platform}"
-  ];
+  }) (
+    [ "scripts/common" ]
+    ++ lib.optional
+      (builtins.pathExists (/. + "${cfg.checkout}/scripts/${platform}"))
+      "scripts/${platform}"
+  );
   /*nixfmt:enable*/
 
 in

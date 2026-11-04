@@ -25,8 +25,7 @@ ssh -t HOST '/home/linuxbrew/.linuxbrew/bin/fish -l'
 
 ## scripts
 
-`scripts/common/` and the current platform's `scripts/darwin/` or `scripts/linux/`
-are installed together in `~/.local/bin/` by Home Manager.
+Scripts from `scripts/common/` and any scripts in `scripts/<platform>/` are installed into `~/.local/bin/`.
 
 ## packages
 
@@ -37,8 +36,6 @@ brew bundle --file ~/dotfiles/brew/Brewfile.core
 ```
 
 ```sh
-~/dotfiles/scripts/linux/install-apt-packages /path/to/packages
-
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
