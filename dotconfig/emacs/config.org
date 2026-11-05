@@ -846,7 +846,8 @@ Preserve point and match data, and retain Isearch's visibility filtering."
 
   :custom
   (split-height-threshold nil) ; Avoid top/bottom splits.
-  (split-width-threshold 0)   ; Prefer side-by-side splits.
+  (split-width-threshold 150)   ; Prefer side-by-side splits.
+  (window-min-width 10)
 
   :init
   (winner-mode 1))
