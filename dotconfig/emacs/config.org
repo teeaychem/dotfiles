@@ -2214,9 +2214,7 @@ https://github.com/llvm/llvm-project.git
     "Use PATH-based formatters rather than PET's executable overrides."
     (require 'apheleia)
     (kill-local-variable 'apheleia-formatters)
-    (setq-local apheleia-formatter
-                (cond ((executable-find "yapf") '(yapf ruff-isort))
-                      (t '(ruff-isort my-ruff)))))
+    (setq-local apheleia-formatter '(ruff-isort my-ruff)))
 
   :custom
   (python-shell-interpreter "python")
