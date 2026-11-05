@@ -1,5 +1,5 @@
 fpath=("${XDG_CONFIG_HOME}/zsh/functions" $fpath)
-autoload -Uz fix-ssh-agent venv-activate
+autoload -Uz fix-ssh-agent venv-activate reload-home-manager
 
 export HISTFILE="$ZDOTDIR/.zhistory" # History filepath
 export HISTSIZE=10000                # Maximum events for internal history

@@ -43,6 +43,7 @@ let
 in
 {
   imports = [
+    ./reload-home-manager.nix
     (import ./aliases.nix {
       files = [ ../dotconfig/shell/aliases.toml ];
     })
