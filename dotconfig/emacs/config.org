@@ -1864,6 +1864,22 @@ Keep existing cursors and avoid duplicate positions."
   (setq magit-display-buffer-function #'my/magit-display-buffer))
 #+end_src
 
+** difftastic
+
+#+begin_src emacs-lisp
+(use-package difftastic
+  :elpaca t
+  :after magit
+  :demand t
+
+  :bind (:map magit-prefix-map
+         ("D" . difftastic-magit-diff)
+         ("C" . difftastic-magit-show))
+
+  :config
+  (difftastic-bindings-mode 1))
+#+end_src
+
 ** magit-delta
 
 #+begin_src emacs-lisp

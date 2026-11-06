@@ -1,4 +1,8 @@
 [alias]
+  # Structural diffs; use less so Delta does not reformat Difftastic output.
+  ddiff = -c diff.external=difft -c core.pager='less -R' diff
+  dshow = -c diff.external=difft -c core.pager='less -R' show --ext-diff
+  dlog = -c diff.external=difft -c core.pager='less -R' log --ext-diff
   l = "log --graph --decorate --pretty=format:'%C(auto)%h %Cblue%ad %Cred%aN %C(auto)%d %n    %s' --date=human"
   # https://stackoverflow.com/questions/957928#comment9747528_957978
   exec = "!exec "

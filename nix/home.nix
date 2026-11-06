@@ -79,6 +79,7 @@ in
 
     home.packages = [
       pkgs.bat
+      pkgs.difftastic
       pkgs.fd
       pkgs.fzf
       pkgs.gh
